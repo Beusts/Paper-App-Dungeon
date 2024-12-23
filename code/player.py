@@ -105,7 +105,7 @@ class Player(pygame.sprite.Sprite):
                 if dx != 0 or dy != 0:
                     pos = (self.rect.x + dx, self.rect.y + dy)
                     rect = pygame.Rect(pos, (TILE_SIZE, TILE_SIZE))
-                    # Vérifie les collisions avec les autres sprites
+                    # Si la tuile est un mur, ne l'ajoute pas aux tuiles adjacentes
                     if not any(sprite.rect.colliderect(rect) for sprite in self.colliders):
                         self.adjacent_positions.append(pos)
 
