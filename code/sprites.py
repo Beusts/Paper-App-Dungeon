@@ -8,3 +8,6 @@ class Wall(pygame.sprite.Sprite):
         self.image.fill('white')
         pygame.draw.rect(self.image, 'gray', self.image.get_rect(), 1)
         self.rect = self.image.get_rect(topleft=pos)
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)

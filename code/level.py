@@ -21,12 +21,13 @@ class Level:
                 for x, tile in enumerate(row):
                     if tile == '1':
                         Wall((x * TILE_SIZE, y * TILE_SIZE),
-                             self.all_sprites)
+                             (self.all_sprites, self.walls))
                     elif tile == 'P':
                         Player((x * TILE_SIZE, y * TILE_SIZE),
-                               self.all_sprites)
+                               self.all_sprites, self.walls)
 
     def run(self, dt):
         self.all_sprites.update(dt)
         self.display_surface.fill('black')
-        self.all_sprites.draw(self.display_surface)
+        for sprite in self.all_sprites:
+            sprite.draw(self.display_surface)
