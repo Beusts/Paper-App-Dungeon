@@ -32,25 +32,34 @@ class Player(pygame.sprite.Sprite):
                  self.rect.y // TILE_SIZE) * TILE_SIZE
             )
 
-            self.movement_remaining = 5
-            self.direction = Vector2(
-                (clicked_tile.x - self.rect.x) // TILE_SIZE, (clicked_tile.y - self.rect.y) // TILE_SIZE)
-
-    def move(self, dt):
-        if self.current_time - self.last_move_time >= SLEEP_TIME:
-            if self.movement_remaining > 0:
+            if (clicked_tile.x, clicked_tile.y) in self.adjacent_positions:
+                if self.movement_remaining == 0:
+                    self.movement_remaining = 5
                 self.can_move = False
-                self.movement_remaining -= 1
-                self.last_move_time = self.current_time
+                self.direction = Vector2(
+                    (clicked_tile.x - self.rect.x) // TILE_SIZE, (clicked_tile.y - self.rect.y) // TILE_SIZE)
+
+    def move(self):
+        if self.current_time - self.last_move_time >= SLEEP_TIME and not self.can_move:
+            if self.direction.x != 0 and self.direction.y != 0:
+                self.try_move(self.direction.x * TILE_SIZE,
+                              self.direction.y * TILE_SIZE)
             else:
-                self.can_move = True
-                self.direction = Vector2(0, 0)
+                if self.direction.x != 0:
+                    self.try_move(self.direction.x * TILE_SIZE, 0)
+                if self.direction.y != 0:
+                    self.try_move(0, self.direction.y * TILE_SIZE)
 
-            if self.direction.x != 0:
-                self.rect.x += self.direction.x * TILE_SIZE
-
-            if self.direction.y != 0:
-                self.rect.y += self.direction.y * TILE_SIZE
+    def try_move(self, dx, dy):
+        new_rect = self.rect.move(dx, dy)
+        if not any(sprite.rect.colliderect(new_rect) for sprite in self.colliders) and self.movement_remaining > 0:
+            self.rect.x += dx
+            self.rect.y += dy
+            self.movement_remaining -= 1
+            self.last_move_time = self.current_time
+        else:
+            self.can_move = True
+            self.direction = Vector2(0, 0)
 
     def update_adjacent_tiles(self):
         self.adjacent_positions = []
@@ -75,5 +84,5 @@ class Player(pygame.sprite.Sprite):
     def update(self, dt):
         self.current_time = pygame.time.get_ticks()
         self.input()
-        self.move(dt)
+        self.move()
         self.update_adjacent_tiles()
