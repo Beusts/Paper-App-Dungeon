@@ -5,6 +5,9 @@ from os.path import join
 
 class Game:
     def __init__(self):
+        """
+        Initialise le jeu, la fenêtre d'affichage et le niveau actuel.
+        """
         pygame.init()
         self.display_surface = pygame.display.set_mode(
             (WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -15,6 +18,9 @@ class Game:
         self.current_stage = Level(self.level_map_files[0])
 
     def run(self):
+        """
+        Exécute la boucle principale du jeu.
+        """
         while True:
             dt = self.clock.tick(FPS) / 1000
             for event in pygame.event.get():
