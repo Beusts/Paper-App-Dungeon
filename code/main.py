@@ -8,7 +8,7 @@ class Game:
         pygame.init()
         self.display_surface = pygame.display.set_mode(
             (WINDOW_WIDTH, WINDOW_HEIGHT))
-        pygame.display.set_caption('Super Pirate World')
+        pygame.display.set_caption('Paper App Dungeon')
         self.clock = pygame.time.Clock()
 
         self.level_map_files = {0: '0'}
