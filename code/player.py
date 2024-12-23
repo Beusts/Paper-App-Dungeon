@@ -1,5 +1,6 @@
 from settings import *
 from pygame.math import Vector2
+from random import randint
 
 
 class Player(pygame.sprite.Sprite):
@@ -33,11 +34,12 @@ class Player(pygame.sprite.Sprite):
             )
 
             if (clicked_tile.x, clicked_tile.y) in self.adjacent_positions:
-                if self.movement_remaining == 0:
-                    self.movement_remaining = 5
                 self.can_move = False
                 self.direction = Vector2(
                     (clicked_tile.x - self.rect.x) // TILE_SIZE, (clicked_tile.y - self.rect.y) // TILE_SIZE)
+            elif (clicked_tile.x, clicked_tile.y) == (self.rect.x, self.rect.y):
+                if self.movement_remaining == 0:
+                    self.movement_remaining = randint(1, 6)
 
     def move(self):
         if self.current_time - self.last_move_time >= SLEEP_TIME and not self.can_move:
@@ -76,6 +78,10 @@ class Player(pygame.sprite.Sprite):
             for pos in self.adjacent_positions:
                 rect = pygame.Rect(pos, (TILE_SIZE, TILE_SIZE))
                 pygame.draw.rect(surface, 'blue', rect, 1)
+                font = pygame.font.Font(None, 24)
+                text = font.render(str(self.movement_remaining), True, 'white')
+                text_rect = text.get_rect(center=rect.center)
+                surface.blit(text, text_rect)
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
