@@ -1,6 +1,6 @@
 import csv
 from settings import *
-from sprites import Wall
+from sprites import *
 from player import Player
 
 
@@ -15,7 +15,7 @@ class Level:
         self.display_surface = pygame.display.get_surface()
 
         # groupes de sprites
-        self.all_sprites = pygame.sprite.LayeredUpdates()
+        self.all_sprites = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
 
         self.setup(level_data)
@@ -39,6 +39,9 @@ class Level:
                         # Crée un joueur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         Player((x * TILE_SIZE, y * TILE_SIZE),
                                self.all_sprites, self.walls)
+                    elif tile == 'O':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        Objet((x * TILE_SIZE, y * TILE_SIZE), self.all_sprites)
 
     def run(self, dt):
         """
@@ -48,6 +51,20 @@ class Level:
             dt (float): Le temps écoulé depuis la dernière mise à jour.
         """
         self.all_sprites.update(dt)
-        self.display_surface.fill('black')
+        self.display_surface.fill('white')
         for sprite in self.all_sprites:
             sprite.draw(self.display_surface)
+
+        self.draw_grid()
+
+    def draw_grid(self):
+        """
+        Dessine une grille sur la surface d'affichage.
+        """
+        width = int(TILE_SIZE * 0.06)
+        for y in range(0, int(16 * TILE_SIZE), int(TILE_SIZE)):
+            pygame.draw.line(self.display_surface, '#cccccc',
+                             (0, y - (width // 2)), (int(15 * TILE_SIZE), y - (width // 2)), width)
+        for x in range(0, int(16 * TILE_SIZE), int(TILE_SIZE)):
+            pygame.draw.line(self.display_surface, '#cccccc',
+                             (x - (width // 2), 0), (x - (width // 2), int(15 * TILE_SIZE)), width)
