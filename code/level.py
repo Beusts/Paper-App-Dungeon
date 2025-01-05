@@ -26,7 +26,7 @@ class Level:
         self.all_sprites = pygame.sprite.Group()
 
         self.walls = pygame.sprite.Group()
-        self.enemies = pygame.sprite.Group()
+        self.objects = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
 
         self.visible_sprites = pygame.sprite.LayeredUpdates()
@@ -51,16 +51,16 @@ class Level:
                     elif tile == 'P':
                         # Crée un joueur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         Player((x * TILE_SIZE, y * TILE_SIZE),
-                               [self.all_sprites, self.player], {"walls": self.walls, "enemies": self.enemies})
+                               [self.all_sprites, self.player], {"walls": self.walls, "objects" : self.objects})
                     elif tile == 'Se':
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
-                        StandardEnemy((x * TILE_SIZE, y * TILE_SIZE), [self.all_sprites, self.enemies])
+                        StandardEnemy((x * TILE_SIZE, y * TILE_SIZE), [self.all_sprites, self.objects])
                     elif tile == 'Me':
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
-                        MysteryEnemy((x * TILE_SIZE, y * TILE_SIZE), [self.all_sprites, self.enemies])
+                        MysteryEnemy((x * TILE_SIZE, y * TILE_SIZE), [self.all_sprites, self.objects])
                     elif tile == 'W':
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
-                        SpiderWeb((x * TILE_SIZE, y * TILE_SIZE), [self.all_sprites])
+                        SpiderWeb((x * TILE_SIZE, y * TILE_SIZE), [self.all_sprites, self.objects])
 
     def run(self, dt):
         """
@@ -83,19 +83,25 @@ class Level:
         """
         width = int(TILE_SIZE * 0.06)
         for y in range(0, int(16 * TILE_SIZE), int(TILE_SIZE)):
-            pygame.draw.line(self.display_surface, '#cccccc',
+            pygame.draw.line(self.display_surface, GRAY,
                              (0, y - (width // 2)), (int(15 * TILE_SIZE), y - (width // 2)), width)
         for x in range(0, int(16 * TILE_SIZE), int(TILE_SIZE)):
-            pygame.draw.line(self.display_surface, '#cccccc',
+            pygame.draw.line(self.display_surface, GRAY,
                              (x - (width // 2), 0), (x - (width // 2), int(15 * TILE_SIZE)), width)
 
 
 
     def draw_text(self, surface, text, position, font, color):
+        """
+        Dessine un texte
+        """
         text_surface = font.render(text, True, color)
         surface.blit(text_surface, position)
 
     def draw_information_player(self):
+        """
+        Dessine un espace pouvant afficher la vie, l'argent, au début et à la fin d'un level
+        """
         font = pygame.font.Font(None, 36)
 
         rect_width, rect_height = 100, 50
