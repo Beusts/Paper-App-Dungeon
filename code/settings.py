@@ -4,7 +4,7 @@ from os.path import join
 from os import walk
 
 # Dimensions de la fenêtre
-WINDOW_WIDTH, WINDOW_HEIGHT = 800, 800
+WINDOW_WIDTH, WINDOW_HEIGHT = 720, 960
 # Taille d'une tuile
 TILE_SIZE = WINDOW_WIDTH / 16
 # Fréquence d'images par seconde

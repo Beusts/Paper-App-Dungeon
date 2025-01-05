@@ -8,6 +8,9 @@ from player import Player
 from standardEnemy import StandardEnemy
 from spiderWeb import SpiderWeb
 
+BLACK = (0, 0, 0)
+GRAY = (200, 200, 200)
+
 
 class Level:
     def __init__(self, level_data):
@@ -72,6 +75,7 @@ class Level:
             sprite.draw(self.display_surface)
 
         self.draw_grid()
+        self.draw_information_player()
 
     def draw_grid(self):
         """
@@ -84,3 +88,38 @@ class Level:
         for x in range(0, int(16 * TILE_SIZE), int(TILE_SIZE)):
             pygame.draw.line(self.display_surface, '#cccccc',
                              (x - (width // 2), 0), (x - (width // 2), int(15 * TILE_SIZE)), width)
+
+
+
+    def draw_text(self, surface, text, position, font, color):
+        text_surface = font.render(text, True, color)
+        surface.blit(text_surface, position)
+
+    def draw_information_player(self):
+        font = pygame.font.Font(None, 36)
+
+        rect_width, rect_height = 100, 50
+        rect_x = (WINDOW_WIDTH - 2 * rect_width - 10) // 2
+        rect_y = ((640 + WINDOW_HEIGHT) - 2 * rect_height - 10) // 2
+
+        for row in range(2):  # 2 lignes
+            for col in range(2):  # 2 colonnes
+                pygame.draw.rect(self.display_surface, GRAY,
+                                 (rect_x + col * (rect_width + 10),
+                                  rect_y + row * (rect_height + 10),
+                                  rect_width, rect_height))
+
+        self.draw_text(self.display_surface, "Starting", (rect_x - 100, rect_y - 40), font, BLACK)
+        self.draw_text(self.display_surface, "+", (rect_x - 80 + (rect_x + 2 * rect_width + 20) // 4, rect_y - 40), font, BLACK)
+        self.draw_text(self.display_surface, "-", (rect_x - 80 + 2 * ((rect_x + 2 * rect_width + 20) // 4), rect_y - 40), font, BLACK)
+        self.draw_text(self.display_surface, "Ending", (rect_x + 2 * rect_width + 20, rect_y - 40), font, BLACK)
+
+        self.draw_text(self.display_surface, f'{self.player.sprite.hp} HP', (rect_x - 120, rect_y + 10), font, BLACK)
+        self.draw_text(self.display_surface, f'{self.player.sprite.coins} ¢', (rect_x - 120, rect_y + rect_height + 20), font, BLACK)
+
+
+        # TODO : afficher a la fin du niveau, l'hp et les coins du joueur
+        self.draw_text(self.display_surface, "HP ____", (rect_x + 2 * rect_width + 20, rect_y + 10), font, BLACK)
+        self.draw_text(self.display_surface, "¢  ____", (rect_x + 2 * rect_width + 20, rect_y + rect_height + 20), font, BLACK)
+
+        # pygame.display.flip()
