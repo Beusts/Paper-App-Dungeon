@@ -1,7 +1,12 @@
 import csv
+
+from mysteryEnemy import MysteryEnemy
 from settings import *
-from sprites import *
+from wall import Wall
+from object import Object
 from player import Player
+from standardEnemy import StandardEnemy
+from spiderWeb import SpiderWeb
 
 
 class Level:
@@ -14,9 +19,14 @@ class Level:
         """
         self.display_surface = pygame.display.get_surface()
 
-        # groupes de sprites
+        # sprite groups
         self.all_sprites = pygame.sprite.Group()
+
         self.walls = pygame.sprite.Group()
+        self.enemies = pygame.sprite.Group()
+        self.player = pygame.sprite.GroupSingle()
+
+        self.visible_sprites = pygame.sprite.LayeredUpdates()
 
         self.setup(level_data)
 
@@ -38,10 +48,16 @@ class Level:
                     elif tile == 'P':
                         # Crée un joueur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         Player((x * TILE_SIZE, y * TILE_SIZE),
-                               self.all_sprites, self.walls)
-                    elif tile == 'O':
+                               [self.all_sprites, self.player], {"walls": self.walls, "enemies": self.enemies})
+                    elif tile == 'Se':
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
-                        Objet((x * TILE_SIZE, y * TILE_SIZE), self.all_sprites)
+                        StandardEnemy((x * TILE_SIZE, y * TILE_SIZE), [self.all_sprites, self.enemies])
+                    elif tile == 'Me':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        MysteryEnemy((x * TILE_SIZE, y * TILE_SIZE), [self.all_sprites, self.enemies])
+                    elif tile == 'W':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        SpiderWeb((x * TILE_SIZE, y * TILE_SIZE), [self.all_sprites])
 
     def run(self, dt):
         """

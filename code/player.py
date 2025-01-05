@@ -2,8 +2,8 @@ from settings import *
 from pygame.math import Vector2
 from random import randint
 
-
 class Player(pygame.sprite.Sprite):
+
     def __init__(self, pos, groups, colliders):
         """
         Initialise un joueur à la position donnée et l'ajoute aux groupes spécifiés.
@@ -13,13 +13,14 @@ class Player(pygame.sprite.Sprite):
             groups (list): Les groupes de sprites auxquels le joueur appartient.
             colliders (pygame.sprite.Group): Les sprites avec lesquels le joueur peut entrer en collision.
         """
-        super().__init__(groups)
+        super().__init__(*groups)
+
         self.image = pygame.image.load(
             join('graphics', 'players.png')).convert_alpha()
         self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
         self.rect = self.image.get_rect(topleft=pos)
 
-        self.groups = groups
+        # self.groups = groups
 
         self.adjacent_positions = []
         self.colliders = colliders
@@ -32,6 +33,11 @@ class Player(pygame.sprite.Sprite):
         self.last_move_time = 0
         self.current_time = 0
         self.can_move = True
+
+        # characteristic of a player
+        self.hp = 10
+        self.coins = 0
+        self.deaths = 0
 
     def input(self):
         """
@@ -93,7 +99,7 @@ class Player(pygame.sprite.Sprite):
         """
         new_rect = self.rect.move(dx, dy)
         # Vérifie les collisions avec les autres sprites
-        if not any(sprite.rect.colliderect(new_rect) for sprite in self.colliders) and self.movement_remaining > 0:
+        if not any(sprite.rect.colliderect(new_rect) for sprite in self.colliders["walls"]) and self.movement_remaining > 0:
             self.rect.x += dx
             self.rect.y += dy
             self.movement_remaining -= 1
@@ -107,19 +113,22 @@ class Player(pygame.sprite.Sprite):
         Met à jour les tuiles adjacentes que le joueur peut atteindre.
         """
         self.adjacent_positions = []
+
         if self.movement_roll % 2 != 0:
             for dx, dy in [(-TILE_SIZE, TILE_SIZE), (TILE_SIZE, TILE_SIZE), (TILE_SIZE, -TILE_SIZE), (-TILE_SIZE, -TILE_SIZE)]:
                 pos = (self.rect.x + dx, self.rect.y + dy)
                 rect = pygame.Rect(pos, (TILE_SIZE, TILE_SIZE))
+
                 # Si la tuile est un mur, ne l'ajoute pas aux tuiles adjacentes
-                if not any(sprite.rect.colliderect(rect) for sprite in self.colliders):
+                if not any(sprite.rect.colliderect(rect) for sprite in self.colliders["walls"]):
                     self.adjacent_positions.append(pos)
         else:
             for dx, dy in [(-TILE_SIZE, 0), (TILE_SIZE, 0), (0, -TILE_SIZE), (0, TILE_SIZE)]:
                 pos = (self.rect.x + dx, self.rect.y + dy)
                 rect = pygame.Rect(pos, (TILE_SIZE, TILE_SIZE))
+
                 # Si la tuile est un mur, ne l'ajoute pas aux tuiles adjacentes
-                if not any(sprite.rect.colliderect(rect) for sprite in self.colliders):
+                if not any(sprite.rect.colliderect(rect) for sprite in self.colliders["walls"]):
                     self.adjacent_positions.append(pos)
 
     def draw_adjacent_tiles(self, surface):
@@ -136,6 +145,7 @@ class Player(pygame.sprite.Sprite):
                 text = font.render(str(self.movement_remaining), True, 'black')
                 text_rect = text.get_rect(center=rect.center)
                 surface.blit(text, text_rect)
+
 
     def draw(self, surface):
         """
