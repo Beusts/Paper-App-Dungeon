@@ -51,16 +51,19 @@ class Level:
                     elif tile == 'P':
                         # Crée un joueur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         Player((x * TILE_SIZE, y * TILE_SIZE),
-                               [self.all_sprites, self.player], {"walls": self.walls, "objects" : self.objects})
+                               [self.all_sprites, self.player], {"walls": self.walls, "objects": self.objects})
                     elif tile == 'Se':
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
-                        StandardEnemy((x * TILE_SIZE, y * TILE_SIZE), [self.all_sprites, self.objects])
+                        StandardEnemy((x * TILE_SIZE, y * TILE_SIZE),
+                                      [self.all_sprites, self.objects])
                     elif tile == 'Me':
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
-                        MysteryEnemy((x * TILE_SIZE, y * TILE_SIZE), [self.all_sprites, self.objects])
+                        MysteryEnemy((x * TILE_SIZE, y * TILE_SIZE),
+                                     [self.all_sprites, self.objects])
                     elif tile == 'W':
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
-                        SpiderWeb((x * TILE_SIZE, y * TILE_SIZE), [self.all_sprites, self.objects])
+                        SpiderWeb((x * TILE_SIZE, y * TILE_SIZE),
+                                  [self.all_sprites, self.objects])
 
     def run(self, dt):
         """
@@ -84,12 +87,10 @@ class Level:
         width = int(TILE_SIZE * 0.06)
         for y in range(0, int(16 * TILE_SIZE), int(TILE_SIZE)):
             pygame.draw.line(self.display_surface, GRAY,
-                             (0, y - (width // 2)), (int(15 * TILE_SIZE), y - (width // 2)), width)
-        for x in range(0, int(16 * TILE_SIZE), int(TILE_SIZE)):
+                             (0, y - (width / 2)), (int(15 * TILE_SIZE), y - (width / 2)), width)
+        for x in range(0, int(15 * TILE_SIZE), int(TILE_SIZE)):
             pygame.draw.line(self.display_surface, GRAY,
-                             (x - (width // 2), 0), (x - (width // 2), int(15 * TILE_SIZE)), width)
-
-
+                             (x - (width / 2), 0), (x - (width / 2), int(15 * TILE_SIZE)), width)
 
     def draw_text(self, surface, text, position, font, color):
         """
@@ -102,30 +103,54 @@ class Level:
         """
         Dessine un espace pouvant afficher la vie, l'argent, au début et à la fin d'un level
         """
-        font = pygame.font.Font(None, 36)
+        # Définir la police et la taille de la police
+        font = pygame.font.Font(None, TILE_SIZE)
 
-        rect_width, rect_height = 100, 50
-        rect_x = (WINDOW_WIDTH - 2 * rect_width - 10) // 2
-        rect_y = ((640 + WINDOW_HEIGHT) - 2 * rect_height - 10) // 2
+        # Positions des rectangles d'information
+        rect_positions = [
+            (TILE_SIZE * 4, TILE_SIZE * 17),
+            (TILE_SIZE * 7.5, TILE_SIZE * 17),
+            (TILE_SIZE * 4, TILE_SIZE * 20),
+            (TILE_SIZE * 7.5, TILE_SIZE * 20)
+        ]
 
-        for row in range(2):  # 2 lignes
-            for col in range(2):  # 2 colonnes
-                pygame.draw.rect(self.display_surface, GRAY,
-                                 (rect_x + col * (rect_width + 10),
-                                  rect_y + row * (rect_height + 10),
-                                  rect_width, rect_height))
+        # Créer et ajuster les rectangles
+        draw_rect = []
+        for pos in rect_positions:
+            rect = pygame.Rect(pos[0], pos[1], TILE_SIZE * 3.5, TILE_SIZE * 3)
+            rect.inflate_ip(-TILE_SIZE * 0.15, -TILE_SIZE * 0.15)
+            draw_rect.append(rect)
 
-        self.draw_text(self.display_surface, "Starting", (rect_x - 100, rect_y - 40), font, BLACK)
-        self.draw_text(self.display_surface, "+", (rect_x - 80 + (rect_x + 2 * rect_width + 20) // 4, rect_y - 40), font, BLACK)
-        self.draw_text(self.display_surface, "-", (rect_x - 80 + 2 * ((rect_x + 2 * rect_width + 20) // 4), rect_y - 40), font, BLACK)
-        self.draw_text(self.display_surface, "Ending", (rect_x + 2 * rect_width + 20, rect_y - 40), font, BLACK)
+        # Dessiner les rectangles avec des coins arrondis
+        pygame.draw.rect(self.display_surface, GRAY,
+                         draw_rect[0], border_top_left_radius=10)
+        pygame.draw.rect(self.display_surface, GRAY,
+                         draw_rect[1], border_top_right_radius=10)
+        pygame.draw.rect(self.display_surface, GRAY,
+                         draw_rect[2], border_bottom_left_radius=10)
+        pygame.draw.rect(self.display_surface, GRAY,
+                         draw_rect[3], border_bottom_right_radius=10)
 
-        self.draw_text(self.display_surface, f'{self.player.sprite.hp} HP', (rect_x - 120, rect_y + 10), font, BLACK)
-        self.draw_text(self.display_surface, f'{self.player.sprite.coins} ¢', (rect_x - 120, rect_y + rect_height + 20), font, BLACK)
+        # Dessiner les textes d'en-tête
+        self.draw_text(self.display_surface, "Starting",
+                       (TILE_SIZE * 0.5, TILE_SIZE * 16), font, BLACK)
+        self.draw_text(self.display_surface, "+",
+                       (draw_rect[0].centerx, TILE_SIZE * 16), font, BLACK)
+        self.draw_text(self.display_surface, "-",
+                       (draw_rect[1].centerx, TILE_SIZE * 16), font, BLACK)
+        self.draw_text(self.display_surface, "Ending",
+                       (TILE_SIZE * 12, TILE_SIZE * 16), font, BLACK)
 
+        # Afficher les informations du joueur au début du niveau
+        self.draw_text(self.display_surface, f'{self.player.sprite.hp} HP',
+                       (TILE_SIZE * 0.5, draw_rect[1].centery), font, BLACK)
+        self.draw_text(self.display_surface, f'{self.player.sprite.coins} ¢',
+                       (TILE_SIZE * 0.5, draw_rect[2].centery), font, BLACK)
 
-        # TODO : afficher a la fin du niveau, l'hp et les coins du joueur
-        self.draw_text(self.display_surface, "HP ____", (rect_x + 2 * rect_width + 20, rect_y + 10), font, BLACK)
-        self.draw_text(self.display_surface, "¢  ____", (rect_x + 2 * rect_width + 20, rect_y + rect_height + 20), font, BLACK)
+        # TODO : afficher à la fin du niveau, l'hp et les coins du joueur
+        self.draw_text(self.display_surface, "HP ____",
+                       (TILE_SIZE * 12, draw_rect[1].centery), font, BLACK)
+        self.draw_text(self.display_surface, "¢  ____",
+                       (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
 
         # pygame.display.flip()

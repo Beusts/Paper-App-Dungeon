@@ -31,6 +31,7 @@ class Game:
             self.current_stage.run(dt)
             pygame.display.update()
 
+
 if __name__ == '__main__':
     game = Game()
     game.run()
