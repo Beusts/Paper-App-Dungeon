@@ -59,7 +59,8 @@ class Level:
                         # Crée un joueur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         Player((x * TILE_SIZE, y * TILE_SIZE),
                                [self.all_sprites, self.player], {"walls": self.walls, "objects": self.objects})
-                    elif re.match(r"Se(\d+)", tile): # Regarde si la tuile correspond a un pattern comme ceci : SeN où N est un nombre positif
+                    # Regarde si la tuile correspond a un pattern comme ceci : SeN où N est un nombre positif
+                    elif re.match(r"Se(\d+)", tile):
 
                         value = 0
                         match = re.match(r"Se(\d+)", tile)
@@ -78,7 +79,6 @@ class Level:
                         SpiderWeb((x * TILE_SIZE, y * TILE_SIZE),
                                   [self.all_sprites, self.objects])
 
-
             self.hp_start = self.player.sprite.hp
             self.coins_start = self.player.sprite.coins
 
@@ -91,7 +91,11 @@ class Level:
         """
         self.all_sprites.update(dt)
         self.display_surface.fill('white')
-        for sprite in self.all_sprites:
+        for sprite in self.walls:
+            sprite.draw(self.display_surface)
+        for sprite in self.objects:
+            sprite.draw(self.display_surface)
+        for sprite in self.player:
             sprite.draw(self.display_surface)
 
         self.draw_grid()
@@ -102,12 +106,12 @@ class Level:
         Dessine une grille sur la surface d'affichage.
         """
         width = int(TILE_SIZE * 0.06)
-        for y in range(0, int(16 * TILE_SIZE), int(TILE_SIZE)):
+        for y in range(0, 16 * TILE_SIZE, TILE_SIZE):
             pygame.draw.line(self.display_surface, GRAY,
-                             (0, y - (width / 2)), (int(15 * TILE_SIZE), y - (width / 2)), width)
-        for x in range(0, int(15 * TILE_SIZE), int(TILE_SIZE)):
+                             (0, y - (width / 2)), (15 * TILE_SIZE, y - (width / 2)), width)
+        for x in range(0, 15 * TILE_SIZE, TILE_SIZE):
             pygame.draw.line(self.display_surface, GRAY,
-                             (x - (width / 2), 0), (x - (width / 2), int(15 * TILE_SIZE)), width)
+                             (x - (width / 2), 0), (x - (width / 2), 15 * TILE_SIZE), width)
 
     def draw_text(self, surface, text, position, font, color):
         """
@@ -158,7 +162,6 @@ class Level:
         self.draw_text(self.display_surface, "Ending",
                        (TILE_SIZE * 12, TILE_SIZE * 16), font, BLACK)
 
-
         # Dessiner les valeurs copiées
         self.draw_text(self.display_surface, f'{self.hp_start} HP',
                        (TILE_SIZE * 0.5, draw_rect[1].centery), font, BLACK)
@@ -170,6 +173,3 @@ class Level:
                        (TILE_SIZE * 12, draw_rect[1].centery), font, BLACK)
         self.draw_text(self.display_surface, "¢  ____",
                        (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
-
-
-
