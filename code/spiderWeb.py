@@ -20,5 +20,5 @@ class SpiderWeb(Object):
             design, (TILE_SIZE, TILE_SIZE))
         return design
 
-    def interaction(self):
+    def on_collision(self, player):
         return

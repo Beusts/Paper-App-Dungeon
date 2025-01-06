@@ -31,7 +31,7 @@ class Object(pygame.sprite.Sprite):
         """
         raise NotImplementedError("This method must be redefined in a subclass")
 
-    def interaction(self):
+    def on_collision(self, player):
         """
         Traite l'interaction avec un objet
 

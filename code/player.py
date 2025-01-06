@@ -1,6 +1,7 @@
 from settings import *
 from pygame.math import Vector2
 from random import randint
+from object import Object
 
 class Player(pygame.sprite.Sprite):
 
@@ -38,6 +39,8 @@ class Player(pygame.sprite.Sprite):
         self.hp = 10
         self.coins = 0
         self.deaths = 0
+
+        self.player = groups[1].sprite
 
     def input(self):
         """
@@ -98,15 +101,24 @@ class Player(pygame.sprite.Sprite):
             dy (int): Déplacement en y.
         """
         new_rect = self.rect.move(dx, dy)
-        # Vérifie les collisions avec les autres sprites
+
+        # Vérifie les collisions avec les autres sprites walls
         if not any(sprite.rect.colliderect(new_rect) for sprite in self.colliders["walls"]) and self.movement_remaining > 0:
             self.rect.x += dx
             self.rect.y += dy
             self.movement_remaining -= 1
             self.last_move_time = self.current_time
+
+            self.on_collision_with_object()
         else:
             self.can_move = True
             self.direction = Vector2(0, 0)
+
+    def on_collision_with_object(self):
+         for object_collided in pygame.sprite.spritecollide(self.player, self.colliders["objects"], False):
+            print(f"collision with {object_collided}")
+            object_collided.on_collision()
+
 
     def update_adjacent_tiles(self):
         """

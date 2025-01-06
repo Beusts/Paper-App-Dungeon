@@ -20,5 +20,6 @@ class StandardEnemy(Object):
             design, (TILE_SIZE, TILE_SIZE))
         return design
 
-    def interaction(self):
+    def on_collision(self, player):
+        print(f"Collisions with me {self}")
         return
