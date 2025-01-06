@@ -2,6 +2,7 @@ from settings import *
 from pygame.math import Vector2
 from random import randint
 
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self, pos, groups, colliders):
@@ -116,10 +117,9 @@ class Player(pygame.sprite.Sprite):
     def on_collision_with_object(self):
         # Lors d'un collision avec un objet, le joueur execute la methode on_collision de l'objet.
 
-         for object_collided in pygame.sprite.spritecollide(self.player, self.colliders["objects"], False):
+        for object_collided in pygame.sprite.spritecollide(self.player, self.colliders["objects"], False):
             print(f"collision with {object_collided}")
             self.player = object_collided.on_collision(self.player)
-
 
     def update_adjacent_tiles(self):
         """
@@ -154,11 +154,10 @@ class Player(pygame.sprite.Sprite):
         if self.can_move and self.movement_remaining > 0:
             for pos in self.adjacent_positions:
                 rect = pygame.Rect(pos, (TILE_SIZE, TILE_SIZE))
-                font = pygame.font.Font(None, 24)
+                font = pygame.font.Font(None, TILE_SIZE * 0.5)
                 text = font.render(str(self.movement_remaining), True, 'black')
                 text_rect = text.get_rect(center=rect.center)
                 surface.blit(text, text_rect)
-
 
     def draw(self, surface):
         """
