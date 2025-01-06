@@ -1,6 +1,7 @@
 from settings import *
 from object import *
 
+
 class StandardEnemy(Object):
 
     def __init__(self, pos, groups, value):
@@ -15,7 +16,6 @@ class StandardEnemy(Object):
         self.value = value
         super().__init__(pos, groups)
 
-
     def design(self):
         """
         Crée l'image de l'ennemi avec un numéro dessus.
@@ -24,7 +24,7 @@ class StandardEnemy(Object):
             pygame.Surface: L'image de l'ennemi avec le numéro ajouté.
         """
         image = pygame.image.load(
-            join('graphics', 'standard_enemy.png')).convert_alpha()
+            join('graphics', 'enemy.png')).convert_alpha()
         image = pygame.transform.scale(
             image, (TILE_SIZE, TILE_SIZE))
 
@@ -40,7 +40,7 @@ class StandardEnemy(Object):
         Returns:
             pygame.Surface: L'image avec le numéro ajouté.
         """
-        font = pygame.font.Font(None, 18)
+        font = pygame.font.Font(None, int(TILE_SIZE * 0.5))
         value_to_string = str(self.value)
 
         text_surface = font.render(value_to_string, True, (255, 255, 255))
