@@ -3,7 +3,9 @@ import csv
 from mysteryEnemy import MysteryEnemy
 from settings import *
 from wall import Wall
-from object import Object
+from random import randint
+import re
+
 from player import Player
 from standardEnemy import StandardEnemy
 from spiderWeb import SpiderWeb
@@ -41,7 +43,11 @@ class Level:
             level_data (str): Le nom du fichier de données du niveau.
         """
         with open(join('data', 'levels', level_data + '.csv'), newline='') as csvfile:
+
             level_reader = csv.reader(csvfile, delimiter=',')
+
+            pattern = r"Se(\d+)"
+
             for y, row in enumerate(level_reader):
                 for x, tile in enumerate(row):
                     if tile == '1':
@@ -52,10 +58,16 @@ class Level:
                         # Crée un joueur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         Player((x * TILE_SIZE, y * TILE_SIZE),
                                [self.all_sprites, self.player], {"walls": self.walls, "objects": self.objects})
-                    elif tile == 'Se':
+                    elif re.match(r"Se(\d+)", tile): # Regarde si la tuile correspond a un pattern comme ceci : SeN où N est un nombre positif
+
+                        value = ""
+                        match = re.match(r"Se(\d+)", tile)
+                        if match:
+                            value = (match.group(1))
+
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         StandardEnemy((x * TILE_SIZE, y * TILE_SIZE),
-                                      [self.all_sprites, self.objects])
+                                      [self.all_sprites, self.objects], value)
                     elif tile == 'Me':
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         MysteryEnemy((x * TILE_SIZE, y * TILE_SIZE),
@@ -154,3 +166,5 @@ class Level:
                        (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
 
         # pygame.display.flip()
+
+

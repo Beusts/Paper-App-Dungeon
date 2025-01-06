@@ -21,4 +21,4 @@ class SpiderWeb(Object):
         return design
 
     def on_collision(self, player):
-        return
+        return player

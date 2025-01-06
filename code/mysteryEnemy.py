@@ -1,5 +1,6 @@
 from settings import *
 from object import *
+from random import randint
 
 class MysteryEnemy(Object):
 
@@ -15,10 +16,12 @@ class MysteryEnemy(Object):
 
     def design(self):
         design = pygame.image.load(
-            join('graphics', 'standard_enemy.png')).convert_alpha()
+            join('graphics', 'mystery_enemy.png')).convert_alpha()
         design = pygame.transform.scale(
             design, (TILE_SIZE, TILE_SIZE))
         return design
 
     def on_collision(self, player):
-        return
+        print(f"Collisions with me {self}")
+        player.hp = player.hp - randint(1, 6)
+        return player

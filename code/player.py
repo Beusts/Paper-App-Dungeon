@@ -115,9 +115,11 @@ class Player(pygame.sprite.Sprite):
             self.direction = Vector2(0, 0)
 
     def on_collision_with_object(self):
+        # Lors d'un collision avec un objet, le joueur execute la methode on_collision de l'objet.
+
          for object_collided in pygame.sprite.spritecollide(self.player, self.colliders["objects"], False):
             print(f"collision with {object_collided}")
-            object_collided.on_collision()
+            self.player = object_collided.on_collision(self.player)
 
 
     def update_adjacent_tiles(self):
@@ -180,3 +182,6 @@ class Player(pygame.sprite.Sprite):
         self.input()
         self.move()
         self.update_adjacent_tiles()
+
+    def check_player_still_alive(self):
+        return self.hp > 0
