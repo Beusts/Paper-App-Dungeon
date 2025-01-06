@@ -154,7 +154,7 @@ class Player(pygame.sprite.Sprite):
         if self.can_move and self.movement_remaining > 0:
             for pos in self.adjacent_positions:
                 rect = pygame.Rect(pos, (TILE_SIZE, TILE_SIZE))
-                font = pygame.font.Font(None, TILE_SIZE * 0.5)
+                font = pygame.font.Font(None, int(TILE_SIZE * 0.5))
                 text = font.render(str(self.movement_remaining), True, 'black')
                 text_rect = text.get_rect(center=rect.center)
                 surface.blit(text, text_rect)
