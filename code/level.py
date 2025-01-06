@@ -60,10 +60,10 @@ class Level:
                                [self.all_sprites, self.player], {"walls": self.walls, "objects": self.objects})
                     elif re.match(r"Se(\d+)", tile): # Regarde si la tuile correspond a un pattern comme ceci : SeN où N est un nombre positif
 
-                        value = ""
+                        value = 0
                         match = re.match(r"Se(\d+)", tile)
                         if match:
-                            value = (match.group(1))
+                            value = int(match.group(1))
 
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         StandardEnemy((x * TILE_SIZE, y * TILE_SIZE),
