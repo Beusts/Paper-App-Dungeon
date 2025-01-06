@@ -1,7 +1,6 @@
 from settings import *
 from pygame.math import Vector2
 from random import randint
-from object import Object
 
 class Player(pygame.sprite.Sprite):
 

@@ -1,10 +1,11 @@
 import csv
+import re
+import copy
 
 from mysteryEnemy import MysteryEnemy
 from settings import *
 from wall import Wall
 from random import randint
-import re
 
 from player import Player
 from standardEnemy import StandardEnemy
@@ -76,6 +77,10 @@ class Level:
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         SpiderWeb((x * TILE_SIZE, y * TILE_SIZE),
                                   [self.all_sprites, self.objects])
+
+
+            self.hp_start = self.player.sprite.hp
+            self.coins_start = self.player.sprite.coins
 
     def run(self, dt):
         """
@@ -153,10 +158,11 @@ class Level:
         self.draw_text(self.display_surface, "Ending",
                        (TILE_SIZE * 12, TILE_SIZE * 16), font, BLACK)
 
-        # Afficher les informations du joueur au début du niveau
-        self.draw_text(self.display_surface, f'{self.player.sprite.hp} HP',
+
+        # Dessiner les valeurs copiées
+        self.draw_text(self.display_surface, f'{self.hp_start} HP',
                        (TILE_SIZE * 0.5, draw_rect[1].centery), font, BLACK)
-        self.draw_text(self.display_surface, f'{self.player.sprite.coins} ¢',
+        self.draw_text(self.display_surface, f'{self.coins_start} ¢',
                        (TILE_SIZE * 0.5, draw_rect[2].centery), font, BLACK)
 
         # TODO : afficher à la fin du niveau, l'hp et les coins du joueur
@@ -165,6 +171,5 @@ class Level:
         self.draw_text(self.display_surface, "¢  ____",
                        (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
 
-        # pygame.display.flip()
 
 
