@@ -1,5 +1,6 @@
 from settings import *
 from level import Level
+from shop import Shop
 from os.path import join
 
 
@@ -14,8 +15,9 @@ class Game:
         pygame.display.set_caption('Paper App Dungeon')
         self.clock = pygame.time.Clock()
 
-        self.level_map_files = {0: '0', 1:'1'}
-        self.current_stage = Level(self.level_map_files[1])
+        self.level_map_files = {0: '0', 1: '1'}
+        # self.current_stage = Level(self.level_map_files[1])
+        self.current_stage = Shop('0')
 
     def run(self):
         """

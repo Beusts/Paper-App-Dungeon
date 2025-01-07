@@ -12,9 +12,5 @@ TILE_SIZE = WINDOW_WIDTH // 15
 FPS = 60
 # Temps de sommeil entre les mouvements
 SLEEP_TIME = 100
-# Couches Z pour les différents éléments
-Z_LAYERS = {
-    'background': 0,
-    'player': 1,
-    'wall': 2
-}
+BLACK = (0, 0, 0)
+GRAY = (200, 200, 200)
