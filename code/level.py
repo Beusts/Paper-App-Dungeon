@@ -108,6 +108,7 @@ class Level:
         """
         self.all_sprites.update(dt)
         self.display_surface.fill('white')
+        # self.draw_shop([["Teleport Scroll", "Teleport to anywhere on the map (use once).", 11], ["Doubling Potion", "Double the number of a dice roll (use once).", 9],["Coin Rush", "All coins and treasure chests are worth 2x on next floor only.", 12]])
         for sprite in self.walls:
             sprite.draw(self.display_surface)
         for sprite in self.objects:
@@ -136,6 +137,23 @@ class Level:
         """
         text_surface = font.render(text, True, color)
         surface.blit(text_surface, position)
+
+    def draw_center_text(self, surface, text, position, font, color):
+        """
+        Dessine un texte au centre de la surface
+        """
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect(
+            center=(position[0], position[1]))
+        surface.blit(text_surface, text_rect)
+
+    def draw_centery_text(self, surface, text, position, font, color):
+        """
+        Dessine un texte centré verticalement
+        """
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect(x=position[0], centery=position[1])
+        surface.blit(text_surface, text_rect)
 
     def draw_information_player(self):
         """
@@ -190,3 +208,29 @@ class Level:
                        (TILE_SIZE * 12, draw_rect[1].centery), font, BLACK)
         self.draw_text(self.display_surface, "¢  ____",
                        (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
+
+    def draw_shop(self, items):
+        """
+        Dessine le shop
+        """
+        def draw_iteam(name, description, price, position):
+            pygame.draw.rect(self.display_surface, BLACK,
+                             (position[0] * TILE_SIZE, position[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE), int(TILE_SIZE*0.15))
+            self.draw_text(self.display_surface, name,
+                           (position[0] * TILE_SIZE + (TILE_SIZE * 2), position[1] * TILE_SIZE), font, BLACK)
+            self.draw_center_text(self.display_surface, f"{price}¢",
+                                  (position[0] * TILE_SIZE + TILE_SIZE / 2, position[1] * TILE_SIZE + (TILE_SIZE * 1.5)), price_font, BLACK)
+            self.draw_centery_text(self.display_surface, description,
+                                   (position[0] * TILE_SIZE + (TILE_SIZE * 2), position[1] * TILE_SIZE + (TILE_SIZE * 1.5)), price_font, BLACK)
+
+        font = pygame.font.Font(None, int(TILE_SIZE * 1.5))
+        price_font = pygame.font.Font(None, int(TILE_SIZE * 0.5))
+        pygame.draw.rect(self.display_surface, GRAY,
+                         (0, 0, TILE_SIZE * 15, TILE_SIZE * 3))
+
+        self.draw_center_text(self.display_surface, "Shop",
+                              (TILE_SIZE * 7.5, TILE_SIZE), font, BLACK)
+
+        draw_iteam(items[0][0], items[0][1], items[0][2], (1, 4))
+        draw_iteam(items[1][0], items[1][1], items[1][2], (1, 8))
+        draw_iteam(items[2][0], items[2][1], items[2][2], (1, 12))
