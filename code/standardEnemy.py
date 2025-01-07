@@ -44,7 +44,8 @@ class StandardEnemy(Object):
         value_to_string = str(self.value)
 
         text_surface = font.render(value_to_string, True, (255, 255, 255))
-        text_rect = text_surface.get_rect(center=image.get_rect().center)
+        text_rect = text_surface.get_rect(
+            centerx=TILE_SIZE / 2, centery=TILE_SIZE / 2)
 
         enemy_with_number = image.copy()
         enemy_with_number.blit(text_surface, text_rect)
@@ -63,7 +64,8 @@ class StandardEnemy(Object):
         """
         print(f"Collision with me {self}")
 
-        if self.has_already_been_used(): return player
+        if self.has_already_been_used():
+            return player
         player.hp -= self.value
         self.used = True
         self.has_already_been_used()

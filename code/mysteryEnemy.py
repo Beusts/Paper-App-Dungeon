@@ -23,7 +23,8 @@ class MysteryEnemy(Object):
         font = pygame.font.Font(None, int(TILE_SIZE * 0.5))
 
         text_surface = font.render("?", True, (255, 255, 255))
-        text_rect = text_surface.get_rect(center=image.get_rect().center)
+        text_rect = text_surface.get_rect(
+            centerx=TILE_SIZE / 2, centery=TILE_SIZE / 2)
 
         enemy = image.copy()
         enemy.blit(text_surface, text_rect)
@@ -31,7 +32,8 @@ class MysteryEnemy(Object):
         return enemy
 
     def on_collision(self, player):
-        if self.has_already_been_used(): return player
+        if self.has_already_been_used():
+            return player
 
         print(f"Collisions with me {self}")
         player.hp = player.hp - randint(1, 6)
