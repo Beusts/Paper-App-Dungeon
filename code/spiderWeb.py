@@ -21,4 +21,7 @@ class SpiderWeb(Object):
         return design
 
     def on_collision(self, player):
+        if self.has_already_been_used(): return player
+
+        self.used = True
         return player

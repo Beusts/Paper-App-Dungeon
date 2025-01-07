@@ -62,5 +62,10 @@ class StandardEnemy(Object):
             Player: Le joueur après modification de ses points de vie.
         """
         print(f"Collision with me {self}")
+
+        if self.has_already_been_used(): return player
+
         player.hp -= self.value
+        self.used = True
+
         return player

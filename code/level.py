@@ -2,14 +2,17 @@ import csv
 import re
 import copy
 
-from mysteryEnemy import MysteryEnemy
+
 from settings import *
 from wall import Wall
 from random import randint
 
 from player import Player
 from standardEnemy import StandardEnemy
+from mysteryEnemy import MysteryEnemy
 from spiderWeb import SpiderWeb
+from mysteryHeart import MysteryHeart
+from standardHeart import StandardHeart
 
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
@@ -78,6 +81,20 @@ class Level:
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         SpiderWeb((x * TILE_SIZE, y * TILE_SIZE),
                                   [self.all_sprites, self.objects])
+                    elif re.match(r"Sh(\d+)", tile):
+
+                        value = 0
+                        match = re.match(r"Sh(\d+)", tile)
+                        if match:
+                            value = int(match.group(1))
+
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        StandardHeart((x * TILE_SIZE, y * TILE_SIZE),
+                                      [self.all_sprites, self.objects], value)
+                    elif tile == 'Mh':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        MysteryHeart((x * TILE_SIZE, y * TILE_SIZE),
+                                     [self.all_sprites, self.objects])
 
             self.hp_start = self.player.sprite.hp
             self.coins_start = self.player.sprite.coins

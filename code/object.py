@@ -14,6 +14,7 @@ class Object(pygame.sprite.Sprite):
         super().__init__(groups)
         self.image = self.design()
         self.rect = self.image.get_rect(topleft=pos)
+        self.used = False
 
     def draw(self, surface):
         """
@@ -37,3 +38,15 @@ class Object(pygame.sprite.Sprite):
 
         """
         raise NotImplementedError("This method must be redefined in a subclass")
+
+    def has_already_been_used(self):
+        if self.used:
+            print(f"I've already been used {self}")
+            image =pygame.image.load(
+                join('graphics', 'dust.png')).convert_alpha()
+            image = pygame.transform.scale(
+                image, (TILE_SIZE, TILE_SIZE))
+
+            self.image = image
+            return True
+        return False

@@ -14,8 +14,8 @@ class Game:
         pygame.display.set_caption('Paper App Dungeon')
         self.clock = pygame.time.Clock()
 
-        self.level_map_files = {0: '0'}
-        self.current_stage = Level(self.level_map_files[0])
+        self.level_map_files = {0: '0', 1:'1'}
+        self.current_stage = Level(self.level_map_files[1])
 
     def run(self):
         """
