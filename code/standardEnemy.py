@@ -64,8 +64,8 @@ class StandardEnemy(Object):
         print(f"Collision with me {self}")
 
         if self.has_already_been_used(): return player
-
         player.hp -= self.value
         self.used = True
+        self.has_already_been_used()
 
         return player

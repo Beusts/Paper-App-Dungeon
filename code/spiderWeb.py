@@ -22,6 +22,7 @@ class SpiderWeb(Object):
 
     def on_collision(self, player):
         if self.has_already_been_used(): return player
-
         self.used = True
+        self.has_already_been_used()
+
         return player
