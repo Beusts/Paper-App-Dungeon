@@ -17,7 +17,7 @@ class Game:
         self.clock = pygame.time.Clock()
 
         self.level_map_files = {0: '0', 1: '1', 2: 'test'}
-        self.current_stage = Level(self.level_map_files[1])
+        self.current_stage = Level(self.level_map_files[2])
         # self.current_stage = Shop('0')
 
     def run(self):

@@ -11,6 +11,10 @@ from mysteryEnemy import MysteryEnemy
 from spiderWeb import SpiderWeb
 from mysteryHeart import MysteryHeart
 from standardHeart import StandardHeart
+from lock import Lock
+from chest import Chest
+from coin import Coin
+from key import Key
 
 from utils import draw_text
 
@@ -94,6 +98,22 @@ class Level:
                     elif tile == 'Mh':
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         MysteryHeart((x * TILE_SIZE, y * TILE_SIZE),
+                                     [self.all_sprites, self.objects])
+                    elif tile == 'K':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        Key((x * TILE_SIZE, y * TILE_SIZE),
+                                     [self.all_sprites, self.objects])
+                    elif tile == 'L':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        Lock((x * TILE_SIZE, y * TILE_SIZE),
+                                     [self.all_sprites, self.objects])
+                    elif tile == 'C':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        Chest((x * TILE_SIZE, y * TILE_SIZE),
+                                     [self.all_sprites, self.objects])
+                    elif tile == 'Co':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        Coin((x * TILE_SIZE, y * TILE_SIZE),
                                      [self.all_sprites, self.objects])
 
             self.hp_start = self.player.sprite.hp
