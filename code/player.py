@@ -42,13 +42,19 @@ class Player(pygame.sprite.Sprite):
 
         self.player = groups[1].sprite
 
+        self.is_input_active = False
+
     def input(self):
         """
         Gère les entrées de l'utilisateur.
+        Il faut relacher le clic de souris pour pouvoir cliquer à nouveau.
         """
-        if pygame.mouse.get_pressed()[0]:
+        if pygame.mouse.get_pressed()[0] and self.is_input_active:
             mouse_pos = pygame.mouse.get_pos()
             self.handle_mouse_click(mouse_pos)
+            self.is_input_active = False
+        elif not pygame.mouse.get_pressed()[0]:
+            self.is_input_active = True
 
     def handle_mouse_click(self, mouse_pos):
         """
