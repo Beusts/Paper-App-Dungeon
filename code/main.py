@@ -17,7 +17,7 @@ class Game:
 
         self.level_map_files = {0: '0', 1: '1'}
         # self.current_stage = Level(self.level_map_files[1])
-        self.current_stage = Shop('0')
+        self.current_stage = Level('1')
 
     def run(self):
         """

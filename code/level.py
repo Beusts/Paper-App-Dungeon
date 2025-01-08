@@ -1,11 +1,17 @@
 import csv
+import re
 
-from mysteryEnemy import MysteryEnemy
 from settings import *
 from wall import Wall
+from random import randint
+
 from player import Player
 from standardEnemy import StandardEnemy
+from mysteryEnemy import MysteryEnemy
 from spiderWeb import SpiderWeb
+from mysteryHeart import MysteryHeart
+from standardHeart import StandardHeart
+
 from utils import draw_text
 
 BLACK = (0, 0, 0)
@@ -41,7 +47,11 @@ class Level:
             level_data (str): Le nom du fichier de données du niveau.
         """
         with open(join('data', 'levels', level_data + '.csv'), newline='') as csvfile:
+
             level_reader = csv.reader(csvfile, delimiter=',')
+
+            pattern = r"Se(\d+)"
+
             for y, row in enumerate(level_reader):
                 for x, tile in enumerate(row):
                     if tile == '1':
@@ -52,10 +62,17 @@ class Level:
                         # Crée un joueur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         Player((x * TILE_SIZE, y * TILE_SIZE),
                                [self.all_sprites, self.player], {"walls": self.walls, "objects": self.objects})
-                    elif tile == 'Se':
+                    # Regarde si la tuile correspond a un pattern comme ceci : SeN où N est un nombre positif
+                    elif re.match(r"Se(\d+)", tile):
+
+                        value = 0
+                        match = re.match(r"Se(\d+)", tile)
+                        if match:
+                            value = int(match.group(1))
+
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         StandardEnemy((x * TILE_SIZE, y * TILE_SIZE),
-                                      [self.all_sprites, self.objects])
+                                      [self.all_sprites, self.objects], value)
                     elif tile == 'Me':
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         MysteryEnemy((x * TILE_SIZE, y * TILE_SIZE),
@@ -64,6 +81,23 @@ class Level:
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         SpiderWeb((x * TILE_SIZE, y * TILE_SIZE),
                                   [self.all_sprites, self.objects])
+                    elif re.match(r"Sh(\d+)", tile):
+
+                        value = 0
+                        match = re.match(r"Sh(\d+)", tile)
+                        if match:
+                            value = int(match.group(1))
+
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        StandardHeart((x * TILE_SIZE, y * TILE_SIZE),
+                                      [self.all_sprites, self.objects], value)
+                    elif tile == 'Mh':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        MysteryHeart((x * TILE_SIZE, y * TILE_SIZE),
+                                     [self.all_sprites, self.objects])
+
+            self.hp_start = self.player.sprite.hp
+            self.coins_start = self.player.sprite.coins
 
     def run(self, dt):
         """
@@ -74,7 +108,11 @@ class Level:
         """
         self.all_sprites.update(dt)
         self.display_surface.fill('white')
-        for sprite in self.all_sprites:
+        for sprite in self.walls:
+            sprite.draw(self.display_surface)
+        for sprite in self.objects:
+            sprite.draw(self.display_surface)
+        for sprite in self.player:
             sprite.draw(self.display_surface)
 
         self.draw_grid()
@@ -85,12 +123,19 @@ class Level:
         Dessine une grille sur la surface d'affichage.
         """
         width = int(TILE_SIZE * 0.06)
-        for y in range(0, int(16 * TILE_SIZE), int(TILE_SIZE)):
+        for y in range(0, 16 * TILE_SIZE, TILE_SIZE):
             pygame.draw.line(self.display_surface, GRAY,
-                             (0, y - (width / 2)), (int(15 * TILE_SIZE), y - (width / 2)), width)
-        for x in range(0, int(15 * TILE_SIZE), int(TILE_SIZE)):
+                             (0, y - (width / 2)), (15 * TILE_SIZE, y - (width / 2)), width)
+        for x in range(0, 15 * TILE_SIZE, TILE_SIZE):
             pygame.draw.line(self.display_surface, GRAY,
-                             (x - (width / 2), 0), (x - (width / 2), int(15 * TILE_SIZE)), width)
+                             (x - (width / 2), 0), (x - (width / 2), 15 * TILE_SIZE), width)
+
+    def draw_text(self, surface, text, position, font, color):
+        """
+        Dessine un texte
+        """
+        text_surface = font.render(text, True, color)
+        surface.blit(text_surface, position)
 
     def draw_information_player(self):
         """
@@ -126,24 +171,22 @@ class Level:
 
         # Dessiner les textes d'en-tête
         draw_text(self.display_surface, "Starting",
-                  (TILE_SIZE * 0.5, TILE_SIZE * 16), font, BLACK)
+                       (TILE_SIZE * 0.5, TILE_SIZE * 16), font, BLACK)
         draw_text(self.display_surface, "+",
-                  (draw_rect[0].centerx, TILE_SIZE * 16), font, BLACK)
+                       (draw_rect[0].centerx, TILE_SIZE * 16), font, BLACK)
         draw_text(self.display_surface, "-",
-                  (draw_rect[1].centerx, TILE_SIZE * 16), font, BLACK)
+                       (draw_rect[1].centerx, TILE_SIZE * 16), font, BLACK)
         draw_text(self.display_surface, "Ending",
-                  (TILE_SIZE * 12, TILE_SIZE * 16), font, BLACK)
+                       (TILE_SIZE * 12, TILE_SIZE * 16), font, BLACK)
 
-        # Afficher les informations du joueur au début du niveau
-        draw_text(self.display_surface, f'{self.player.sprite.hp} HP',
-                  (TILE_SIZE * 0.5, draw_rect[1].centery), font, BLACK)
-        draw_text(self.display_surface, f'{self.player.sprite.coins} ¢',
-                  (TILE_SIZE * 0.5, draw_rect[2].centery), font, BLACK)
+        # Dessiner les valeurs copiées
+        draw_text(self.display_surface, f'{self.hp_start} HP',
+                       (TILE_SIZE * 0.5, draw_rect[1].centery), font, BLACK)
+        draw_text(self.display_surface, f'{self.coins_start} ¢',
+                       (TILE_SIZE * 0.5, draw_rect[2].centery), font, BLACK)
 
         # TODO : afficher à la fin du niveau, l'hp et les coins du joueur
         draw_text(self.display_surface, "HP ____",
-                  (TILE_SIZE * 12, draw_rect[1].centery), font, BLACK)
+                       (TILE_SIZE * 12, draw_rect[1].centery), font, BLACK)
         draw_text(self.display_surface, "¢  ____",
-                  (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
-
-        # pygame.display.flip()
+                       (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
