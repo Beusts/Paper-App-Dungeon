@@ -32,10 +32,15 @@ class Shop:
         Dessine le shop
         """
         pygame.draw.rect(self.display_surface, GRAY,
-                         (0, 0, TILE_SIZE * 15, TILE_SIZE * 3))
+                         (0, 0, TILE_SIZE * 15, TILE_SIZE * 2))
+
+        round_radius = int(TILE_SIZE)
+        for i in range(15):
+            pygame.draw.rect(self.display_surface, GRAY,
+                             (i * TILE_SIZE, TILE_SIZE * 2, TILE_SIZE, TILE_SIZE), border_bottom_left_radius=round_radius, border_bottom_right_radius=round_radius)
 
         draw_text(self.display_surface, "Shop",
-                  (TILE_SIZE * 7.5, TILE_SIZE), FONT, BLACK, center=True)
+                  (TILE_SIZE * 7.5, TILE_SIZE * 1.5), FONT, BLACK, center=True)
 
         for item in self.items:
             item.draw()
