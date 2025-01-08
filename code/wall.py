@@ -1,6 +1,7 @@
 from settings import *
 from random import randint
 
+
 class Wall(pygame.sprite.Sprite):
     def __init__(self, pos, groups):
         """
@@ -14,9 +15,10 @@ class Wall(pygame.sprite.Sprite):
         gray = randint(100, 200)
         self.color = (gray, gray, gray)
         self.rect = pygame.Rect(
-            (pos[0] + TILE_SIZE * 0.05, pos[1] + TILE_SIZE * 0.05),
+            (pos[0], pos[1]),
             (TILE_SIZE * 0.9, TILE_SIZE * 0.9)
         )
+        self.rect.center = (pos[0] + TILE_SIZE // 2, pos[1] + TILE_SIZE // 2)
 
     def draw(self, surface):
         """
