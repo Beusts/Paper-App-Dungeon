@@ -28,11 +28,3 @@ def draw_text(surface, text, position, font, color, center=False, center_y=False
             surface.blit(text_surface, text_rect)
     else:
         surface.blit(text_surface, text_rect)
-
-
-def draw_center_text(surface, text, position, font, color):
-    draw_text(surface, text, position, font, color, center=True)
-
-
-def draw_centery_text(surface, text, position, font, color):
-    draw_text(surface, text, position, font, color, center_y=True)

@@ -6,7 +6,7 @@ from wall import Wall
 from player import Player
 from standardEnemy import StandardEnemy
 from spiderWeb import SpiderWeb
-from utils import draw_text, draw_center_text, draw_centery_text
+from utils import draw_text
 
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
@@ -92,12 +92,6 @@ class Level:
             pygame.draw.line(self.display_surface, GRAY,
                              (x - (width / 2), 0), (x - (width / 2), int(15 * TILE_SIZE)), width)
 
-    def draw_text(self, surface, text, position, font, color):
-        """
-        Dessine un texte
-        """
-        draw_text(surface, text, position, font, color)
-
     def draw_information_player(self):
         """
         Dessine un espace pouvant afficher la vie, l'argent, au début et à la fin d'un level
@@ -131,25 +125,25 @@ class Level:
                          draw_rect[3], border_bottom_right_radius=10)
 
         # Dessiner les textes d'en-tête
-        self.draw_text(self.display_surface, "Starting",
-                       (TILE_SIZE * 0.5, TILE_SIZE * 16), font, BLACK)
-        self.draw_text(self.display_surface, "+",
-                       (draw_rect[0].centerx, TILE_SIZE * 16), font, BLACK)
-        self.draw_text(self.display_surface, "-",
-                       (draw_rect[1].centerx, TILE_SIZE * 16), font, BLACK)
-        self.draw_text(self.display_surface, "Ending",
-                       (TILE_SIZE * 12, TILE_SIZE * 16), font, BLACK)
+        draw_text(self.display_surface, "Starting",
+                  (TILE_SIZE * 0.5, TILE_SIZE * 16), font, BLACK)
+        draw_text(self.display_surface, "+",
+                  (draw_rect[0].centerx, TILE_SIZE * 16), font, BLACK)
+        draw_text(self.display_surface, "-",
+                  (draw_rect[1].centerx, TILE_SIZE * 16), font, BLACK)
+        draw_text(self.display_surface, "Ending",
+                  (TILE_SIZE * 12, TILE_SIZE * 16), font, BLACK)
 
         # Afficher les informations du joueur au début du niveau
-        self.draw_text(self.display_surface, f'{self.player.sprite.hp} HP',
-                       (TILE_SIZE * 0.5, draw_rect[1].centery), font, BLACK)
-        self.draw_text(self.display_surface, f'{self.player.sprite.coins} ¢',
-                       (TILE_SIZE * 0.5, draw_rect[2].centery), font, BLACK)
+        draw_text(self.display_surface, f'{self.player.sprite.hp} HP',
+                  (TILE_SIZE * 0.5, draw_rect[1].centery), font, BLACK)
+        draw_text(self.display_surface, f'{self.player.sprite.coins} ¢',
+                  (TILE_SIZE * 0.5, draw_rect[2].centery), font, BLACK)
 
         # TODO : afficher à la fin du niveau, l'hp et les coins du joueur
-        self.draw_text(self.display_surface, "HP ____",
-                       (TILE_SIZE * 12, draw_rect[1].centery), font, BLACK)
-        self.draw_text(self.display_surface, "¢  ____",
-                       (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
+        draw_text(self.display_surface, "HP ____",
+                  (TILE_SIZE * 12, draw_rect[1].centery), font, BLACK)
+        draw_text(self.display_surface, "¢  ____",
+                  (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
 
         # pygame.display.flip()
