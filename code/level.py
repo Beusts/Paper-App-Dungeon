@@ -3,7 +3,6 @@ import csv
 from mysteryEnemy import MysteryEnemy
 from settings import *
 from wall import Wall
-from object import Object
 from player import Player
 from standardEnemy import StandardEnemy
 from spiderWeb import SpiderWeb

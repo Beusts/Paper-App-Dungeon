@@ -1,5 +1,4 @@
 import csv
-import re
 
 from settings import *
 from utils import draw_text
