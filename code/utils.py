@@ -1,27 +1,38 @@
 import pygame
 
 
-def draw_text(surface, text, position, font, color):
-    """
-    Dessine un texte
-    """
+def draw_text(surface, text, position, font, color, center=False, center_y=False, line_width=None):
     text_surface = font.render(text, True, color)
-    surface.blit(text_surface, position)
+    if center:
+        text_rect = text_surface.get_rect(center=position)
+    elif center_y:
+        text_rect = text_surface.get_rect(x=position[0], centery=position[1])
+    else:
+        text_rect = text_surface.get_rect(topleft=position)
+
+    if line_width != None and text_rect.width > line_width:
+        lines = []
+        line = ""
+        for word in text.split():
+            if font.size(line + word)[0] < line_width:
+                line += word + " "
+            else:
+                lines.append(line)
+                line = word + " "
+        lines.append(line)
+
+        for i, line in enumerate(lines):
+            text_surface = font.render(line, True, color)
+            text_rect = text_surface.get_rect(
+                topleft=(position[0], position[1] + i * text_rect.height))
+            surface.blit(text_surface, text_rect)
+    else:
+        surface.blit(text_surface, text_rect)
 
 
 def draw_center_text(surface, text, position, font, color):
-    """
-    Dessine un texte au centre de la surface
-    """
-    text_surface = font.render(text, True, color)
-    text_rect = text_surface.get_rect(center=(position[0], position[1]))
-    surface.blit(text_surface, text_rect)
+    draw_text(surface, text, position, font, color, center=True)
 
 
 def draw_centery_text(surface, text, position, font, color):
-    """
-    Dessine un texte centré verticalement
-    """
-    text_surface = font.render(text, True, color)
-    text_rect = text_surface.get_rect(x=position[0], centery=position[1])
-    surface.blit(text_surface, text_rect)
+    draw_text(surface, text, position, font, color, center_y=True)
