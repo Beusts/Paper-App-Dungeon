@@ -34,6 +34,7 @@ class Player(pygame.sprite.Sprite):
         self.last_move_time = 0
         self.current_time = 0
         self.can_move = True
+        self.show_adjacent_tiles = False
 
         # characteristic of a player
         self.hp = 10
@@ -78,13 +79,15 @@ class Player(pygame.sprite.Sprite):
                  self.rect.y // TILE_SIZE) * TILE_SIZE
             )
 
-            # Vérifie si la tuile cliquée est adjacente
-            if (clicked_tile.x, clicked_tile.y) in self.adjacent_positions:
+            # Si il clique sur une tuile adjacente et qu'il reste des mouvements
+            if (clicked_tile.x, clicked_tile.y) in self.adjacent_positions and self.movement_remaining > 0 and self.show_adjacent_tiles:
                 self.can_move = False
+                self.show_adjacent_tiles = False
                 self.direction = Vector2(
                     (clicked_tile.x - self.rect.x) // TILE_SIZE, (clicked_tile.y - self.rect.y) // TILE_SIZE)
-            # Si la tuile cliquée est la même que la position actuelle
+            # Si il clique sur le joueur
             elif (clicked_tile.x, clicked_tile.y) == (self.rect.x, self.rect.y):
+                self.show_adjacent_tiles = not self.show_adjacent_tiles
                 # Redéfinit le nombre de mouvements restants
                 if self.movement_remaining == 0:
                     self.movement_roll = randint(1, 6)
@@ -163,12 +166,14 @@ class Player(pygame.sprite.Sprite):
         Args:
             surface (pygame.Surface): La surface sur laquelle dessiner les tuiles adjacentes.
         """
-        if self.can_move and self.movement_remaining > 0:
+        if self.can_move and self.movement_remaining > 0 and self.show_adjacent_tiles:
             for pos in self.adjacent_positions:
-                rect = pygame.Rect(pos, (TILE_SIZE, TILE_SIZE))
                 font = pygame.font.Font(None, int(TILE_SIZE * 0.5))
-                text = font.render(str(self.movement_remaining), True, 'black')
-                text_rect = text.get_rect(center=rect.center)
+                text = font.render(str(self.movement_remaining), True, BLACK)
+                text_rect = text.get_rect(center=pos + Vector2(TILE_SIZE // 2))
+                circle = pygame.draw.circle(
+                    surface, GRAY, pos + Vector2(TILE_SIZE // 2), TILE_SIZE // 4)
+
                 surface.blit(text, text_rect)
 
     def draw(self, surface):
@@ -179,7 +184,8 @@ class Player(pygame.sprite.Sprite):
             surface (pygame.Surface): La surface sur laquelle dessiner le joueur.
         """
         surface.blit(self.image, self.rect)
-        self.draw_adjacent_tiles(surface)
+        if self.can_move and self.movement_remaining > 0:
+            self.draw_adjacent_tiles(surface)
 
     def update(self, dt):
         """
