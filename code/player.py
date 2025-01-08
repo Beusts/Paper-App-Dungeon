@@ -40,6 +40,11 @@ class Player(pygame.sprite.Sprite):
         self.coins = 0
         self.deaths = 0
 
+        self.losing_hp = 0;
+        self.winning_hp = 0;
+        self.losing_coins = 0;
+        self.winning_coins = 0;
+
         self.player = groups[1].sprite
 
         self.is_input_active = False

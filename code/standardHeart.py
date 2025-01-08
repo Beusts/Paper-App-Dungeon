@@ -66,7 +66,7 @@ class StandardHeart(Object):
             return player
 
         print(f"Collision with me {self}")
-        player.hp += self.value
+        player.winning_hp += self.value
 
         self.used = True
         self.has_already_been_used()

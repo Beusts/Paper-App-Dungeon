@@ -36,7 +36,7 @@ class MysteryHeart(Object):
             return player
 
         print(f"Collisions with me {self}")
-        player.hp = player.hp + randint(1, 6)
+        player.winning_hp += randint(1, 6)
         self.used = True
         self.has_already_been_used()
 
