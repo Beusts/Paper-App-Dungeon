@@ -11,6 +11,10 @@ from mysteryEnemy import MysteryEnemy
 from spiderWeb import SpiderWeb
 from mysteryHeart import MysteryHeart
 from standardHeart import StandardHeart
+from lock import Lock
+from chest import Chest
+from coin import Coin
+from key import Key
 
 from utils import draw_text
 
@@ -95,6 +99,22 @@ class Level:
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         MysteryHeart((x * TILE_SIZE, y * TILE_SIZE),
                                      [self.all_sprites, self.objects])
+                    elif tile == 'K':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        Key((x * TILE_SIZE, y * TILE_SIZE),
+                                     [self.all_sprites, self.objects])
+                    elif tile == 'L':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        Lock((x * TILE_SIZE, y * TILE_SIZE),
+                                     [self.all_sprites, self.objects])
+                    elif tile == 'C':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        Chest((x * TILE_SIZE, y * TILE_SIZE),
+                                     [self.all_sprites, self.objects])
+                    elif tile == 'Co':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        Coin((x * TILE_SIZE, y * TILE_SIZE),
+                                     [self.all_sprites, self.objects])
 
             self.hp_start = self.player.sprite.hp
             self.coins_start = self.player.sprite.coins
@@ -168,6 +188,24 @@ class Level:
                          draw_rect[2], border_bottom_left_radius=10)
         pygame.draw.rect(self.display_surface, GRAY,
                          draw_rect[3], border_bottom_right_radius=10)
+
+        # Afficher les hp et coins pendant la partie du joueur
+
+        if self.player.sprite.winning_hp > 0:
+            draw_text(self.display_surface, str(self.player.sprite.winning_hp),
+                      (draw_rect[0].centerx * 0.95 , draw_rect[0].centery * 0.98), font, BLACK)
+
+        if self.player.sprite.losing_hp > 0:
+            draw_text(self.display_surface, str(self.player.sprite.losing_hp),
+                      (draw_rect[1].centerx * 0.95 , draw_rect[1].centery * 0.98), font, BLACK)
+
+        if self.player.sprite.winning_coins > 0:
+            draw_text(self.display_surface, str(self.player.sprite.winning_coins),
+                      (draw_rect[2].centerx * 0.95 , draw_rect[2].centery * 0.98), font, BLACK)
+
+        if self.player.sprite.losing_coins > 0:
+            draw_text(self.display_surface, str(self.player.sprite.losing_coins),
+                      (draw_rect[3].centerx * 0.95 , draw_rect[3].centery * 0.98), font, BLACK)
 
         # Dessiner les textes d'en-tête
         draw_text(self.display_surface, "Starting",

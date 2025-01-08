@@ -1,5 +1,8 @@
 from settings import *
 from object import *
+from pygame.math import Vector2
+from random import randint
+
 
 class SpiderWeb(Object):
 
@@ -21,8 +24,22 @@ class SpiderWeb(Object):
         return design
 
     def on_collision(self, player):
+
         if self.has_already_been_used(): return player
+
+        # Stop the player
+        player.direction = Vector2(0, 0)
+        player.movement_remaining = 0
+        player.last_move_time = player.current_time = 0
+        player.movement_roll = 0
+        player.can_move = True
+
+        # roll the die to determine how many coins the player lose
+        losing_coins = randint(1, 6)
+        player.losing_coins += losing_coins
+
+        print(f"losing coins {losing_coins}")
+
         self.used = True
         self.has_already_been_used()
-
         return player

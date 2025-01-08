@@ -13,11 +13,12 @@ class Game:
         self.display_surface = pygame.display.set_mode(
             (WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption('Paper App Dungeon')
+
         self.clock = pygame.time.Clock()
 
-        self.level_map_files = {0: '0', 1: '1'}
-        # self.current_stage = Level(self.level_map_files[1])
-        self.current_stage = Level('1')
+        self.level_map_files = {0: '0', 1: '1', 2: 'test'}
+        self.current_stage = Level(self.level_map_files[2])
+        # self.current_stage = Shop('0')
 
     def run(self):
         """
@@ -25,6 +26,7 @@ class Game:
         """
         while True:
             dt = self.clock.tick(FPS) / 1000
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()

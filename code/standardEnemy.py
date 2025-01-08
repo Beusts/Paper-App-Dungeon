@@ -1,5 +1,6 @@
 from settings import *
 from object import *
+from utils import draw_text
 
 
 class StandardEnemy(Object):
@@ -64,9 +65,9 @@ class StandardEnemy(Object):
         """
         print(f"Collision with me {self}")
 
-        if self.has_already_been_used():
-            return player
-        player.hp -= self.value
+        if self.has_already_been_used() : return player
+
+        player.losing_hp += self.value
         self.used = True
         self.has_already_been_used()
 
