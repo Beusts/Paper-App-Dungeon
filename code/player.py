@@ -3,6 +3,8 @@ from time import sleep
 from settings import *
 from pygame.math import Vector2
 from random import randint
+from teleporter import Teleporter
+from stair import Stair
 
 
 class Player(pygame.sprite.Sprite):
@@ -138,12 +140,12 @@ class Player(pygame.sprite.Sprite):
         for object_collided in pygame.sprite.spritecollide(self.player, self.colliders["objects"], False):
             print(f"collision with {object_collided}")
 
-            if type(object_collided).__name__ == "Teleporter":
+            if isinstance(object_collided, Teleporter):
                 self.player = object_collided.on_collision(
                     self.player, self.level.objects)
                 return
 
-            if type(object_collided).__name__ == "Stair":
+            if isinstance(object_collided, Stair):
                 object_collided.on_collision(self.level)
                 return
 
