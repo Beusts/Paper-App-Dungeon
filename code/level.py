@@ -1,6 +1,5 @@
 import csv
 import re
-from tokenize import blank_re
 
 from teleporter import Teleporter
 from settings import *
@@ -247,3 +246,4 @@ class Level:
 
     def ending_level(self):
         # TODO : create a choice for the user : finish the level or continue => interface
+        return
