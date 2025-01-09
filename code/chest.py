@@ -23,7 +23,7 @@ class Chest(Object):
             pygame.Surface: L'image de l'ennemi avec le numéro ajouté.
         """
         image = pygame.image.load(
-            join('graphics', 'locks.png')).convert_alpha()
+            join('graphics', 'treasure_chest.png')).convert_alpha()
         image = pygame.transform.scale(
             image, (TILE_SIZE, TILE_SIZE))
 
