@@ -137,7 +137,6 @@ class Player(pygame.sprite.Sprite):
 
             if (any(sprite.rect.colliderect(new_rect) for sprite in self.colliders["walls"])):
                 self.show_adjacent_tiles = True
-                self.draw_adjacent_tiles(self.level.display_surface)
 
     def on_collision_with_object(self):
         # Lors d'une collision avec un objet, le joueur execute la methode on_collision de l'objet.
