@@ -5,6 +5,7 @@ from pygame.math import Vector2
 from random import randint
 
 
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self, pos, groups, colliders, level):
@@ -139,7 +140,13 @@ class Player(pygame.sprite.Sprite):
             print(f"collision with {object_collided}")
 
             if type(object_collided).__name__ == "Teleporter" :
-                self.player = object_collided.on_collision(self.player, self.level.objects )
+                self.player = object_collided.on_collision(self.player, self.level.objects)
+                return
+
+            if type(object_collided).__name__ == "Stair" :
+                self.level.paused = object_collided.on_collision(self.level.paused)
+                self.level.ending_level()
+
                 return
 
             self.player = object_collided.on_collision(self.player)

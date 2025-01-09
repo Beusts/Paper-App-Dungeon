@@ -1,5 +1,6 @@
 import csv
 import re
+from tokenize import blank_re
 
 from teleporter import Teleporter
 from settings import *
@@ -22,7 +23,8 @@ from utils import draw_text
 
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
-
+WHITE = (255, 255, 255)
+TRANSPARENT_BLACK = (0, 0, 0, 180)
 
 class Level:
     def __init__(self, level_data):
@@ -44,6 +46,8 @@ class Level:
         self.visible_sprites = pygame.sprite.LayeredUpdates()
 
         self.setup(level_data)
+
+        self.paused = False
 
     def setup(self, level_data):
         """
@@ -136,6 +140,8 @@ class Level:
         Args:
             dt (float): Le temps écoulé depuis la dernière mise à jour.
         """
+        if self.paused : return
+
         self.all_sprites.update(dt)
         self.display_surface.fill('white')
         for sprite in self.walls:
@@ -238,3 +244,6 @@ class Level:
                        (TILE_SIZE * 12, draw_rect[1].centery), font, BLACK)
         draw_text(self.display_surface, "¢  ____",
                        (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
+
+    def ending_level(self):
+        # TODO : create a choice for the user : finish the level or continue => interface
