@@ -3,6 +3,7 @@ from contextlib import nullcontext
 from settings import *
 
 class Object(pygame.sprite.Sprite):
+
     def __init__(self, pos, groups):
         """
         Initialise un objet à la position donnée et l'ajoute aux groupes spécifiés.
@@ -16,6 +17,8 @@ class Object(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=pos)
         self.used = False
 
+        self.pos = pos
+
     def draw(self, surface):
         """
         Dessine l'objet sur la surface spécifiée.
@@ -28,18 +31,19 @@ class Object(pygame.sprite.Sprite):
     def design(self):
         """
         Determine ce que l'objet doit ressembler
-
         """
         raise NotImplementedError("This method must be redefined in a subclass")
 
     def on_collision(self, player):
         """
         Traite l'interaction avec un objet
-
         """
         raise NotImplementedError("This method must be redefined in a subclass")
 
     def has_already_been_used(self):
+        """
+        Regarde si l'objet a déjà été utilisé => True si oui, False sinon
+        """
         if self.used:
             print(f"I've already been used {self}")
             image =pygame.image.load(

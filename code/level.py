@@ -16,6 +16,7 @@ from lock import Lock
 from chest import Chest
 from coin import Coin
 from key import Key
+from stair import Stair
 
 from utils import draw_text
 
@@ -66,7 +67,7 @@ class Level:
                     elif tile == 'P':
                         # Crée un joueur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         Player((x * TILE_SIZE, y * TILE_SIZE),
-                               [self.all_sprites, self.player], {"walls": self.walls, "objects": self.objects})
+                               [self.all_sprites, self.player], {"walls": self.walls, "objects": self.objects}, self)
                     # Regarde si la tuile correspond a un pattern comme ceci : SeN où N est un nombre positif
                     elif re.match(r"Se(\d+)", tile):
 
@@ -119,6 +120,10 @@ class Level:
                     elif tile == 'T':
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         Teleporter((x * TILE_SIZE, y * TILE_SIZE),
+                                     [self.all_sprites, self.objects])
+                    elif tile == 'S':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        Stair((x * TILE_SIZE, y * TILE_SIZE),
                                      [self.all_sprites, self.objects])
 
             self.hp_start = self.player.sprite.hp

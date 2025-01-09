@@ -1,3 +1,5 @@
+from time import sleep
+
 from settings import *
 from pygame.math import Vector2
 from random import randint
@@ -5,7 +7,7 @@ from random import randint
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self, pos, groups, colliders):
+    def __init__(self, pos, groups, colliders, level):
         """
         Initialise un joueur à la position donnée et l'ajoute aux groupes spécifiés.
 
@@ -48,6 +50,7 @@ class Player(pygame.sprite.Sprite):
         self.winning_coins = 0
 
         self.player = groups[1].sprite
+        self.level = level
 
         self.is_input_active = False
 
@@ -134,6 +137,11 @@ class Player(pygame.sprite.Sprite):
 
         for object_collided in pygame.sprite.spritecollide(self.player, self.colliders["objects"], False):
             print(f"collision with {object_collided}")
+
+            if type(object_collided).__name__ == "Teleporter" :
+                self.player = object_collided.on_collision(self.player, self.level.objects )
+                return
+
             self.player = object_collided.on_collision(self.player)
 
     def update_adjacent_tiles(self):
