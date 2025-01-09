@@ -15,3 +15,5 @@ FPS = 60
 SLEEP_TIME = 100
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
+global is_input_active
+is_input_active = False

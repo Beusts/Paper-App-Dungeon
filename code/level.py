@@ -257,6 +257,8 @@ class Level:
         """
         Affiche l'interface de fin de niveau pour permettre au joueur de choisir de continuer ou de terminer le niveau.
         """
+
+        global is_input_active
         font = pygame.font.Font(None, TILE_SIZE)
 
         continue_rect = pygame.Rect(0, 0, TILE_SIZE * 6, TILE_SIZE * 2)
@@ -275,12 +277,15 @@ class Level:
         draw_text(self.display_surface, "Finish",
                   finish_rect.center, font, BLACK, center=True)
 
+        global is_input_active
         mouse_pos = pygame.mouse.get_pos()
-        if pygame.mouse.get_pressed()[0]:
+        if pygame.mouse.get_pressed()[0] and is_input_active:
             if continue_rect.collidepoint(mouse_pos):
                 self.paused = False
             elif finish_rect.collidepoint(mouse_pos):
                 self.finish_level()
+        elif not pygame.mouse.get_pressed()[0]:
+            is_input_active = True
 
     def finish_level(self):
         """
