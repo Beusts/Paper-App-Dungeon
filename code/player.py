@@ -136,7 +136,8 @@ class Player(pygame.sprite.Sprite):
             self.direction = Vector2(0, 0)
 
             if (any(sprite.rect.colliderect(new_rect) for sprite in self.colliders["walls"])):
-                self.handle_mouse_click((self.rect.x, self.rect.y))
+                self.show_adjacent_tiles = True
+                self.draw_adjacent_tiles(self.level.display_surface)
 
     def on_collision_with_object(self):
         # Lors d'une collision avec un objet, le joueur execute la methode on_collision de l'objet.
