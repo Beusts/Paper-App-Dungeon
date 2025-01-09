@@ -84,12 +84,13 @@ class Player(pygame.sprite.Sprite):
                  self.rect.y // TILE_SIZE) * TILE_SIZE
             )
 
-            # Si il clique sur une tuile adjacente et qu'il reste des mouvements
+            # S'il clique sur une tuile adjacente et qu'il reste des mouvements
             if (clicked_tile.x, clicked_tile.y) in self.adjacent_positions and self.movement_remaining > 0 and self.show_adjacent_tiles:
                 self.can_move = False
                 self.show_adjacent_tiles = False
                 self.direction = Vector2(
                     (clicked_tile.x - self.rect.x) // TILE_SIZE, (clicked_tile.y - self.rect.y) // TILE_SIZE)
+
             # Si il clique sur le joueur
             elif (clicked_tile.x, clicked_tile.y) == (self.rect.x, self.rect.y):
                 self.show_adjacent_tiles = not self.show_adjacent_tiles
@@ -134,8 +135,11 @@ class Player(pygame.sprite.Sprite):
             self.can_move = True
             self.direction = Vector2(0, 0)
 
+            if (any(sprite.rect.colliderect(new_rect) for sprite in self.colliders["walls"])):
+                self.handle_mouse_click((self.rect.x, self.rect.y))
+
     def on_collision_with_object(self):
-        # Lors d'un collision avec un objet, le joueur execute la methode on_collision de l'objet.
+        # Lors d'une collision avec un objet, le joueur execute la methode on_collision de l'objet.
 
         for object_collided in pygame.sprite.spritecollide(self.player, self.colliders["objects"], False):
             print(f"collision with {object_collided}")
