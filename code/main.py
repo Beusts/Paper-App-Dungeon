@@ -20,7 +20,6 @@ class Game:
         self.current_stage = Level(self.level_map_files[2])
         # self.current_stage = Shop('0')
 
-
     def run(self):
         """
         Exécute la boucle principale du jeu.
@@ -32,7 +31,6 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-
 
             self.current_stage.run(dt)
             pygame.display.update()

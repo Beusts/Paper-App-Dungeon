@@ -144,9 +144,7 @@ class Player(pygame.sprite.Sprite):
                 return
 
             if type(object_collided).__name__ == "Stair":
-                self.level.paused = object_collided.on_collision()
-                self.level.ending_level()
-
+                object_collided.on_collision(self.level)
                 return
 
             self.player = object_collided.on_collision(self.player)
@@ -186,7 +184,7 @@ class Player(pygame.sprite.Sprite):
                 font = pygame.font.Font(None, int(TILE_SIZE * 0.5))
                 text = font.render(str(self.movement_remaining), True, BLACK)
                 text_rect = text.get_rect(center=pos + Vector2(TILE_SIZE // 2))
-                circle = pygame.draw.circle(
+                pygame.draw.circle(
                     surface, GRAY, pos + Vector2(TILE_SIZE // 2), TILE_SIZE // 4)
 
                 surface.blit(text, text_rect)

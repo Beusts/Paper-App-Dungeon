@@ -154,6 +154,7 @@ class Level:
             dt (float): Le temps écoulé depuis la dernière mise à jour.
         """
         if self.paused:
+            self.draw_end_level_interface()
             return
 
         self.all_sprites.update(dt)
@@ -179,13 +180,6 @@ class Level:
         for x in range(0, 15 * TILE_SIZE, TILE_SIZE):
             pygame.draw.line(self.display_surface, GRAY,
                              (x - (width / 2), 0), (x - (width / 2), 15 * TILE_SIZE), width)
-
-    def draw_text(self, surface, text, position, font, color):
-        """
-        Dessine un texte
-        """
-        text_surface = font.render(text, True, color)
-        surface.blit(text_surface, position)
 
     def draw_information_player(self):
         """
@@ -259,6 +253,39 @@ class Level:
         draw_text(self.display_surface, "¢  ____",
                   (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
 
-    def ending_level(self):
-        # TODO : create a choice for the user : finish the level or continue => interface
-        return
+    def draw_end_level_interface(self):
+        """
+        Affiche l'interface de fin de niveau pour permettre au joueur de choisir de continuer ou de terminer le niveau.
+        """
+        font = pygame.font.Font(None, TILE_SIZE)
+
+        continue_rect = pygame.Rect(0, 0, TILE_SIZE * 6, TILE_SIZE * 2)
+        continue_rect.center = (TILE_SIZE * 7.5, TILE_SIZE * 6)
+
+        finish_rect = pygame.Rect(0, 0, TILE_SIZE * 6, TILE_SIZE * 2)
+        finish_rect.center = (TILE_SIZE * 7.5, TILE_SIZE * 9)
+
+        pygame.draw.rect(self.display_surface, GRAY,
+                         continue_rect, border_radius=10)
+        pygame.draw.rect(self.display_surface, GRAY,
+                         finish_rect, border_radius=10)
+
+        draw_text(self.display_surface, "Continue",
+                  continue_rect.center, font, BLACK, center=True)
+        draw_text(self.display_surface, "Finish",
+                  finish_rect.center, font, BLACK, center=True)
+
+        mouse_pos = pygame.mouse.get_pos()
+        if pygame.mouse.get_pressed()[0]:
+            if continue_rect.collidepoint(mouse_pos):
+                self.paused = False
+            elif finish_rect.collidepoint(mouse_pos):
+                self.finish_level()
+
+    def finish_level(self):
+        """
+        Termine le niveau et affiche les résultats finaux.
+        """
+        # Logique pour terminer le niveau et afficher les résultats finaux
+        print("Niveau terminé")
+        # ...ajouter la logique pour terminer le niveau...

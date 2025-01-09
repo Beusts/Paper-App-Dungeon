@@ -16,6 +16,6 @@ class Stair(Object):
 
         return image
 
-    def on_collision(self):
+    def on_collision(self, level):
         print(f"Collision with me {self}")
-        return True
+        level.paused = True
