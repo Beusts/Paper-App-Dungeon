@@ -1,6 +1,7 @@
 from settings import *
 from object import *
 
+
 class Stair(Object):
 
     def __init__(self, pos, groups):
@@ -15,9 +16,6 @@ class Stair(Object):
 
         return image
 
-    def on_collision(self, paused):
+    def on_collision(self):
         print(f"Collision with me {self}")
-
-        paused = True
-        return paused
-
+        return True
