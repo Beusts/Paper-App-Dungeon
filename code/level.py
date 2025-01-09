@@ -1,6 +1,7 @@
 import csv
 import re
 
+from teleporter import Teleporter
 from settings import *
 from wall import Wall
 from random import randint
@@ -114,6 +115,10 @@ class Level:
                     elif tile == 'Co':
                         # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         Coin((x * TILE_SIZE, y * TILE_SIZE),
+                                     [self.all_sprites, self.objects])
+                    elif tile == 'T':
+                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+                        Teleporter((x * TILE_SIZE, y * TILE_SIZE),
                                      [self.all_sprites, self.objects])
 
             self.hp_start = self.player.sprite.hp

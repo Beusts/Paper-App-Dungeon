@@ -30,13 +30,18 @@ class Lock(Object):
 
     def on_collision(self, player):
 
+        if self.used : return player
+
         print(f"Collision with me {self}")
 
-        # if player.keys > 1:
-        #     # TODO : change the lock into a simple case
-        # else :
-        #     # TODO : the player can't go throught the lock
-        #
+        if player.keys >= 1:
+            # change the lock into a simple case
+            self.image.fill((0,0,0,0))
+            player.keys -= 1
+            self.used = True
+        else :
+            # the player can't go throught the lock
+            player.direction = -player.direction
+            player.movement_remaining = 1
 
-        self.used = True
         return player
