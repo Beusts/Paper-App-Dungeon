@@ -25,6 +25,7 @@ GRAY = (200, 200, 200)
 WHITE = (255, 255, 255)
 TRANSPARENT_BLACK = (0, 0, 0, 180)
 
+
 class Level:
     def __init__(self, level_data):
         """
@@ -50,6 +51,21 @@ class Level:
 
     def setup(self, level_data):
         """
+        Le fichier CSV doit contenir une grille où chaque cellule représente un type d'objet dans le jeu.
+        Les valeurs possibles pour chaque cellule sont :
+            '1'  : Crée un mur.
+            'P'  : Crée un joueur.
+            'SeN': Crée un ennemi standard avec N comme valeur.
+            'Me' : Crée un ennemi mystère.
+            'W'  : Crée une toile d'araignée.
+            'ShN': Crée un cœur standard avec N comme valeur.
+            'Mh' : Crée un cœur mystère.
+            'K'  : Crée une clé.
+            'L'  : Crée un verrou.
+            'C'  : Crée un coffre.
+            'Co' : Crée une pièce.
+            'T'  : Crée un téléporteur.
+            'S'  : Crée un escalier.
         Configure le niveau en chargeant les données depuis un fichier CSV.
 
         Args:
@@ -79,15 +95,14 @@ class Level:
                         if match:
                             value = int(match.group(1))
 
-                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         StandardEnemy((x * TILE_SIZE, y * TILE_SIZE),
                                       [self.all_sprites, self.objects], value)
                     elif tile == 'Me':
-                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+
                         MysteryEnemy((x * TILE_SIZE, y * TILE_SIZE),
                                      [self.all_sprites, self.objects])
                     elif tile == 'W':
-                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+
                         SpiderWeb((x * TILE_SIZE, y * TILE_SIZE),
                                   [self.all_sprites, self.objects])
                     elif re.match(r"Sh(\d+)", tile):
@@ -97,37 +112,36 @@ class Level:
                         if match:
                             value = int(match.group(1))
 
-                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         StandardHeart((x * TILE_SIZE, y * TILE_SIZE),
                                       [self.all_sprites, self.objects], value)
                     elif tile == 'Mh':
-                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+
                         MysteryHeart((x * TILE_SIZE, y * TILE_SIZE),
                                      [self.all_sprites, self.objects])
                     elif tile == 'K':
-                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+
                         Key((x * TILE_SIZE, y * TILE_SIZE),
-                                     [self.all_sprites, self.objects])
+                            [self.all_sprites, self.objects])
                     elif tile == 'L':
-                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+
                         Lock((x * TILE_SIZE, y * TILE_SIZE),
-                                     [self.all_sprites, self.objects])
+                             [self.all_sprites, self.objects])
                     elif tile == 'C':
-                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+
                         Chest((x * TILE_SIZE, y * TILE_SIZE),
-                                     [self.all_sprites, self.objects])
+                              [self.all_sprites, self.objects])
                     elif tile == 'Co':
-                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+
                         Coin((x * TILE_SIZE, y * TILE_SIZE),
-                                     [self.all_sprites, self.objects])
+                             [self.all_sprites, self.objects])
                     elif tile == 'T':
-                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+
                         Teleporter((x * TILE_SIZE, y * TILE_SIZE),
-                                     [self.all_sprites, self.objects])
+                                   [self.all_sprites, self.objects])
                     elif tile == 'S':
-                        # Crée un objet aux coordonnées (x, y) et l'ajoute aux groupes appropriés
+
                         Stair((x * TILE_SIZE, y * TILE_SIZE),
-                                     [self.all_sprites, self.objects])
+                              [self.all_sprites, self.objects])
 
             self.hp_start = self.player.sprite.hp
             self.coins_start = self.player.sprite.coins
@@ -139,7 +153,8 @@ class Level:
         Args:
             dt (float): Le temps écoulé depuis la dernière mise à jour.
         """
-        if self.paused : return
+        if self.paused:
+            return
 
         self.all_sprites.update(dt)
         self.display_surface.fill('white')
@@ -208,41 +223,41 @@ class Level:
 
         if self.player.sprite.winning_hp > 0:
             draw_text(self.display_surface, str(self.player.sprite.winning_hp),
-                      (draw_rect[0].centerx * 0.95 , draw_rect[0].centery * 0.98), font, BLACK)
+                      (draw_rect[0].centerx * 0.95, draw_rect[0].centery * 0.98), font, BLACK)
 
         if self.player.sprite.losing_hp > 0:
             draw_text(self.display_surface, str(self.player.sprite.losing_hp),
-                      (draw_rect[1].centerx * 0.95 , draw_rect[1].centery * 0.98), font, BLACK)
+                      (draw_rect[1].centerx * 0.95, draw_rect[1].centery * 0.98), font, BLACK)
 
         if self.player.sprite.winning_coins > 0:
             draw_text(self.display_surface, str(self.player.sprite.winning_coins),
-                      (draw_rect[2].centerx * 0.95 , draw_rect[2].centery * 0.98), font, BLACK)
+                      (draw_rect[2].centerx * 0.95, draw_rect[2].centery * 0.98), font, BLACK)
 
         if self.player.sprite.losing_coins > 0:
             draw_text(self.display_surface, str(self.player.sprite.losing_coins),
-                      (draw_rect[3].centerx * 0.95 , draw_rect[3].centery * 0.98), font, BLACK)
+                      (draw_rect[3].centerx * 0.95, draw_rect[3].centery * 0.98), font, BLACK)
 
         # Dessiner les textes d'en-tête
         draw_text(self.display_surface, "Starting",
-                       (TILE_SIZE * 0.5, TILE_SIZE * 16), font, BLACK)
+                  (TILE_SIZE * 0.5, TILE_SIZE * 16), font, BLACK)
         draw_text(self.display_surface, "+",
-                       (draw_rect[0].centerx, TILE_SIZE * 16), font, BLACK)
+                  (draw_rect[0].centerx, TILE_SIZE * 16), font, BLACK)
         draw_text(self.display_surface, "-",
-                       (draw_rect[1].centerx, TILE_SIZE * 16), font, BLACK)
+                  (draw_rect[1].centerx, TILE_SIZE * 16), font, BLACK)
         draw_text(self.display_surface, "Ending",
-                       (TILE_SIZE * 12, TILE_SIZE * 16), font, BLACK)
+                  (TILE_SIZE * 12, TILE_SIZE * 16), font, BLACK)
 
         # Dessiner les valeurs copiées
         draw_text(self.display_surface, f'{self.hp_start} HP',
-                       (TILE_SIZE * 0.5, draw_rect[1].centery), font, BLACK)
+                  (TILE_SIZE * 0.5, draw_rect[1].centery), font, BLACK)
         draw_text(self.display_surface, f'{self.coins_start} ¢',
-                       (TILE_SIZE * 0.5, draw_rect[2].centery), font, BLACK)
+                  (TILE_SIZE * 0.5, draw_rect[2].centery), font, BLACK)
 
         # TODO : afficher à la fin du niveau, l'hp et les coins du joueur
         draw_text(self.display_surface, "HP ____",
-                       (TILE_SIZE * 12, draw_rect[1].centery), font, BLACK)
+                  (TILE_SIZE * 12, draw_rect[1].centery), font, BLACK)
         draw_text(self.display_surface, "¢  ____",
-                       (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
+                  (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
 
     def ending_level(self):
         # TODO : create a choice for the user : finish the level or continue => interface
