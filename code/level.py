@@ -47,7 +47,15 @@ class Level:
 
         self.setup(level_data)
 
+        self.hp_start = 10
+        self.coins_start = 0
+
+        self.hp_end = 0
+        self.coins_end = 0
+        self.player_dying = False
+
         self.paused = False
+        self.completed = False
 
     def setup(self, level_data):
         """
@@ -293,4 +301,31 @@ class Level:
         """
         # Logique pour terminer le niveau et afficher les résultats finaux
         print("Niveau terminé")
+
         # ...ajouter la logique pour terminer le niveau...
+        font = pygame.font.Font(None, TILE_SIZE)
+
+        hp_rect = pygame.Rect(TILE_SIZE * 7.5, TILE_SIZE * 17, TILE_SIZE * 3.5, TILE_SIZE * 3)
+
+        coins_rect = pygame.Rect(TILE_SIZE * 4, TILE_SIZE * 20, TILE_SIZE * 3.5, TILE_SIZE * 3)
+
+
+        self.player.sprite.hp = self.hp_start + self.player.sprite.winning_hp - self.player.sprite.losing_hp
+        self.player.sprite.coins = self.coins_start + self.player.sprite.winning_coins - self.player.sprite.losing_coins
+
+
+        if self.player.sprite.hp <= 0:
+            self.hp_end = 10
+            self.coins_end = 0
+            self.player_dying = True
+        else:
+            self.player.sprite.hp = self.player.sprite.hp if self.player.sprite.hp <= 25 else 25
+            self.hp_end = self.player.sprite.hp
+            self.player.sprite.coins = self.player.sprite.coins if self.player.sprite.coins >= 0 else 0
+            self.coins_end = self.player.sprite.coins
+
+        draw_text(self.display_surface, f"HP {self.player.sprite.hp} ",
+                  (TILE_SIZE * 12, hp_rect.centery), font, BLACK)
+        draw_text(self.display_surface, f"¢  {self.player.sprite.coins}",
+                  (TILE_SIZE * 12, coins_rect.centery), font, BLACK)
+        self.completed = True
