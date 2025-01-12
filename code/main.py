@@ -24,6 +24,7 @@ class Game:
         self.tally_of_deaths = 0
         self.final_coins = 0
         self.final_hp = 0
+        self.inventory = []
 
     def change_level(self):
         self.current_level_index += 1
