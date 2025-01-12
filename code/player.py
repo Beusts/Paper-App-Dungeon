@@ -41,6 +41,7 @@ class Player(pygame.sprite.Sprite):
         self.winning_hp = 0
         self.losing_coins = 0
         self.winning_coins = 0
+        self.inventory = []
 
     def setup(self, pos, groups, colliders, level):
         self.kill()

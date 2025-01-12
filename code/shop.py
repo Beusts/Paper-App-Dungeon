@@ -10,9 +10,10 @@ DESC_FONT = pygame.font.Font(None, int(TILE_SIZE * 0.7))
 
 
 class Shop:
-    def __init__(self, shop_data):
+    def __init__(self, shop_data, player):
         self.display_surface = pygame.display.get_surface()
         self.items = []
+        self.player = player  # Déplacez cette ligne avant l'appel à setup
         self.setup(shop_data)
 
     def setup(self, shop_data):
@@ -21,27 +22,28 @@ class Shop:
             shop_reader = csv.reader(csvfile, delimiter=',')
             for row in shop_reader:
                 if row[0] == 'Doubling Potion':
-                    self.items.append(Doubling_Potion((1, col)))
+                    self.items.append(Doubling_Potion((1, col), self.player))
                 elif row[0] == 'Scroll of Mulligan':
-                    self.items.append(Scroll_of_Mulligan((1, col)))
+                    self.items.append(
+                        Scroll_of_Mulligan((1, col), self.player))
                 elif row[0] == 'Gambler':
-                    self.items.append(Gambler((1, col)))
+                    self.items.append(Gambler((1, col), self.player))
                 elif row[0] == 'Light Snack':
-                    self.items.append(Light_Snack((1, col)))
+                    self.items.append(Light_Snack((1, col), self.player))
                 elif row[0] == 'Coin Rush':
-                    self.items.append(Coin_Rush((1, col)))
+                    self.items.append(Coin_Rush((1, col), self.player))
                 elif row[0] == 'Break on Through':
-                    self.items.append(Break_on_Trought((1, col)))
+                    self.items.append(Break_on_Trought((1, col), self.player))
                 elif row[0] == 'Hearty Snack':
-                    self.items.append(Hearty_Snack((1, col)))
+                    self.items.append(Hearty_Snack((1, col), self.player))
                 elif row[0] == 'Teleport Scroll':
-                    self.items.append(Teleport_Scroll((1, col)))
+                    self.items.append(Teleport_Scroll((1, col), self.player))
                 elif row[0] == 'Magic Shield':
-                    self.items.append(Magic_Shield((1, col)))
+                    self.items.append(Magic_Shield((1, col), self.player))
                 if row[0] == 'Medium Snack':
-                    self.items.append(Medium_Snack((1, col)))
+                    self.items.append(Medium_Snack((1, col), self.player))
                 if row[0] == 'Weaklings':
-                    self.items.append(Weaklings((1, col)))
+                    self.items.append(Weaklings((1, col), self.player))
                 col += 4
 
     def run(self, dt):
@@ -66,17 +68,9 @@ class Shop:
         for item in self.items:
             item.draw()
 
-    def purchase_item(self, game, item):
-
-        if coins > item.price :
-            item.buy()
-            game.final_coins -= item.price
-            game.inventory.append(item)
-
-        return game
 
 class Item:
-    def __init__(self, name, description, price, position, use_once = False):
+    def __init__(self, name, description, price, position, player, use_once=False):
         self.name = name
         self.description = description
         self.price = price
@@ -84,9 +78,13 @@ class Item:
         self.position = position
         self.display_surface = pygame.display.get_surface()
         self.use_once = use_once
+        self.player = player
 
     def buy(self):
-        self.is_bought = True
+        if self.player.coins >= self.price:
+            self.player.coins -= self.price
+            self.is_bought = True
+            self.player.inventory.append(self)
 
     def use(self, player):
         raise NotImplementedError(
@@ -119,43 +117,47 @@ class Item:
     Items that have a direct impact on the player
 """
 
+
 class Gambler(Item):
-    def __init__(self, position):
+    def __init__(self, position, player):
         super().__init__("Gambler",
-                         "Roll: If you roll 4+, gain 10¢. Otherwise, gain 0¢.", 5, position)
+                         "Roll: If you roll 4+, gain 10¢. Otherwise, gain 0¢.", 5, position, player)
 
     def use(self, player):
         roll = randint(1, 6)
 
-        if roll > 4 :
+        if roll > 4:
             player.winning_coins += 4
 
         return player
 
+
 class Light_Snack(Item):
-    def __init__(self, position):
+    def __init__(self, position, player):
         super().__init__("Light Snack",
-                         "Gain 3 HP.", 2, position)
+                         "Gain 3 HP.", 2, position, player)
 
     def use(self, player):
         player.winning_hp += 3
 
         return player
 
+
 class Medium_Snack(Item):
-    def __init__(self, position):
+    def __init__(self, position, player):
         super().__init__("Meduim Snack",
-                         "Gain 6 HP.", 9, position)
+                         "Gain 6 HP.", 9, position, player)
 
     def use(self, player):
         player.winning_hp += 6
 
         return player
 
+
 class Hearty_Snack(Item):
-    def __init__(self, position):
+    def __init__(self, position, player):
         super().__init__("Hearty Snack",
-                         "Gain 9 HP", 13, position)
+                         "Gain 9 HP", 13, position, player)
 
     def use(self, player):
         player.winning_hp += 9
@@ -166,60 +168,66 @@ class Hearty_Snack(Item):
 """
     Particular items
 """
+
+
 class Doubling_Potion(Item):
-    def __init__(self, position):
+    def __init__(self, position, player):
         super().__init__("Doubling Potion",
-                         "Double the number of a dice roll (use once).", 6, position, True)
+                         "Double the number of a dice roll (use once).", 6, position, player, True)
 
     def use(self, level):
         pass
+
 
 class Scroll_of_Mulligan(Item):
-    def __init__(self, position):
+    def __init__(self, position, player):
         super().__init__("Scroll of Mulligan",
-                         "re-roll your dice (use once).", 10, position, True)
+                         "re-roll your dice (use once).", 10, position, player, True)
 
     def use(self, level):
         pass
+
 
 class Coin_Rush(Item):
-    def __init__(self, position):
+    def __init__(self, position, player):
         super().__init__("Coin Rush",
-                         "All coins and treasure chests are worth 2x on next floor only.", 11, position)
+                         "All coins and treasure chests are worth 2x on next floor only.", 11, position, player)
 
     def use(self, level):
         pass
 
+
 class Break_on_Trought(Item):
-    def __init__(self, position):
+    def __init__(self, position, player):
         super().__init__("Break on Through",
-                         "Traver through a wall (use once).", 9, position, True)
+                         "Traver through a wall (use once).", 9, position, player, True)
 
     def use(self, level):
         pass
 
 
 class Teleport_Scroll(Item):
-    def __init__(self, position):
+    def __init__(self, position, player):
         super().__init__("Teleport Scroll",
-                         "Teleport to anywhere on the map (use once).", 11, position, True)
+                         "Teleport to anywhere on the map (use once).", 11, position, player, True)
 
     def use(self, level):
         pass
 
+
 class Magic_Shield(Item):
-    def __init__(self, position):
+    def __init__(self, position, player):
         super().__init__("Magic Shield",
-                         "Provides invinicibility on the next floor only. Enjoy!", 18, position)
+                         "Provides invinicibility on the next floor only. Enjoy!", 18, position, player)
 
     def use(self, level):
         pass
 
 
 class Weaklings(Item):
-    def __init__(self, position):
+    def __init__(self, position, player):
         super().__init__("Weaklings",
-                         "Act as if all monsters on the next floor have only 1 HP.", 15, position)
+                         "Act as if all monsters on the next floor have only 1 HP.", 15, position, player)
 
     def use(self, level):
         pass

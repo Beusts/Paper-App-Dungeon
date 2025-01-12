@@ -23,7 +23,7 @@ class Game:
 
         self.player = Player()
 
-        self.current_stage = Level('test', self.player)
+        self.current_stage = Shop('0', self.player)
 
     def change_level(self):
         self.current_level_index += 1
@@ -34,7 +34,7 @@ class Game:
             new_level_file = self.level_map_files[self.current_level_index]
 
             if self.current_level_index % 6 == 0:
-                self.current_stage = Shop('0')
+                self.current_stage = Shop('0', self.player)
             else:
                 self.current_stage = Level(new_level_file, self.player)
             print("changing level")
