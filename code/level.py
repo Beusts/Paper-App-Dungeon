@@ -27,7 +27,7 @@ TRANSPARENT_BLACK = (0, 0, 0, 180)
 
 
 class Level:
-    def __init__(self, level_data):
+    def __init__(self, level_data, player):
         """
         Initialise le niveau avec les données spécifiées.
 
@@ -41,9 +41,8 @@ class Level:
 
         self.walls = pygame.sprite.Group()
         self.objects = pygame.sprite.Group()
-        self.player = pygame.sprite.GroupSingle()
 
-        self.visible_sprites = pygame.sprite.LayeredUpdates()
+        self.player = player
 
         self.setup(level_data)
 
@@ -93,8 +92,8 @@ class Level:
                              (self.all_sprites, self.walls))
                     elif tile == 'P':
                         # Crée un joueur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
-                        Player((x * TILE_SIZE, y * TILE_SIZE),
-                               [self.all_sprites, self.player], {"walls": self.walls, "objects": self.objects}, self)
+                        self.player.setup((x * TILE_SIZE, y * TILE_SIZE),
+                                          self.all_sprites, {"walls": self.walls, "objects": self.objects}, self)
                     # Regarde si la tuile correspond a un pattern comme ceci : SeN où N est un nombre positif
                     elif re.match(r"Se(\d+)", tile):
 
@@ -151,8 +150,8 @@ class Level:
                         Stair((x * TILE_SIZE, y * TILE_SIZE),
                               [self.all_sprites, self.objects])
 
-            self.hp_start = self.player.sprite.hp
-            self.coins_start = self.player.sprite.coins
+            self.hp_start = self.player.hp
+            self.coins_start = self.player.coins
 
     def run(self, dt):
         """
@@ -171,8 +170,8 @@ class Level:
             sprite.draw(self.display_surface)
         for sprite in self.objects:
             sprite.draw(self.display_surface)
-        for sprite in self.player:
-            sprite.draw(self.display_surface)
+
+        self.player.draw(self.display_surface)
 
         self.draw_grid()
         self.draw_information_player()
@@ -223,20 +222,20 @@ class Level:
 
         # Afficher les hp et coins pendant la partie du joueur
 
-        if self.player.sprite.winning_hp > 0:
-            draw_text(self.display_surface, str(self.player.sprite.winning_hp),
+        if self.player.winning_hp > 0:
+            draw_text(self.display_surface, str(self.player.winning_hp),
                       (draw_rect[0].centerx * 0.95, draw_rect[0].centery * 0.98), font, BLACK)
 
-        if self.player.sprite.losing_hp > 0:
-            draw_text(self.display_surface, str(self.player.sprite.losing_hp),
+        if self.player.losing_hp > 0:
+            draw_text(self.display_surface, str(self.player.losing_hp),
                       (draw_rect[1].centerx * 0.95, draw_rect[1].centery * 0.98), font, BLACK)
 
-        if self.player.sprite.winning_coins > 0:
-            draw_text(self.display_surface, str(self.player.sprite.winning_coins),
+        if self.player.winning_coins > 0:
+            draw_text(self.display_surface, str(self.player.winning_coins),
                       (draw_rect[2].centerx * 0.95, draw_rect[2].centery * 0.98), font, BLACK)
 
-        if self.player.sprite.losing_coins > 0:
-            draw_text(self.display_surface, str(self.player.sprite.losing_coins),
+        if self.player.losing_coins > 0:
+            draw_text(self.display_surface, str(self.player.losing_coins),
                       (draw_rect[3].centerx * 0.95, draw_rect[3].centery * 0.98), font, BLACK)
 
         # Dessiner les textes d'en-tête
@@ -305,27 +304,29 @@ class Level:
         # ...ajouter la logique pour terminer le niveau...
         font = pygame.font.Font(None, TILE_SIZE)
 
-        hp_rect = pygame.Rect(TILE_SIZE * 7.5, TILE_SIZE * 17, TILE_SIZE * 3.5, TILE_SIZE * 3)
+        hp_rect = pygame.Rect(TILE_SIZE * 7.5, TILE_SIZE *
+                              17, TILE_SIZE * 3.5, TILE_SIZE * 3)
 
-        coins_rect = pygame.Rect(TILE_SIZE * 4, TILE_SIZE * 20, TILE_SIZE * 3.5, TILE_SIZE * 3)
+        coins_rect = pygame.Rect(
+            TILE_SIZE * 4, TILE_SIZE * 20, TILE_SIZE * 3.5, TILE_SIZE * 3)
 
+        self.player.hp = self.hp_start + \
+            self.player.winning_hp - self.player.losing_hp
+        self.player.coins = self.coins_start + \
+            self.player.winning_coins - self.player.losing_coins
 
-        self.player.sprite.hp = self.hp_start + self.player.sprite.winning_hp - self.player.sprite.losing_hp
-        self.player.sprite.coins = self.coins_start + self.player.sprite.winning_coins - self.player.sprite.losing_coins
-
-
-        if self.player.sprite.hp <= 0:
+        if self.player.hp <= 0:
             self.hp_end = 10
             self.coins_end = 0
             self.player_dying = True
         else:
-            self.player.sprite.hp = self.player.sprite.hp if self.player.sprite.hp <= 25 else 25
-            self.hp_end = self.player.sprite.hp
-            self.player.sprite.coins = self.player.sprite.coins if self.player.sprite.coins >= 0 else 0
-            self.coins_end = self.player.sprite.coins
+            self.player.hp = self.player.hp if self.player.hp <= 25 else 25
+            self.hp_end = self.player.hp
+            self.player.coins = self.player.coins if self.player.coins >= 0 else 0
+            self.coins_end = self.player.coins
 
-        draw_text(self.display_surface, f"HP {self.player.sprite.hp} ",
+        draw_text(self.display_surface, f"HP {self.player.hp} ",
                   (TILE_SIZE * 12, hp_rect.centery), font, BLACK)
-        draw_text(self.display_surface, f"¢  {self.player.sprite.coins}",
+        draw_text(self.display_surface, f"¢  {self.player.coins}",
                   (TILE_SIZE * 12, coins_rect.centery), font, BLACK)
         self.completed = True

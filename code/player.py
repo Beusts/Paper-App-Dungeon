@@ -9,26 +9,17 @@ from stair import Stair
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self, pos, groups, colliders, level):
+    def __init__(self):
         """
-        Initialise un joueur à la position donnée et l'ajoute aux groupes spécifiés.
-
-        Args:
-            pos (tuple): La position (x, y) du joueur.
-            groups (list): Les groupes de sprites auxquels le joueur appartient.
-            colliders (pygame.sprite.Group): Les sprites avec lesquels le joueur peut entrer en collision.
+        Initialise un joueur
         """
-        super().__init__(*groups)
 
+        super().__init__()
         self.image = pygame.image.load(
             join('graphics', 'players.png')).convert_alpha()
         self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
-        self.rect = self.image.get_rect(topleft=pos)
-
-        # self.groups = groups
 
         self.adjacent_positions = []
-        self.colliders = colliders
 
         self.direction = Vector2(0, 0)
 
@@ -51,7 +42,11 @@ class Player(pygame.sprite.Sprite):
         self.losing_coins = 0
         self.winning_coins = 0
 
-        self.player = groups[1].sprite
+    def setup(self, pos, groups, colliders, level):
+        self.kill()
+        self.add(groups)
+        self.rect = self.image.get_rect(topleft=pos)
+        self.colliders = colliders
         self.level = level
 
     def input(self):
@@ -140,19 +135,19 @@ class Player(pygame.sprite.Sprite):
     def on_collision_with_object(self):
         # Lors d'une collision avec un objet, le joueur execute la methode on_collision de l'objet.
 
-        for object_collided in pygame.sprite.spritecollide(self.player, self.colliders["objects"], False):
+        for object_collided in pygame.sprite.spritecollide(self, self.colliders["objects"], False):
             print(f"collision with {object_collided}")
 
             if isinstance(object_collided, Teleporter):
-                self.player = object_collided.on_collision(
-                    self.player, self.level.objects)
+                self = object_collided.on_collision(
+                    self, self.level.objects)
                 return
 
             if isinstance(object_collided, Stair):
                 object_collided.on_collision(self.level)
                 return
 
-            self.player = object_collided.on_collision(self.player)
+            self = object_collided.on_collision(self)
 
     def update_adjacent_tiles(self):
         """
