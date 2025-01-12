@@ -90,7 +90,7 @@ class Player(pygame.sprite.Sprite):
                 self.show_adjacent_tiles = not self.show_adjacent_tiles
                 # Redéfinit le nombre de mouvements restants
                 if self.movement_remaining == 0:
-                    self.movement_roll = randint(1, 6)
+                    self.movement_roll = randint(1, 2)
                     self.movement_remaining = self.movement_roll
 
     def move(self):

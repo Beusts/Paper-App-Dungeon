@@ -1,12 +1,14 @@
 import pygame
 
 
-def draw_text(surface, text, position, font, color, center=False, center_y=False, line_width=None):
+def draw_text(surface, text, position, font, color, center=False, center_y=False, center_x=False, line_width=None):
     text_surface = font.render(text, True, color)
     if center:
         text_rect = text_surface.get_rect(center=position)
     elif center_y:
         text_rect = text_surface.get_rect(x=position[0], centery=position[1])
+    elif center_x:
+        text_rect = text_surface.get_rect(centerx=position[0], y=position[1])
     else:
         text_rect = text_surface.get_rect(topleft=position)
 

@@ -46,13 +46,6 @@ class Level:
 
         self.setup(level_data)
 
-        self.hp_start = 10
-        self.coins_start = 0
-
-        self.hp_end = 0
-        self.coins_end = 0
-        self.player_dying = False
-
         self.paused = False
         self.completed = False
 
@@ -81,8 +74,6 @@ class Level:
         with open(join('data', 'levels', level_data + '.csv'), newline='') as csvfile:
 
             level_reader = csv.reader(csvfile, delimiter=',')
-
-            pattern = r"Se(\d+)"
 
             for y, row in enumerate(level_reader):
                 for x, tile in enumerate(row):
@@ -224,40 +215,41 @@ class Level:
 
         if self.player.winning_hp > 0:
             draw_text(self.display_surface, str(self.player.winning_hp),
-                      (draw_rect[0].centerx * 0.95, draw_rect[0].centery * 0.98), font, BLACK)
+                      draw_rect[0].center, font, BLACK, center=True)
 
         if self.player.losing_hp > 0:
             draw_text(self.display_surface, str(self.player.losing_hp),
-                      (draw_rect[1].centerx * 0.95, draw_rect[1].centery * 0.98), font, BLACK)
+                      draw_rect[1].center, font, BLACK, center=True)
 
         if self.player.winning_coins > 0:
             draw_text(self.display_surface, str(self.player.winning_coins),
-                      (draw_rect[2].centerx * 0.95, draw_rect[2].centery * 0.98), font, BLACK)
+                      draw_rect[2].center, font, BLACK, center=True)
 
         if self.player.losing_coins > 0:
             draw_text(self.display_surface, str(self.player.losing_coins),
-                      (draw_rect[3].centerx * 0.95, draw_rect[3].centery * 0.98), font, BLACK)
+                      draw_rect[3].center, font, BLACK, center=True)
 
         # Dessiner les textes d'en-tête
         draw_text(self.display_surface, "Starting",
                   (TILE_SIZE * 0.5, TILE_SIZE * 16), font, BLACK)
         draw_text(self.display_surface, "+",
-                  (draw_rect[0].centerx, TILE_SIZE * 16), font, BLACK)
+                  (draw_rect[0].centerx, TILE_SIZE * 16), font, BLACK, center_x=True)
         draw_text(self.display_surface, "-",
-                  (draw_rect[1].centerx, TILE_SIZE * 16), font, BLACK)
+                  (draw_rect[1].centerx, TILE_SIZE * 16), font, BLACK, center_x=True)
         draw_text(self.display_surface, "Ending",
                   (TILE_SIZE * 12, TILE_SIZE * 16), font, BLACK)
 
         # Dessiner les valeurs copiées
-        draw_text(self.display_surface, f'{self.hp_start} HP',
+        draw_text(self.display_surface, f'{self.player.hp} HP',
                   (TILE_SIZE * 0.5, draw_rect[1].centery), font, BLACK)
-        draw_text(self.display_surface, f'{self.coins_start} ¢',
+        draw_text(self.display_surface, f'{self.player.coins} ¢',
                   (TILE_SIZE * 0.5, draw_rect[2].centery), font, BLACK)
 
         # TODO : afficher à la fin du niveau, l'hp et les coins du joueur
-        draw_text(self.display_surface, "HP ____",
+        draw_text(self.display_surface, f'{self.hp_start + self.player.winning_hp - self.player.losing_hp} HP',
                   (TILE_SIZE * 12, draw_rect[1].centery), font, BLACK)
-        draw_text(self.display_surface, "¢  ____",
+
+        draw_text(self.display_surface, f'{self.coins_start + self.player.winning_coins - self.player.losing_coins} ¢',
                   (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
 
     def draw_end_level_interface(self):
@@ -301,32 +293,21 @@ class Level:
         # Logique pour terminer le niveau et afficher les résultats finaux
         print("Niveau terminé")
 
-        # ...ajouter la logique pour terminer le niveau...
-        font = pygame.font.Font(None, TILE_SIZE)
-
-        hp_rect = pygame.Rect(TILE_SIZE * 7.5, TILE_SIZE *
-                              17, TILE_SIZE * 3.5, TILE_SIZE * 3)
-
-        coins_rect = pygame.Rect(
-            TILE_SIZE * 4, TILE_SIZE * 20, TILE_SIZE * 3.5, TILE_SIZE * 3)
-
         self.player.hp = self.hp_start + \
             self.player.winning_hp - self.player.losing_hp
+        self.player.hp = self.player.hp if self.player.hp <= 25 else 25
         self.player.coins = self.coins_start + \
             self.player.winning_coins - self.player.losing_coins
+        self.player.coins = self.player.coins if self.player.coins >= 0 else 0
+
+        self.player.winning_hp = 0
+        self.player.losing_hp = 0
+        self.player.winning_coins = 0
+        self.player.losing_coins = 0
 
         if self.player.hp <= 0:
-            self.hp_end = 10
-            self.coins_end = 0
-            self.player_dying = True
-        else:
-            self.player.hp = self.player.hp if self.player.hp <= 25 else 25
-            self.hp_end = self.player.hp
-            self.player.coins = self.player.coins if self.player.coins >= 0 else 0
-            self.coins_end = self.player.coins
+            self.coins = 0
+            self.player.hp = 10
+            self.player.deaths += 1
 
-        draw_text(self.display_surface, f"HP {self.player.hp} ",
-                  (TILE_SIZE * 12, hp_rect.centery), font, BLACK)
-        draw_text(self.display_surface, f"¢  {self.player.coins}",
-                  (TILE_SIZE * 12, coins_rect.centery), font, BLACK)
         self.completed = True
