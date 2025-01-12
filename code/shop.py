@@ -92,3 +92,84 @@ class Doubling_Potion(Item):
 
     def use(self):
         pass
+
+class Scroll_of_Mulligan(Item):
+    def __init__(self, position):
+        super().__init__("Scroll of Mulligan",
+                         "re-roll your dice (use once).", 6, position)
+
+    def use(self):
+        pass
+
+class Gambler(Item):
+    def __init__(self, position):
+        super().__init__("Gambler",
+                         "Roll: If you roll 4+, gain 10¢. Otherwise, gain 0¢.", 6, position)
+
+    def use(self):
+        pass
+
+class Light_Snack(Item):
+    def __init__(self, position):
+        super().__init__("Light Snack",
+                         "Gain 3 HP.", 6, position)
+
+    def use(self):
+        pass
+
+class Coin_Rush(Item):
+    def __init__(self, position):
+        super().__init__("Coin Rush",
+                         "All coins and treasure chests are worth 2x on next floor only.", 6, position)
+
+    def use(self):
+        pass
+
+class Break_on_Trought(Item):
+    def __init__(self, position):
+        super().__init__("Break on Through",
+                         "Traver through a wall (use once).", 6, position)
+
+    def use(self):
+        pass
+
+class Hearty_Snack(Item):
+    def __init__(self, position):
+        super().__init__("Hearty Snack",
+                         "Gain 9 HP", 6, position)
+
+    def use(self):
+        pass
+
+class Teleport_Scroll(Item):
+    def __init__(self, position):
+        super().__init__("Teleport Scroll",
+                         "Teleport to anywhere on the map (use once).", 6, position)
+
+    def use(self):
+        pass
+
+class Magic_Shield(Item):
+    def __init__(self, position):
+        super().__init__("Magic Shield",
+                         "Provides invinicibility on the next floor only. Enjoy!", 6, position)
+
+    def use(self):
+        pass
+
+class Medium_Snack(Item):
+    def __init__(self, position):
+        super().__init__("Meduim Snack",
+                         "Gain 6 HP.", 6, position)
+
+    def use(self):
+        pass
+
+
+class Weaklings(Item):
+    def __init__(self, position):
+        super().__init__("Weaklings",
+                         "Act as if all monsters on the next floor have only 1 HP.", 6, position)
+
+    def use(self):
+        pass

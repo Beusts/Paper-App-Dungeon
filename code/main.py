@@ -18,8 +18,8 @@ class Game:
 
         self.level_map_files = {0: '0', 1: '1', 2: 'test'}
         self.current_level_index = 0
-        self.current_stage = Level(self.level_map_files[self.current_level_index])
-        # self.current_stage = Shop('0')
+        # self.current_stage = Level(self.level_map_files[self.current_level_index])
+        self.current_stage = Shop('0')
 
         self.tally_of_deaths = 0
         self.final_coins = 0
@@ -59,7 +59,7 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
-            if self.current_stage.completed:
+            if isinstance(self.current_stage, Level) and self.current_stage.completed:
                 self.change_level()
 
             self.current_stage.run(dt)
