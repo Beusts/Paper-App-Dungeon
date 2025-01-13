@@ -165,7 +165,7 @@ class Level:
         self.player.draw(self.display_surface)
 
         self.draw_grid()
-        self.draw_information_player()
+        self.player.draw_information_player(self.display_surface)
 
     def draw_grid(self):
         """
@@ -178,79 +178,6 @@ class Level:
         for x in range(0, 15 * TILE_SIZE, TILE_SIZE):
             pygame.draw.line(self.display_surface, GRAY,
                              (x - (width / 2), 0), (x - (width / 2), 15 * TILE_SIZE), width)
-
-    def draw_information_player(self):
-        """
-        Dessine un espace pouvant afficher la vie, l'argent, au début et à la fin d'un level
-        """
-        # Définir la police et la taille de la police
-        font = pygame.font.Font(None, TILE_SIZE)
-
-        # Positions des rectangles d'information
-        rect_positions = [
-            (TILE_SIZE * 4, TILE_SIZE * 17),
-            (TILE_SIZE * 7.5, TILE_SIZE * 17),
-            (TILE_SIZE * 4, TILE_SIZE * 20),
-            (TILE_SIZE * 7.5, TILE_SIZE * 20)
-        ]
-
-        # Créer et ajuster les rectangles
-        draw_rect = []
-        for pos in rect_positions:
-            rect = pygame.Rect(pos[0], pos[1], TILE_SIZE * 3.5, TILE_SIZE * 3)
-            rect.inflate_ip(-TILE_SIZE * 0.15, -TILE_SIZE * 0.15)
-            draw_rect.append(rect)
-
-        # Dessiner les rectangles avec des coins arrondis
-        pygame.draw.rect(self.display_surface, GRAY,
-                         draw_rect[0], border_top_left_radius=10)
-        pygame.draw.rect(self.display_surface, GRAY,
-                         draw_rect[1], border_top_right_radius=10)
-        pygame.draw.rect(self.display_surface, GRAY,
-                         draw_rect[2], border_bottom_left_radius=10)
-        pygame.draw.rect(self.display_surface, GRAY,
-                         draw_rect[3], border_bottom_right_radius=10)
-
-        # Afficher les hp et coins pendant la partie du joueur
-
-        if self.player.winning_hp > 0:
-            draw_text(self.display_surface, str(self.player.winning_hp),
-                      draw_rect[0].center, font, BLACK, center=True)
-
-        if self.player.losing_hp > 0:
-            draw_text(self.display_surface, str(self.player.losing_hp),
-                      draw_rect[1].center, font, BLACK, center=True)
-
-        if self.player.winning_coins > 0:
-            draw_text(self.display_surface, str(self.player.winning_coins),
-                      draw_rect[2].center, font, BLACK, center=True)
-
-        if self.player.losing_coins > 0:
-            draw_text(self.display_surface, str(self.player.losing_coins),
-                      draw_rect[3].center, font, BLACK, center=True)
-
-        # Dessiner les textes d'en-tête
-        draw_text(self.display_surface, "Starting",
-                  (TILE_SIZE * 0.5, TILE_SIZE * 16), font, BLACK)
-        draw_text(self.display_surface, "+",
-                  (draw_rect[0].centerx, TILE_SIZE * 16), font, BLACK, center_x=True)
-        draw_text(self.display_surface, "-",
-                  (draw_rect[1].centerx, TILE_SIZE * 16), font, BLACK, center_x=True)
-        draw_text(self.display_surface, "Ending",
-                  (TILE_SIZE * 12, TILE_SIZE * 16), font, BLACK)
-
-        # Dessiner les valeurs copiées
-        draw_text(self.display_surface, f'{self.player.hp} HP',
-                  (TILE_SIZE * 0.5, draw_rect[1].centery), font, BLACK)
-        draw_text(self.display_surface, f'{self.player.coins} ¢',
-                  (TILE_SIZE * 0.5, draw_rect[2].centery), font, BLACK)
-
-        # TODO : afficher à la fin du niveau, l'hp et les coins du joueur
-        draw_text(self.display_surface, f'{self.hp_start + self.player.winning_hp - self.player.losing_hp} HP',
-                  (TILE_SIZE * 12, draw_rect[1].centery), font, BLACK)
-
-        draw_text(self.display_surface, f'{self.coins_start + self.player.winning_coins - self.player.losing_coins} ¢',
-                  (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
 
     def draw_end_level_interface(self):
         """
