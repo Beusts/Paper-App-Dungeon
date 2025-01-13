@@ -19,11 +19,10 @@ class Game:
 
         self.level_map_files = {0: '0', 1: '1', 2: 'test'}
         self.current_level_index = 0
-        # self.current_stage = Level(self.level_map_files[self.current_level_index])
-
         self.player = Player()
 
-        self.current_stage = Shop('0', self.player)
+        self.current_stage = Level(self.level_map_files[self.current_level_index], self.player)
+        # self.current_stage = Shop('0', self.player)
 
     def change_level(self):
         self.current_level_index += 1
