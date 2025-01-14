@@ -105,14 +105,6 @@ class Player(pygame.sprite.Sprite):
                 self.movement_roll = randint(1, 6)
                 self.movement_remaining = self.movement_roll
 
-    def draw_inventory(self):
-        """
-        Gère le clic sur le bouton d'inventaire.
-        """
-        if not self.show_inventory:
-            return
-        # TODO: Afficher l'inventaire
-
     def move(self):
         """
         Déplace le joueur selon la direction et le temps écoulé.
@@ -220,8 +212,16 @@ class Player(pygame.sprite.Sprite):
         if self.can_move and self.movement_remaining > 0:
             self.draw_adjacent_tiles(surface)
         self.draw_inventory_button(surface)
-        self.draw_information_player(surface)
-        self.draw_inventory()
+        if self.show_player_info:
+            self.draw_information_player(surface)
+        if self.show_inventory:
+            self.draw_inventory()
+
+    def draw_inventory(self):
+        """
+        Gère le clic sur le bouton d'inventaire.
+        """
+        # TODO: Afficher l'inventaire
 
     def update(self, dt):
         """
@@ -255,9 +255,6 @@ class Player(pygame.sprite.Sprite):
         Args:
             surface (pygame.Surface): La surface sur laquelle dessiner les informations du joueur.
         """
-        if not self.show_player_info:
-            return
-
         font = pygame.font.Font(None, TILE_SIZE)
 
         rect_positions = [

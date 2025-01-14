@@ -165,7 +165,6 @@ class Level:
         self.player.draw(self.display_surface)
 
         self.draw_grid()
-        self.player.draw_information_player(self.display_surface)
 
     def draw_grid(self):
         """
