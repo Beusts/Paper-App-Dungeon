@@ -43,9 +43,9 @@ class Player(pygame.sprite.Sprite):
         self.winning_coins = 0
         self.inventory = []
         self.inventory_button_rect = pygame.Rect(
-            0, 0, get_tile_size() * 4, get_tile_size() * 2)
+            0, 0, UI_SIZE * 4, UI_SIZE * 2)
         self.inventory_button_rect.center = (
-            get_tile_size() * 7.5, get_tile_size() * 25)
+            UI_SIZE * 7.5, UI_SIZE * 25)
 
         self.show_player_info = True
         self.show_inventory = False
@@ -242,9 +242,9 @@ class Player(pygame.sprite.Sprite):
         return self.hp > 0
 
     def draw_inventory_button(self, surface):
-        font = pygame.font.Font(None, get_tile_size())
-        rect = pygame.Rect(0, 0, get_tile_size() * 4, get_tile_size() * 2)
-        rect.center = (get_tile_size() * 7.5, get_tile_size() * 25)
+        font = pygame.font.Font(None, UI_SIZE)
+        rect = pygame.Rect(0, 0, UI_SIZE * 4, UI_SIZE * 2)
+        rect.center = (UI_SIZE * 7.5, UI_SIZE * 25)
         pygame.draw.rect(
             surface, GRAY, self.inventory_button_rect, border_radius=10)
         text = font.render("Inventory", True, BLACK)
@@ -258,20 +258,20 @@ class Player(pygame.sprite.Sprite):
         Args:
             surface (pygame.Surface): La surface sur laquelle dessiner les informations du joueur.
         """
-        font = pygame.font.Font(None, get_tile_size())
+        font = pygame.font.Font(None, UI_SIZE)
 
         rect_positions = [
-            (get_tile_size() * 4, get_tile_size() * 17),
-            (get_tile_size() * 7.5, get_tile_size() * 17),
-            (get_tile_size() * 4, get_tile_size() * 20),
-            (get_tile_size() * 7.5, get_tile_size() * 20)
+            (UI_SIZE * 4, UI_SIZE * 17),
+            (UI_SIZE * 7.5, UI_SIZE * 17),
+            (UI_SIZE * 4, UI_SIZE * 20),
+            (UI_SIZE * 7.5, UI_SIZE * 20)
         ]
 
         draw_rect = []
         for pos in rect_positions:
             rect = pygame.Rect(
-                pos[0], pos[1], get_tile_size() * 3.5, get_tile_size() * 3)
-            rect.inflate_ip(-get_tile_size() * 0.15, -get_tile_size() * 0.15)
+                pos[0], pos[1], UI_SIZE * 3.5, UI_SIZE * 3)
+            rect.inflate_ip(-UI_SIZE * 0.15, -UI_SIZE * 0.15)
             draw_rect.append(rect)
 
         pygame.draw.rect(
@@ -299,21 +299,21 @@ class Player(pygame.sprite.Sprite):
             draw_text(surface, str(self.losing_coins),
                       draw_rect[3].center, font, BLACK, center=True)
 
-        draw_text(surface, "Starting", (get_tile_size() *
-                  0.5, get_tile_size() * 16), font, BLACK)
+        draw_text(surface, "Starting", (UI_SIZE *
+                  0.5, UI_SIZE * 16), font, BLACK)
         draw_text(
-            surface, "+", (draw_rect[0].centerx, get_tile_size() * 16), font, BLACK, center_x=True)
+            surface, "+", (draw_rect[0].centerx, UI_SIZE * 16), font, BLACK, center_x=True)
         draw_text(
-            surface, "-", (draw_rect[1].centerx, get_tile_size() * 16), font, BLACK, center_x=True)
-        draw_text(surface, "Ending", (get_tile_size() *
-                  12, get_tile_size() * 16), font, BLACK)
+            surface, "-", (draw_rect[1].centerx, UI_SIZE * 16), font, BLACK, center_x=True)
+        draw_text(surface, "Ending", (UI_SIZE *
+                  12, UI_SIZE * 16), font, BLACK)
 
-        draw_text(surface, f'{self.hp} HP', (get_tile_size() *
+        draw_text(surface, f'{self.hp} HP', (UI_SIZE *
                   0.5, draw_rect[1].centery), font, BLACK)
-        draw_text(surface, f'{self.coins} ¢', (get_tile_size() *
+        draw_text(surface, f'{self.coins} ¢', (UI_SIZE *
                   0.5, draw_rect[2].centery), font, BLACK)
 
         draw_text(surface, f'{self.level.hp_start + self.winning_hp - self.losing_hp} HP',
-                  (get_tile_size() * 12, draw_rect[1].centery), font, BLACK)
+                  (UI_SIZE * 12, draw_rect[1].centery), font, BLACK)
         draw_text(surface, f'{self.level.coins_start + self.winning_coins - self.losing_coins} ¢',
-                  (get_tile_size() * 12, draw_rect[2].centery), font, BLACK)
+                  (UI_SIZE * 12, draw_rect[2].centery), font, BLACK)
