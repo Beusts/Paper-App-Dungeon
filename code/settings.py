@@ -19,7 +19,9 @@ is_input_active = False
 
 
 # Taille d'une tuile (initiale)
-TILE_SIZE = int(WINDOW_WIDTH / max(15, 15))
+TILE_SIZE = int((WINDOW_WIDTH / max(15, 15)))
+
+print(TILE_SIZE)
 
 
 def get_tile_size():

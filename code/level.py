@@ -76,15 +76,20 @@ class Level:
             level_reader = csv.reader(csvfile, delimiter=',')
             level_reader = list(level_reader)
 
+            self.rows = len(level_reader)
+            self.cols = len(level_reader[0])
+
+            self.x_offset = (WINDOW_WIDTH - (self.cols * get_tile_size())) / 2
+
             for y, row in enumerate(level_reader):
                 for x, tile in enumerate(row):
                     if tile == '1':
                         # Crée un mur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
-                        Wall((x * get_tile_size(), y * get_tile_size()),
+                        Wall((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                              (self.all_sprites, self.walls))
                     elif tile == 'P':
                         # Crée un joueur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
-                        self.player.setup((x * get_tile_size(), y * get_tile_size()),
+                        self.player.setup((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                                           self.all_sprites, {"walls": self.walls, "objects": self.objects}, self)
                     # Regarde si la tuile correspond a un pattern comme ceci : SeN où N est un nombre positif
                     elif re.match(r"Se(\d+)", tile):
@@ -94,15 +99,15 @@ class Level:
                         if match:
                             value = int(match.group(1))
 
-                        StandardEnemy((x * get_tile_size(), y * get_tile_size()),
+                        StandardEnemy((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                                       [self.all_sprites, self.objects], value)
                     elif tile == 'Me':
 
-                        MysteryEnemy((x * get_tile_size(), y * get_tile_size()),
+                        MysteryEnemy((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                                      [self.all_sprites, self.objects])
                     elif tile == 'W':
 
-                        SpiderWeb((x * get_tile_size(), y * get_tile_size()),
+                        SpiderWeb((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                                   [self.all_sprites, self.objects])
                     elif re.match(r"Sh(\d+)", tile):
 
@@ -111,35 +116,35 @@ class Level:
                         if match:
                             value = int(match.group(1))
 
-                        StandardHeart((x * get_tile_size(), y * get_tile_size()),
+                        StandardHeart((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                                       [self.all_sprites, self.objects], value)
                     elif tile == 'Mh':
 
-                        MysteryHeart((x * get_tile_size(), y * get_tile_size()),
+                        MysteryHeart((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                                      [self.all_sprites, self.objects])
                     elif tile == 'K':
 
-                        Key((x * get_tile_size(), y * get_tile_size()),
+                        Key((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                             [self.all_sprites, self.objects])
                     elif tile == 'L':
 
-                        Lock((x * get_tile_size(), y * get_tile_size()),
+                        Lock((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                              [self.all_sprites, self.objects])
                     elif tile == 'C':
 
-                        Chest((x * get_tile_size(), y * get_tile_size()),
+                        Chest((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                               [self.all_sprites, self.objects])
                     elif tile == 'Co':
 
-                        Coin((x * get_tile_size(), y * get_tile_size()),
+                        Coin((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                              [self.all_sprites, self.objects])
                     elif tile == 'T':
 
-                        Teleporter((x * get_tile_size(), y * get_tile_size()),
+                        Teleporter((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                                    [self.all_sprites, self.objects])
                     elif tile == 'S':
 
-                        Stair((x * get_tile_size(), y * get_tile_size()),
+                        Stair((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                               [self.all_sprites, self.objects])
 
             self.hp_start = self.player.hp
@@ -172,12 +177,12 @@ class Level:
         Dessine une grille sur la surface d'affichage.
         """
         width = int(get_tile_size() * 0.06)
-        for y in range(0, 16 * get_tile_size(), get_tile_size()):
+        for y in range(0, (self.rows + 1) * get_tile_size(), get_tile_size()):
             pygame.draw.line(self.display_surface, GRAY,
-                             (0, y - (width / 2)), (15 * get_tile_size(), y - (width / 2)), width)
-        for x in range(0, 15 * get_tile_size(), get_tile_size()):
+                             (self.x_offset, y), (self.cols * get_tile_size() + self.x_offset, y), width)
+        for x in range(0, (self.cols + 1) * get_tile_size(), get_tile_size()):
             pygame.draw.line(self.display_surface, GRAY,
-                             (x - (width / 2), 0), (x - (width / 2), 15 * get_tile_size()), width)
+                             (x + self.x_offset, 0), (x + self.x_offset, self.rows * get_tile_size()), width)
 
     def draw_end_level_interface(self):
         """
