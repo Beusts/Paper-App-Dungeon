@@ -12,7 +12,7 @@ class Stair(Object):
         image = pygame.image.load(
             join('graphics', 'stairs.png')).convert_alpha()
         image = pygame.transform.scale(
-            image, (TILE_SIZE, TILE_SIZE))
+            image, (get_tile_size(), get_tile_size()))
 
         return image
 

@@ -10,13 +10,11 @@ class Teleporter(Object):
 
         super().__init__(pos, groups)
 
-
-
     def design(self):
         image = pygame.image.load(
             join('graphics', 'teleporters.png')).convert_alpha()
         image = pygame.transform.scale(
-            image, (TILE_SIZE, TILE_SIZE))
+            image, (get_tile_size(), get_tile_size()))
 
         return image
 

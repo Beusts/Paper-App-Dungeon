@@ -5,8 +5,8 @@ from utils import draw_text
 from random import randint
 
 pygame.font.init()
-FONT = pygame.font.Font(None, int(TILE_SIZE * 1.5))
-DESC_FONT = pygame.font.Font(None, int(TILE_SIZE * 0.7))
+FONT = pygame.font.Font(None, int(get_tile_size() * 1.5))
+DESC_FONT = pygame.font.Font(None, int(get_tile_size() * 0.7))
 
 
 class Shop:
@@ -55,15 +55,15 @@ class Shop:
         Dessine le shop
         """
         pygame.draw.rect(self.display_surface, GRAY,
-                         (0, 0, TILE_SIZE * 15, TILE_SIZE * 2))
+                         (0, 0, get_tile_size() * 15, get_tile_size() * 2))
 
-        round_radius = int(TILE_SIZE)
+        round_radius = int(get_tile_size())
         for i in range(15):
             pygame.draw.rect(self.display_surface, GRAY,
-                             (i * TILE_SIZE, TILE_SIZE * 2, TILE_SIZE, TILE_SIZE), border_bottom_left_radius=round_radius, border_bottom_right_radius=round_radius)
+                             (i * get_tile_size(), get_tile_size() * 2, get_tile_size(), get_tile_size()), border_bottom_left_radius=round_radius, border_bottom_right_radius=round_radius)
 
         draw_text(self.display_surface, "Shop",
-                  (TILE_SIZE * 7.5, TILE_SIZE * 1.5), FONT, BLACK, center=True)
+                  (get_tile_size() * 7.5, get_tile_size() * 1.5), FONT, BLACK, center=True)
 
         for item in self.items:
             item.draw()
@@ -92,12 +92,12 @@ class Item:
 
     def draw(self):
         rect = pygame.Rect(
-            self.position[0] * TILE_SIZE, self.position[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+            self.position[0] * get_tile_size(), self.position[1] * get_tile_size(), get_tile_size(), get_tile_size())
         if self.is_bought:
             pygame.draw.rect(self.display_surface, BLACK, rect)
         else:
             pygame.draw.rect(self.display_surface, BLACK,
-                             rect, int(TILE_SIZE*0.15))
+                             rect, int(get_tile_size()*0.15))
 
         # Check for mouse click on the item
         mouse_pos = pygame.mouse.get_pos()
@@ -106,11 +106,11 @@ class Item:
         if rect.collidepoint(mouse_pos) and mouse_click:
             self.buy()
         draw_text(self.display_surface, self.name,
-                  (self.position[0] * TILE_SIZE + (TILE_SIZE * 2), self.position[1] * TILE_SIZE), FONT, BLACK)
+                  (self.position[0] * get_tile_size() + (get_tile_size() * 2), self.position[1] * get_tile_size()), FONT, BLACK)
         draw_text(self.display_surface, f"{self.price}¢",
-                  (self.position[0] * TILE_SIZE + TILE_SIZE / 2, self.position[1] * TILE_SIZE + (TILE_SIZE * 1.5)), DESC_FONT, BLACK, center=True)
+                  (self.position[0] * get_tile_size() + get_tile_size() / 2, self.position[1] * get_tile_size() + (get_tile_size() * 1.5)), DESC_FONT, BLACK, center=True)
         draw_text(self.display_surface, self.description,
-                  (self.position[0] * TILE_SIZE + (TILE_SIZE * 2), self.position[1] * TILE_SIZE + (TILE_SIZE * 1.5)), DESC_FONT, BLACK, center_y=True, line_width=TILE_SIZE * 10)
+                  (self.position[0] * get_tile_size() + (get_tile_size() * 2), self.position[1] * get_tile_size() + (get_tile_size() * 1.5)), DESC_FONT, BLACK, center_y=True, line_width=get_tile_size() * 10)
 
 
 """

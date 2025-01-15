@@ -2,6 +2,7 @@ from settings import *
 from object import *
 from random import randint
 
+
 class Chest(Object):
 
     def __init__(self, pos, groups):
@@ -25,14 +26,15 @@ class Chest(Object):
         image = pygame.image.load(
             join('graphics', 'treasure_chest.png')).convert_alpha()
         image = pygame.transform.scale(
-            image, (TILE_SIZE, TILE_SIZE))
+            image, (get_tile_size(), get_tile_size()))
 
         return image
 
     def on_collision(self, player):
 
         print(f"Collision with me {self}")
-        if self.has_already_been_used() : return player
+        if self.has_already_been_used():
+            return player
 
         winning_coins = randint(1, 6)
         player.winning_coins += winning_coins

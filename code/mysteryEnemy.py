@@ -18,13 +18,14 @@ class MysteryEnemy(Object):
     def design(self):
         image = pygame.image.load(
             join('graphics', 'enemy.png')).convert_alpha()
-        image = pygame.transform.scale(image, (TILE_SIZE, TILE_SIZE))
+        image = pygame.transform.scale(
+            image, (get_tile_size(), get_tile_size()))
 
-        font = pygame.font.Font(None, int(TILE_SIZE * 0.5))
+        font = pygame.font.Font(None, int(get_tile_size() * 0.5))
 
         text_surface = font.render("?", True, (255, 255, 255))
         text_rect = text_surface.get_rect(
-            centerx=TILE_SIZE / 2, centery=TILE_SIZE / 2)
+            centerx=get_tile_size() / 2, centery=get_tile_size() / 2)
 
         enemy = image.copy()
         enemy.blit(text_surface, text_rect)

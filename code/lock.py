@@ -1,6 +1,7 @@
 from settings import *
 from object import *
 
+
 class Lock(Object):
 
     def __init__(self, pos, groups):
@@ -24,22 +25,23 @@ class Lock(Object):
         image = pygame.image.load(
             join('graphics', 'locks.png')).convert_alpha()
         image = pygame.transform.scale(
-            image, (TILE_SIZE, TILE_SIZE))
+            image, (get_tile_size(), get_tile_size()))
 
         return image
 
     def on_collision(self, player):
 
-        if self.used : return player
+        if self.used:
+            return player
 
         print(f"Collision with me {self}")
 
         if player.keys >= 1:
             # change the lock into a simple case
-            self.image.fill((0,0,0,0))
+            self.image.fill((0, 0, 0, 0))
             player.keys -= 1
             self.used = True
-        else :
+        else:
             # the player can't go throught the lock
             player.direction = -player.direction
             player.movement_remaining = 1

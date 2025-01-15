@@ -18,7 +18,6 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.image.load(
             join('graphics', 'players.png')).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
 
         self.adjacent_positions = []
 
@@ -44,8 +43,9 @@ class Player(pygame.sprite.Sprite):
         self.winning_coins = 0
         self.inventory = []
         self.inventory_button_rect = pygame.Rect(
-            0, 0, TILE_SIZE * 4, TILE_SIZE * 2)
-        self.inventory_button_rect.center = (TILE_SIZE * 7.5, TILE_SIZE * 25)
+            0, 0, get_tile_size() * 4, get_tile_size() * 2)
+        self.inventory_button_rect.center = (
+            get_tile_size() * 7.5, get_tile_size() * 25)
 
         self.show_player_info = True
         self.show_inventory = False
@@ -53,6 +53,8 @@ class Player(pygame.sprite.Sprite):
     def setup(self, pos, groups, colliders, level):
         self.kill()
         self.add(groups)
+        self.image = pygame.transform.scale(
+            self.image, (get_tile_size(), get_tile_size()))
         self.rect = self.image.get_rect(topleft=pos)
         self.colliders = colliders
         self.level = level
@@ -84,10 +86,10 @@ class Player(pygame.sprite.Sprite):
 
         # Calcule la tuile cliquée en fonction de la position de la souris
         clicked_tile = self.rect.move(
-            (mouse_pos[0] // TILE_SIZE -
-                self.rect.x // TILE_SIZE) * TILE_SIZE,
-            (mouse_pos[1] // TILE_SIZE -
-                self.rect.y // TILE_SIZE) * TILE_SIZE
+            (mouse_pos[0] // get_tile_size() -
+                self.rect.x // get_tile_size()) * get_tile_size(),
+            (mouse_pos[1] // get_tile_size() -
+                self.rect.y // get_tile_size()) * get_tile_size()
         )
 
         # S'il clique sur une tuile adjacente et qu'il reste des mouvements
@@ -95,7 +97,7 @@ class Player(pygame.sprite.Sprite):
             self.can_move = False
             self.show_adjacent_tiles = False
             self.direction = Vector2(
-                (clicked_tile.x - self.rect.x) // TILE_SIZE, (clicked_tile.y - self.rect.y) // TILE_SIZE)
+                (clicked_tile.x - self.rect.x) // get_tile_size(), (clicked_tile.y - self.rect.y) // get_tile_size())
 
         # Si il clique sur le joueur
         elif (clicked_tile.x, clicked_tile.y) == (self.rect.x, self.rect.y) and self.can_move:
@@ -111,13 +113,13 @@ class Player(pygame.sprite.Sprite):
         """
         if self.current_time - self.last_move_time >= SLEEP_TIME and not self.can_move:
             if self.direction.x != 0 and self.direction.y != 0:
-                self.try_move(self.direction.x * TILE_SIZE,
-                              self.direction.y * TILE_SIZE)
+                self.try_move(self.direction.x * get_tile_size(),
+                              self.direction.y * get_tile_size())
             else:
                 if self.direction.x != 0:
-                    self.try_move(self.direction.x * TILE_SIZE, 0)
+                    self.try_move(self.direction.x * get_tile_size(), 0)
                 if self.direction.y != 0:
-                    self.try_move(0, self.direction.y * TILE_SIZE)
+                    self.try_move(0, self.direction.y * get_tile_size())
 
     def try_move(self, dx, dy):
         """
@@ -168,17 +170,17 @@ class Player(pygame.sprite.Sprite):
         self.adjacent_positions = []
 
         if self.movement_roll % 2 != 0:
-            for dx, dy in [(-TILE_SIZE, TILE_SIZE), (TILE_SIZE, TILE_SIZE), (TILE_SIZE, -TILE_SIZE), (-TILE_SIZE, -TILE_SIZE)]:
+            for dx, dy in [(-get_tile_size(), get_tile_size()), (get_tile_size(), get_tile_size()), (get_tile_size(), -get_tile_size()), (-get_tile_size(), -get_tile_size())]:
                 pos = (self.rect.x + dx, self.rect.y + dy)
-                rect = pygame.Rect(pos, (TILE_SIZE, TILE_SIZE))
+                rect = pygame.Rect(pos, (get_tile_size(), get_tile_size()))
 
                 # Si la tuile est un mur, ne l'ajoute pas aux tuiles adjacentes
                 if not any(sprite.rect.colliderect(rect) for sprite in self.colliders["walls"]):
                     self.adjacent_positions.append(pos)
         else:
-            for dx, dy in [(-TILE_SIZE, 0), (TILE_SIZE, 0), (0, -TILE_SIZE), (0, TILE_SIZE)]:
+            for dx, dy in [(-get_tile_size(), 0), (get_tile_size(), 0), (0, -get_tile_size()), (0, get_tile_size())]:
                 pos = (self.rect.x + dx, self.rect.y + dy)
-                rect = pygame.Rect(pos, (TILE_SIZE, TILE_SIZE))
+                rect = pygame.Rect(pos, (get_tile_size(), get_tile_size()))
 
                 # Si la tuile est un mur, ne l'ajoute pas aux tuiles adjacentes
                 if not any(sprite.rect.colliderect(rect) for sprite in self.colliders["walls"]):
@@ -193,11 +195,12 @@ class Player(pygame.sprite.Sprite):
         """
         if self.can_move and self.movement_remaining > 0 and self.show_adjacent_tiles:
             for pos in self.adjacent_positions:
-                font = pygame.font.Font(None, int(TILE_SIZE * 0.5))
+                font = pygame.font.Font(None, int(get_tile_size() * 0.5))
                 text = font.render(str(self.movement_remaining), True, BLACK)
-                text_rect = text.get_rect(center=pos + Vector2(TILE_SIZE // 2))
+                text_rect = text.get_rect(
+                    center=pos + Vector2(get_tile_size() // 2))
                 pygame.draw.circle(
-                    surface, GRAY, pos + Vector2(TILE_SIZE // 2), TILE_SIZE // 4)
+                    surface, GRAY, pos + Vector2(get_tile_size() // 2), get_tile_size() // 4)
 
                 surface.blit(text, text_rect)
 
@@ -239,9 +242,9 @@ class Player(pygame.sprite.Sprite):
         return self.hp > 0
 
     def draw_inventory_button(self, surface):
-        font = pygame.font.Font(None, TILE_SIZE)
-        rect = pygame.Rect(0, 0, TILE_SIZE * 4, TILE_SIZE * 2)
-        rect.center = (TILE_SIZE * 7.5, TILE_SIZE * 25)
+        font = pygame.font.Font(None, get_tile_size())
+        rect = pygame.Rect(0, 0, get_tile_size() * 4, get_tile_size() * 2)
+        rect.center = (get_tile_size() * 7.5, get_tile_size() * 25)
         pygame.draw.rect(
             surface, GRAY, self.inventory_button_rect, border_radius=10)
         text = font.render("Inventory", True, BLACK)
@@ -255,19 +258,20 @@ class Player(pygame.sprite.Sprite):
         Args:
             surface (pygame.Surface): La surface sur laquelle dessiner les informations du joueur.
         """
-        font = pygame.font.Font(None, TILE_SIZE)
+        font = pygame.font.Font(None, get_tile_size())
 
         rect_positions = [
-            (TILE_SIZE * 4, TILE_SIZE * 17),
-            (TILE_SIZE * 7.5, TILE_SIZE * 17),
-            (TILE_SIZE * 4, TILE_SIZE * 20),
-            (TILE_SIZE * 7.5, TILE_SIZE * 20)
+            (get_tile_size() * 4, get_tile_size() * 17),
+            (get_tile_size() * 7.5, get_tile_size() * 17),
+            (get_tile_size() * 4, get_tile_size() * 20),
+            (get_tile_size() * 7.5, get_tile_size() * 20)
         ]
 
         draw_rect = []
         for pos in rect_positions:
-            rect = pygame.Rect(pos[0], pos[1], TILE_SIZE * 3.5, TILE_SIZE * 3)
-            rect.inflate_ip(-TILE_SIZE * 0.15, -TILE_SIZE * 0.15)
+            rect = pygame.Rect(
+                pos[0], pos[1], get_tile_size() * 3.5, get_tile_size() * 3)
+            rect.inflate_ip(-get_tile_size() * 0.15, -get_tile_size() * 0.15)
             draw_rect.append(rect)
 
         pygame.draw.rect(
@@ -295,21 +299,21 @@ class Player(pygame.sprite.Sprite):
             draw_text(surface, str(self.losing_coins),
                       draw_rect[3].center, font, BLACK, center=True)
 
-        draw_text(surface, "Starting", (TILE_SIZE *
-                  0.5, TILE_SIZE * 16), font, BLACK)
+        draw_text(surface, "Starting", (get_tile_size() *
+                  0.5, get_tile_size() * 16), font, BLACK)
         draw_text(
-            surface, "+", (draw_rect[0].centerx, TILE_SIZE * 16), font, BLACK, center_x=True)
+            surface, "+", (draw_rect[0].centerx, get_tile_size() * 16), font, BLACK, center_x=True)
         draw_text(
-            surface, "-", (draw_rect[1].centerx, TILE_SIZE * 16), font, BLACK, center_x=True)
-        draw_text(surface, "Ending", (TILE_SIZE *
-                  12, TILE_SIZE * 16), font, BLACK)
+            surface, "-", (draw_rect[1].centerx, get_tile_size() * 16), font, BLACK, center_x=True)
+        draw_text(surface, "Ending", (get_tile_size() *
+                  12, get_tile_size() * 16), font, BLACK)
 
-        draw_text(surface, f'{self.hp} HP', (TILE_SIZE *
+        draw_text(surface, f'{self.hp} HP', (get_tile_size() *
                   0.5, draw_rect[1].centery), font, BLACK)
-        draw_text(surface, f'{self.coins} ¢', (TILE_SIZE *
+        draw_text(surface, f'{self.coins} ¢', (get_tile_size() *
                   0.5, draw_rect[2].centery), font, BLACK)
 
         draw_text(surface, f'{self.level.hp_start + self.winning_hp - self.losing_hp} HP',
-                  (TILE_SIZE * 12, draw_rect[1].centery), font, BLACK)
+                  (get_tile_size() * 12, draw_rect[1].centery), font, BLACK)
         draw_text(surface, f'{self.level.coins_start + self.winning_coins - self.losing_coins} ¢',
-                  (TILE_SIZE * 12, draw_rect[2].centery), font, BLACK)
+                  (get_tile_size() * 12, draw_rect[2].centery), font, BLACK)

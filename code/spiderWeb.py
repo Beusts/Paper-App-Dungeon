@@ -20,12 +20,13 @@ class SpiderWeb(Object):
         design = pygame.image.load(
             join('graphics', 'spiderweb.png')).convert_alpha()
         design = pygame.transform.scale(
-            design, (TILE_SIZE, TILE_SIZE))
+            design, (get_tile_size(), get_tile_size()))
         return design
 
     def on_collision(self, player):
 
-        if self.has_already_been_used(): return player
+        if self.has_already_been_used():
+            return player
 
         # Stop the player
         player.direction = Vector2(0, 0)

@@ -1,17 +1,18 @@
 from settings import *
 from object import *
 
+
 class Key(Object):
 
     def __init__(self, pos, groups):
         super().__init__(pos, groups)
 
     def design(self):
-      
+
         image = pygame.image.load(
             join('graphics', 'keys.png')).convert_alpha()
         image = pygame.transform.scale(
-            image, (TILE_SIZE, TILE_SIZE))
+            image, (get_tile_size(), get_tile_size()))
 
         return image
 
@@ -19,7 +20,8 @@ class Key(Object):
 
         print(f"Collision with me {self}")
 
-        if self.has_already_been_used() : return player
+        if self.has_already_been_used():
+            return player
 
         player.keys += 1
         self.used = True

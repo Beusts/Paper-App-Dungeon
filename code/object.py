@@ -2,6 +2,7 @@ from contextlib import nullcontext
 
 from settings import *
 
+
 class Object(pygame.sprite.Sprite):
 
     def __init__(self, pos, groups):
@@ -32,13 +33,15 @@ class Object(pygame.sprite.Sprite):
         """
         Determine ce que l'objet doit ressembler
         """
-        raise NotImplementedError("This method must be redefined in a subclass")
+        raise NotImplementedError(
+            "This method must be redefined in a subclass")
 
     def on_collision(self, player):
         """
         Traite l'interaction avec un objet
         """
-        raise NotImplementedError("This method must be redefined in a subclass")
+        raise NotImplementedError(
+            "This method must be redefined in a subclass")
 
     def has_already_been_used(self):
         """
@@ -46,10 +49,10 @@ class Object(pygame.sprite.Sprite):
         """
         if self.used:
             print(f"I've already been used {self}")
-            image =pygame.image.load(
+            image = pygame.image.load(
                 join('graphics', 'dust.png')).convert_alpha()
             image = pygame.transform.scale(
-                image, (TILE_SIZE, TILE_SIZE))
+                image, (get_tile_size(), get_tile_size()))
 
             self.image = image
             return True
