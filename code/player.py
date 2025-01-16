@@ -16,8 +16,6 @@ class Player(pygame.sprite.Sprite):
         """
 
         super().__init__()
-        self.image = pygame.image.load(
-            join('graphics', 'players.png')).convert_alpha()
 
         self.adjacent_positions = []
 
@@ -53,6 +51,8 @@ class Player(pygame.sprite.Sprite):
     def setup(self, pos, groups, colliders, level, x_offset):
         self.kill()
         self.add(groups)
+        self.image = pygame.image.load(
+            join('graphics', 'players.png')).convert_alpha()
         self.image = pygame.transform.scale(
             self.image, (get_tile_size(), get_tile_size()))
         self.rect = self.image.get_rect(topleft=pos)
