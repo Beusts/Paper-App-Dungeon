@@ -194,15 +194,15 @@ class Level:
         """
 
         global can_receive_input
-        font = pygame.font.Font(None, get_tile_size())
+        font = pygame.font.Font(None, UI_SIZE)
 
         continue_rect = pygame.Rect(
-            0, 0, get_tile_size() * 6, get_tile_size() * 2)
-        continue_rect.center = (get_tile_size() * 7.5, get_tile_size() * 6)
+            0, 0, UI_SIZE * 6, UI_SIZE * 2)
+        continue_rect.center = (UI_SIZE * 7.5, UI_SIZE * 6)
 
         finish_rect = pygame.Rect(
-            0, 0, get_tile_size() * 6, get_tile_size() * 2)
-        finish_rect.center = (get_tile_size() * 7.5, get_tile_size() * 9)
+            0, 0, UI_SIZE * 6, UI_SIZE * 2)
+        finish_rect.center = (UI_SIZE * 7.5, UI_SIZE * 9)
 
         pygame.draw.rect(self.display_surface, GRAY,
                          continue_rect, border_radius=10)
