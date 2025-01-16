@@ -15,11 +15,11 @@ SLEEP_TIME = 100
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
 global is_input_active
-is_input_active = False
+can_receive_input = True
 
 
 # Taille d'une tuile (initiale)
-TILE_SIZE = int((WINDOW_WIDTH / max(15, 15)))
+TILE_SIZE = int((WINDOW_WIDTH / 15))
 
 UI_SIZE = int(WINDOW_WIDTH / 15)
 
