@@ -79,6 +79,8 @@ class Level:
             self.rows = len(level_reader)
             self.cols = len(level_reader[0])
 
+            set_tile_size(int(WINDOW_WIDTH / max(self.rows, self.cols)))
+
             self.x_offset = (WINDOW_WIDTH - (self.cols * get_tile_size())) / 2
 
             for y, row in enumerate(level_reader):
@@ -90,7 +92,7 @@ class Level:
                     elif tile == 'P':
                         # Crée un joueur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         self.player.setup((x * get_tile_size() + self.x_offset, y * get_tile_size()),
-                                          self.all_sprites, {"walls": self.walls, "objects": self.objects}, self)
+                                          self.all_sprites, {"walls": self.walls, "objects": self.objects}, self, self.x_offset)
                     # Regarde si la tuile correspond a un pattern comme ceci : SeN où N est un nombre positif
                     elif re.match(r"Se(\d+)", tile):
 
@@ -172,11 +174,16 @@ class Level:
 
         self.draw_grid()
 
+        pygame.draw.line(self.display_surface, 'red', (0, WINDOW_HEIGHT *
+                         0.56), (WINDOW_WIDTH, WINDOW_HEIGHT * 0.56), int(get_tile_size() * 0.06))
+
     def draw_grid(self):
         """
         Dessine une grille sur la surface d'affichage.
         """
         width = int(get_tile_size() * 0.06)
+        if width < 1:
+            width = 1
         for y in range(0, (self.rows + 1) * get_tile_size(), get_tile_size()):
             pygame.draw.line(self.display_surface, GRAY,
                              (self.x_offset, y), (self.cols * get_tile_size() + self.x_offset, y), width)
@@ -189,7 +196,7 @@ class Level:
         Affiche l'interface de fin de niveau pour permettre au joueur de choisir de continuer ou de terminer le niveau.
         """
 
-        global is_input_active
+        global can_receive_input
         font = pygame.font.Font(None, get_tile_size())
 
         continue_rect = pygame.Rect(
@@ -210,15 +217,15 @@ class Level:
         draw_text(self.display_surface, "Finish",
                   finish_rect.center, font, BLACK, center=True)
 
-        global is_input_active
+        global can_receive_input
         mouse_pos = pygame.mouse.get_pos()
-        if pygame.mouse.get_pressed()[0] and is_input_active:
+        if pygame.mouse.get_pressed()[0] and can_receive_input:
             if continue_rect.collidepoint(mouse_pos):
                 self.paused = False
             elif finish_rect.collidepoint(mouse_pos):
                 self.finish_level()
         elif not pygame.mouse.get_pressed()[0]:
-            is_input_active = True
+            can_receive_input = True
 
     def finish_level(self):
         """

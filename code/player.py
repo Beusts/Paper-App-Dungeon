@@ -50,7 +50,7 @@ class Player(pygame.sprite.Sprite):
         self.show_player_info = True
         self.show_inventory = False
 
-    def setup(self, pos, groups, colliders, level):
+    def setup(self, pos, groups, colliders, level, x_offset):
         self.kill()
         self.add(groups)
         self.image = pygame.transform.scale(
@@ -58,19 +58,20 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=pos)
         self.colliders = colliders
         self.level = level
+        self.x_offset = x_offset
 
     def input(self):
         """
         Gère les entrées de l'utilisateur.
         Il faut relacher le clic de souris pour pouvoir cliquer à nouveau.
         """
-        global is_input_active
-        if pygame.mouse.get_pressed()[0] and is_input_active:
+        global can_receive_input
+        if pygame.mouse.get_pressed()[0] and can_receive_input:
             mouse_pos = pygame.mouse.get_pos()
             self.handle_mouse_click(mouse_pos)
-            is_input_active = False
+            can_receive_input = False
         elif not pygame.mouse.get_pressed()[0]:
-            is_input_active = True
+            can_receive_input = True
 
     def handle_mouse_click(self, mouse_pos):
         """
@@ -86,7 +87,7 @@ class Player(pygame.sprite.Sprite):
 
         # Calcule la tuile cliquée en fonction de la position de la souris
         clicked_tile = self.rect.move(
-            (mouse_pos[0] // get_tile_size() -
+            ((mouse_pos[0] - self.x_offset) // get_tile_size() -
                 self.rect.x // get_tile_size()) * get_tile_size(),
             (mouse_pos[1] // get_tile_size() -
                 self.rect.y // get_tile_size()) * get_tile_size()
