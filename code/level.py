@@ -174,9 +174,6 @@ class Level:
 
         self.draw_grid()
 
-        pygame.draw.line(self.display_surface, 'red', (0, WINDOW_HEIGHT *
-                         0.56), (WINDOW_WIDTH, WINDOW_HEIGHT * 0.56), int(get_tile_size() * 0.06))
-
     def draw_grid(self):
         """
         Dessine une grille sur la surface d'affichage.
