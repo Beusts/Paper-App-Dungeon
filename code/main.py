@@ -1,6 +1,8 @@
 import copy
 import csv
 import math
+import random
+from sqlite3 import connect
 
 from settings import *
 from level import Level
@@ -24,7 +26,7 @@ class Game:
 
         self.difficulty = 1
 
-        wall_pourcentage = 0.6 * self.difficulty
+        wall_pourcentage = 0.12 * self.difficulty
         self.rule = {
             'size': (15, 15),
             'walls_pourcentage': wall_pourcentage
@@ -33,14 +35,12 @@ class Game:
         self.write_level()
 
 
-
         self.level_map_files = {0: 'gen_pro', 1: '1', 2: 'test'}
         self.current_level_index = 0
         self.player = Player()
 
         self.current_stage = Level(self.level_map_files[self.current_level_index], self.player)
         # self.current_stage = Shop('0', self.player)
-
 
 
 
@@ -103,90 +103,12 @@ class Game:
         self.current_object_on_level.append(point)
         return point
 
-    def generate_level(self):
-        level = self.place_walls_around_map()
-
-        # Place a player on the level
-        coo_player = self.generate_point(1, 13)
-        level[coo_player[0]][coo_player[1]] = 'P'
-
-        # Place a stair on the level
-        coo_stair = self.generate_point(1, 13)
-        level[coo_stair[0]][coo_stair[1]] = 'S'
-
-        walls = self.generate_aleatoire_pattern_walls()
-
-        for wall in walls:
-            level[wall[0]][wall[1]] = '1'
-
-        self.print_level(level)
-        return level
-
-    def generate_aleatoire_pattern_walls(self):
-
-        # Generate a zone
-        current_walls = []
-
-        points = int(15 * self.rule['walls_pourcentage'])
-        zone = randint(1, 6)
-
-        print(f"nb points {points}")
-        # Place randomly different points on the level
-
-        for point in range(points):
-            # Place a wall on the level
-            coo_wall = self.generate_point(zone, 13 - zone)
-            current_walls.append(coo_wall)
-
-        # Shuffle the list of our walls
-        shuffle_current_walls = copy.copy(current_walls)
-        shuffle_current_walls = self.shuffle_list(shuffle_current_walls)
-
-        print(f"list points : {shuffle_current_walls}")
-
-        # Connect all point
-        first_point = shuffle_current_walls[0]
-        second_point = shuffle_current_walls[1]
-
-        new_pattern = [first_point, second_point]
-        new_pattern = new_pattern + self.connect_two_points(first_point, second_point)
-
-        if points == 2 : return new_pattern
-
-
-        for i in range(points - 2):
-            to = shuffle_current_walls[i + 2]
-            closest_point = self.find_closest_point(new_pattern, to)
-            print(f"closest point : {closest_point}")
-            new_pattern = new_pattern + self.connect_two_points(closest_point, to)
-
-        new_pattern = new_pattern + shuffle_current_walls
-
-        return new_pattern
-
-    def find_closest_point(self, points, to):
-
-        temp = math.sqrt((points[0][0] - to[0]) ** 2 + (points[0][1] - to[1]) ** 2)
-        temp_point = points[0]
-        for point in points:
-
-            distance_point_to = math.sqrt((point[0] - to[0]) ** 2 + (point[1] - to[1]) ** 2)
-
-            if (distance_point_to < temp) :
-                temp = distance_point_to
-                temp_point = point
-
-        return temp_point
-
     def connect_two_points(self, _from , to):
         list_point = []
-
         r = randint(1, 2)
 
-        if r == 1 :
-
-            for i in range( abs(_from[0] - to[0])):
-
+        if r == 1:
+            for i in range(abs(_from[0] - to[0])):
                 if _from[0] > to[0]:
                     _from = (_from[0] - 1, _from[1])
 
@@ -197,18 +119,17 @@ class Game:
                 self.current_object_on_level.append(_from)
 
             for i in range(abs(_from[1] - to[1])):
-
                 if _from[1] > to[1]:
-                    _from = (_from[0] , _from[1] - 1)
+                    _from = (_from[0], _from[1] - 1)
 
                 if _from[1] < to[1]:
-                    _from = (_from[0] , _from[1] + 1)
+                    _from = (_from[0], _from[1] + 1)
 
                 self.current_object_on_level.append(_from)
                 list_point.append(_from)
-        else :
-            for i in range(abs(_from[1] - to[1])):
+        else:
 
+            for i in range(abs(_from[1] - to[1])):
                 if _from[1] > to[1]:
                     _from = (_from[0], _from[1] - 1)
 
@@ -218,8 +139,7 @@ class Game:
                 self.current_object_on_level.append(_from)
                 list_point.append(_from)
 
-            for i in range( abs(_from[0] - to[0])):
-
+            for i in range(abs(_from[0] - to[0])):
                 if _from[0] > to[0]:
                     _from = (_from[0] - 1, _from[1])
 
@@ -228,44 +148,99 @@ class Game:
 
                 list_point.append(_from)
                 self.current_object_on_level.append(_from)
-
         return list_point
 
-    def shuffle_list(self, list):
-        for i in range(len(list)):
-            temp = list[i]
-            random_index = randint(i, len(list) - 1)
-            list[i] = list[random_index]
-            list[random_index] = temp
-        return  list
 
-    def place_walls_around_map(self):
-        level = []
-        for col in range(self.rule['size'][0]):
-            raw = []
-            for row in range(self.rule['size'][1]):
 
-                # Generate walls all around the map
-                if row == 0 or row == self.rule['size'][0] - 1 or col == 0 or col == self.rule['size'][1] - 1:
-                    raw.append('1')
-                    self.current_object_on_level.append((row, col))
-                else:
-                    raw.append('0')
-            level.append(raw)
+    def making_structure(self, level):
+        list_point = []
+
+        for row in range(1, self.rule['size'][0] - 2):
+            for col in range(2, self.rule['size'][1] - 3):
+                if level[row][col] == '1': # if the object is a wall
+
+                    # check if there are other wall all around him
+                    if level[row][col - 2] == '1':
+                        list_point.append(self.connect_two_points((row, col), (row, col - 2)))
+
+                    if level[row][col + 2] == '1':
+                        list_point.append(self.connect_two_points((row, col), (row, col + 2)))
+
+        for row in range(2, self.rule['size'][0] - 3):
+            for col in range(1, self.rule['size'][1] - 2):
+                if level[row][col] == '1':  # if the object is a wall
+
+                    # check if there are other wall all around him
+                    if level[row - 2][col] == '1':
+                        list_point.append(self.connect_two_points((row, col), (row - 2, col)))
+
+                    if level[row + 2][col] == '1':
+                        list_point.append(self.connect_two_points((row, col), (row + 2, col)))
+
+
+        for row in range(1, self.rule['size'][0] - 2):
+            for col in range(1, self.rule['size'][1] - 2):
+                if level[row][col] == '1':  # if the object is a wall
+
+                    # check if there are other wall all around him
+                    if level[row - 1][col - 1] == '1':
+                        list_point.append(self.connect_two_points((row, col), (row - 1, col - 1)))
+
+                    if level[row - 1][col + 1] == '1':
+                        list_point.append(self.connect_two_points((row, col), (row  - 1, col + 1)))
+
+                        # check if there are other wall all around him
+                        if level[row + 1][col - 1] == '1':
+                            list_point.append(self.connect_two_points((row, col), (row + 1, col - 1)))
+
+                        if level[row + 1][col + 1] == '1':
+                            list_point.append(self.connect_two_points((row, col), (row + 1, col + 1)))
+
+
+        for points in list_point:
+            for point in points:
+                level[point[0]][point[1]] = '1'
+
+        print(f"new wall = {list_point}")
         return level
 
-    def print_level(self, level):
-        str = ''
+    def generate_level(self):
+        level = []
 
-        for i in range(len(level)):
-            for j in range(len(level[i])):
-                str += level[i][j]
-            str += '\n'
+        for row in range(self.rule['size'][0]):
+            rows = []
+            for col in range(self.rule['size'][1]):
 
-        print(str)
+                # Place walls all around the map
+                if row == 0 or row == self.rule['size'][0] - 1 or col == 0 or col == self.rule['size'][1] - 1:
+                    rows.append('1')
+                    self.current_object_on_level.append((row, col))
+                    continue
 
+                # Place randomly a wall
+                if random.random() < self.rule['walls_pourcentage']:
+                    rows.append('1')
+                    self.current_object_on_level.append((row, col))
+                    continue
+                rows.append('0')
+            level.append(rows)
+
+        level = self.making_structure(level)
+
+        #Place a player on the level
+        coo_player = self.generate_point(1, self.rule['size'][0] - 2)
+        print(f"coo player : {coo_player}")
+        level[coo_player[0]][coo_player[1]] = 'P'
+
+        # Place a stair on the level
+        coo_stair = self.generate_point(1, self.rule['size'][0] - 2)
+        print(f"coo stair : {coo_stair}")
+        level[coo_stair[0]][coo_stair[1]] = 'S'
+
+        return level
 
 
 if __name__ == '__main__':
+
     game = Game()
     game.run()
