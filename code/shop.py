@@ -16,6 +16,8 @@ class Shop:
         self.player = player  # Déplacez cette ligne avant l'appel à setup
         self.setup(shop_data)
 
+        self.close = False
+
     def setup(self, shop_data):
         col = 4
         with open(join('data', 'shop', shop_data + '.csv'), newline='') as csvfile:
@@ -49,6 +51,7 @@ class Shop:
     def run(self, dt):
         self.display_surface.fill('white')
         self.draw_shop()
+        self.player.draw_information_player(self.display_surface)
 
     def draw_shop(self):
         """
@@ -67,6 +70,33 @@ class Shop:
 
         for item in self.items:
             item.draw()
+
+        self.draw_continue_button()
+
+    def draw_continue_button(self):
+        font = pygame.font.Font(None, UI_SIZE)
+        rect = pygame.Rect(0, 0, UI_SIZE * 4, UI_SIZE * 2)
+        rect.center = (UI_SIZE * 7.5, UI_SIZE * 25)
+        pygame.draw.rect(
+            self.display_surface, GRAY, rect, border_radius=10)
+
+        text = font.render("Continue", True, BLACK)
+        text_rect = text.get_rect(center=rect.center)
+        self.display_surface.blit(text, text_rect)
+
+        self.handle_continue_button(rect)
+
+    def handle_continue_button(self, continue_rect):
+
+        global can_receive_input
+        mouse_pos = pygame.mouse.get_pos()
+
+        if pygame.mouse.get_pressed()[0] and can_receive_input:
+            if continue_rect.collidepoint(mouse_pos):
+                self.close = True
+        elif not pygame.mouse.get_pressed()[0]:
+            can_receive_input = True
+        return
 
 
 class Item:
@@ -111,6 +141,7 @@ class Item:
                   (self.position[0] * UI_SIZE + UI_SIZE / 2, self.position[1] * UI_SIZE + (UI_SIZE * 1.5)), DESC_FONT, BLACK, center=True)
         draw_text(self.display_surface, self.description,
                   (self.position[0] * UI_SIZE + (UI_SIZE * 2), self.position[1] * UI_SIZE + (UI_SIZE * 1.5)), DESC_FONT, BLACK, center_y=True, line_width=UI_SIZE * 10)
+
 
 
 """

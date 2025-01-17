@@ -18,7 +18,7 @@ class Game:
         self.clock = pygame.time.Clock()
 
         self.level_map_files = {0: '0', 1: '1', 2: 'test', 3: '32'}
-        self.current_level_index = 3
+        self.current_level_index = 0
         self.player = Player()
 
         self.current_stage = Level(
@@ -26,6 +26,7 @@ class Game:
         # self.current_stage = Shop('0', self.player)
 
     def change_level(self):
+
         self.current_level_index += 1
 
         if self.current_level_index >= len(self.level_map_files):
@@ -33,7 +34,7 @@ class Game:
         else:
             new_level_file = self.level_map_files[self.current_level_index]
 
-            if self.current_level_index % 6 == 0:
+            if self.current_level_index % 2 == 1:
                 self.current_stage = Shop('0', self.player)
             else:
                 self.current_stage = Level(new_level_file, self.player)
@@ -53,6 +54,10 @@ class Game:
 
             if isinstance(self.current_stage, Level) and self.current_stage.completed:
                 self.change_level()
+
+            if isinstance(self.current_stage, Shop) and self.current_stage.close:
+                self.current_stage = Level(
+                    self.level_map_files[self.current_level_index], self.player)
 
             self.current_stage.run(dt)
             pygame.display.update()
