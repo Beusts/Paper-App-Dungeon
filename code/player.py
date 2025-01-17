@@ -39,7 +39,14 @@ class Player(pygame.sprite.Sprite):
         self.winning_hp = 0
         self.losing_coins = 0
         self.winning_coins = 0
-        self.inventory = []
+
+        self.inventory = {
+            "Doubling Potion": 0,
+            "Scroll of Mulligan": 0,
+            "Break on Through": 0,
+            "Teleport Scroll": 0,
+        }
+
         self.inventory_button_rect = pygame.Rect(
             0, 0, UI_SIZE * 4, UI_SIZE * 2)
         self.inventory_button_rect.center = (
@@ -219,13 +226,39 @@ class Player(pygame.sprite.Sprite):
         if self.show_player_info:
             self.draw_information_player(surface)
         if self.show_inventory:
-            self.draw_inventory()
+            self.draw_inventory(surface)
 
-    def draw_inventory(self):
+    def draw_inventory(self,surface):
         """
-        Gère le clic sur le bouton d'inventaire.
+        affiche l'inventaire du joueur.
         """
-        # TODO: Afficher l'inventaire
+        font = pygame.font.Font(None, UI_SIZE)
+
+        y = 17
+        rect = pygame.Rect(UI_SIZE * 0.2, UI_SIZE * y, UI_SIZE * 3.5, UI_SIZE * 3)
+        rect.inflate_ip(-UI_SIZE * 0.15, -UI_SIZE * 0.15)
+
+        for item, quantity in self.inventory.items():
+            if quantity == 0: continue
+
+            draw_text(surface, f"{quantity}x - {item} - used", (UI_SIZE * 4, rect.centery), font, BLACK)
+
+            # Check for mouse click on the item
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_click = pygame.mouse.get_pressed()[0]
+            global can_receive_input
+
+            if rect.collidepoint(mouse_pos) and mouse_click and can_receive_input:
+                self.inventory[item].buy()
+                print(f"object clicked : {self.inventory[item].buy()}")
+            elif not mouse_click:
+                can_receive_input = True
+
+            y += 1
+            rect = pygame.Rect(UI_SIZE * 0.2, UI_SIZE * y, UI_SIZE * 3.5, UI_SIZE * 3)
+
+
+
 
     def update(self, dt):
         """
@@ -238,9 +271,6 @@ class Player(pygame.sprite.Sprite):
         self.input()
         self.move()
         self.update_adjacent_tiles()
-
-    def check_player_still_alive(self):
-        return self.hp > 0
 
     def draw_inventory_button(self, surface):
         font = pygame.font.Font(None, UI_SIZE)
@@ -314,7 +344,7 @@ class Player(pygame.sprite.Sprite):
         draw_text(surface, f'{self.coins} ¢', (UI_SIZE *
                   0.5, draw_rect[2].centery), font, BLACK)
 
-        draw_text(surface, f'{self.level.hp_start + self.winning_hp - self.losing_hp} HP',
+        draw_text(surface, f'{self.hp + self.winning_hp - self.losing_hp} HP',
                   (UI_SIZE * 12, draw_rect[1].centery), font, BLACK)
-        draw_text(surface, f'{self.level.coins_start + self.winning_coins - self.losing_coins} ¢',
+        draw_text(surface, f'{self.coins + self.winning_coins - self.losing_coins} ¢',
                   (UI_SIZE * 12, draw_rect[2].centery), font, BLACK)

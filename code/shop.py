@@ -1,4 +1,5 @@
 import csv
+from encodings import search_function
 
 from settings import *
 from utils import draw_text
@@ -9,14 +10,17 @@ FONT = pygame.font.Font(None, int(UI_SIZE * 1.5))
 DESC_FONT = pygame.font.Font(None, int(UI_SIZE * 0.7))
 
 
-class Shop:
+class Shop(pygame.sprite.Sprite):
     def __init__(self, shop_data, player):
         self.display_surface = pygame.display.get_surface()
         self.items = []
         self.player = player  # Déplacez cette ligne avant l'appel à setup
-        self.setup(shop_data)
+        print(f"level hp start : {self.player.level.hp_start}")
+        print(f"current hp : {self.player.level.hp_start}")
 
+        self.setup(shop_data)
         self.close = False
+
 
     def setup(self, shop_data):
         col = 4
@@ -94,13 +98,15 @@ class Shop:
         if pygame.mouse.get_pressed()[0] and can_receive_input:
             if continue_rect.collidepoint(mouse_pos):
                 self.close = True
+                print(self.player.inventory)
         elif not pygame.mouse.get_pressed()[0]:
             can_receive_input = True
         return
 
 
-class Item:
+class Item(pygame.sprite.Sprite):
     def __init__(self, name, description, price, position, player, use_once=False):
+        super().__init__()
         self.name = name
         self.description = description
         self.price = price
@@ -112,9 +118,15 @@ class Item:
 
     def buy(self):
         if self.player.coins >= self.price:
+
             self.player.coins -= self.price
             self.is_bought = True
-            self.player.inventory.append(self)
+
+            if not self.use_once:
+                self.player = self.use(self.player)
+                return
+
+            self.player.inventory[self.name] += 1
 
     def use(self, player):
         raise NotImplementedError(
@@ -133,8 +145,13 @@ class Item:
         mouse_pos = pygame.mouse.get_pos()
         mouse_click = pygame.mouse.get_pressed()[0]
 
-        if rect.collidepoint(mouse_pos) and mouse_click:
+        global can_receive_input
+
+        if rect.collidepoint(mouse_pos) and mouse_click and can_receive_input:
             self.buy()
+        elif not mouse_click:
+            can_receive_input = True
+
         draw_text(self.display_surface, self.name,
                   (self.position[0] * UI_SIZE + (UI_SIZE * 2), self.position[1] * UI_SIZE), FONT, BLACK)
         draw_text(self.display_surface, f"{self.price}¢",
@@ -159,7 +176,6 @@ class Gambler(Item):
 
         if roll > 4:
             player.winning_coins += 4
-
         return player
 
 
