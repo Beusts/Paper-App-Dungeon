@@ -242,7 +242,7 @@ class Level:
         self.player.losing_hp = 0
         self.player.winning_coins = 0
         self.player.losing_coins = 0
-
+        
         self.player.movement_remaining = 0
 
         if self.player.hp <= 0:

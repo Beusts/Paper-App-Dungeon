@@ -145,6 +145,7 @@ class Item(pygame.sprite.Sprite):
         mouse_pos = pygame.mouse.get_pos()
         mouse_click = pygame.mouse.get_pressed()[0]
 
+
         global can_receive_input
 
         if rect.collidepoint(mouse_pos) and mouse_click and can_receive_input:
