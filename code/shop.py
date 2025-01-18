@@ -234,7 +234,6 @@ class Scroll_of_Mulligan(Item):
 
     def use(self, player):
         self.player.movement_remaining = 0
-        handle_mouse_click()
 
 class Coin_Rush(Item):
     def __init__(self, position, player):
