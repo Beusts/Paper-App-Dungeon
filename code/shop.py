@@ -223,8 +223,8 @@ class Doubling_Potion(Item):
         super().__init__("Doubling Potion",
                          "Double the number of a dice roll (use once).", 6, position, player, True)
 
-    def use(self, level):
-        pass
+    def use(self, player):
+        self.player.movement_remaining *= 2
 
 
 class Scroll_of_Mulligan(Item):
@@ -232,8 +232,10 @@ class Scroll_of_Mulligan(Item):
         super().__init__("Scroll of Mulligan",
                          "re-roll your dice (use once).", 10, position, player, True)
 
+
     def use(self, player):
-        self.player.movement_remaining = 0
+        self.player.movement_remaining = randint(1, 6)
+
 
 class Coin_Rush(Item):
     def __init__(self, position, player):
@@ -250,6 +252,8 @@ class Break_on_Trought(Item):
                          "Traver through a wall (use once).", 9, position, player, True)
 
     def use(self, level):
+        # Next movement, if the player travel into a wall, he goes through the wall ?
+        # Or, once used, the next wall the player meet, he goes through it, even if this is not the next roll
         pass
 
 
@@ -263,11 +267,15 @@ class Teleport_Scroll(Item):
             x, y = randint(0, int(WINDOW_WIDTH // TILE_SIZE - 1)) * TILE_SIZE, randint(0,
                                                     int(WINDOW_WIDTH // TILE_SIZE - 1)) * TILE_SIZE
 
-            if all(sprite.rect.x != x or sprite.rect.y != y for sprite in self.player.colliders["walls"]) and all(sprite.rect.x != x or sprite.rect.y != y for sprite in self.player.colliders["objects"]) :
+            new_rect = pygame.Rect(x, y, TILE_SIZE, TILE_SIZE)
+
+            if not any(sprite.rect.colliderect(new_rect) for sprite in self.player.colliders["walls"]) and not any(sprite.rect.colliderect(new_rect) for sprite in self.player.colliders["objects"]):
                 self.player.rect.x = x
                 self.player.rect.y = y
                 self.player.movement_remaining = 0
                 return
+
+
 
 class Magic_Shield(Item):
     def __init__(self, position, player):

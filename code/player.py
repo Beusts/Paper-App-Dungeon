@@ -42,10 +42,10 @@ class Player(pygame.sprite.Sprite):
         self.winning_coins = 0
 
         self.inventory = {
-            "Doubling Potion": {"quantity": 0 , "item": Doubling_Potion(self.direction, self)},
+            "Doubling Potion": {"quantity": 1 , "item": Doubling_Potion(self.direction, self)},
             "Scroll of Mulligan": {"quantity": 1 , "item": Scroll_of_Mulligan(self.direction, self)},
-            "Break on Through": {"quantity": 0 , "item": Break_on_Trought(self.direction, self)},
-            "Teleport Scroll": {"quantity": 1 , "item": Teleport_Scroll(self.direction, self)},
+            "Break on Through": {"quantity": 1 , "item": Break_on_Trought(self.direction, self)},
+            "Teleport Scroll": {"quantity": 4 , "item": Teleport_Scroll(self.direction, self)},
         }
 
         self.inventory_button_rect = pygame.Rect(
@@ -59,13 +59,16 @@ class Player(pygame.sprite.Sprite):
     def setup(self, pos, groups, colliders, level, x_offset):
         self.kill()
         self.add(groups)
+
         self.image = pygame.image.load(
             join('graphics', 'players.png')).convert_alpha()
         self.image = pygame.transform.scale(
             self.image, (get_tile_size(), get_tile_size()))
         self.rect = self.image.get_rect(topleft=pos)
+
         self.colliders = colliders
         self.level = level
+
         self.x_offset = x_offset
 
     def input(self):
@@ -74,6 +77,7 @@ class Player(pygame.sprite.Sprite):
         Il faut relacher le clic de souris pour pouvoir cliquer à nouveau.
         """
         global can_receive_input
+
         if pygame.mouse.get_pressed()[0] and can_receive_input:
             mouse_pos = pygame.mouse.get_pos()
             self.handle_mouse_click(mouse_pos)
@@ -230,9 +234,12 @@ class Player(pygame.sprite.Sprite):
         if self.show_inventory:
             self.draw_inventory(surface)
 
-    def draw_inventory(self,surface):
+    def draw_inventory(self, surface):
         """
         affiche l'inventaire du joueur.
+
+        Args:
+            surface (pygame.Surface): La surface sur laquelle dessiner l'inventaire.
         """
         font = pygame.font.Font(None, UI_SIZE)
 
@@ -255,35 +262,48 @@ class Player(pygame.sprite.Sprite):
             i += 1
 
 
-    def handle_click_inventory(self, rect, value, key):
+    def handle_click_inventory(self, rect, value, name):
+        """
+            Gère le click de l'utilisateur sur un item de l'inventaire
+
+        :param rect: item de l'inventaire
+        :param value: valeur de l'item
+        :param name: Nom de l'item
+        """
+
         # Check for mouse click on the item
         mouse_pos = pygame.mouse.get_pos()
         mouse_click = pygame.mouse.get_pressed()[0]
 
         global can_receive_input
-        print(f"if : {rect.collidepoint(mouse_pos) and mouse_click}")
+
+        print(f"if : { rect.collidepoint(mouse_pos)} and {mouse_click} and {can_receive_input} = {rect.collidepoint(mouse_pos) and mouse_click and can_receive_input}")
 
         if rect.collidepoint(mouse_pos) and mouse_click:
+
             if value["quantity"] > 0:
                 # TODO : make use() method of each item
 
-                if key == "Teleport Scroll" :
+                if name == "Teleport Scroll" :
                     value["item"].use(self.level.all_sprites)
 
-                if key == "Scroll of Mulligan" :
-                    print(f"object to use : {value["item"]}")
+                if name == "Scroll of Mulligan" :
+                    value["item"].use(self)
 
-                if key == "Break on Through":
-                    print(f"object to use : {value["item"]}")
+                if name == "Break on Through":
+                    value["item"].use(self)
 
-                if key == "Doubling Potion":
+                if name == "Doubling Potion":
+                    value["item"].use(self)
                     print(f"object to use : {value["item"]}")
 
                 value["quantity"] -= 1
+                can_receive_input = True
 
-            print(f"object clicked : {key}")
+            print(f"object clicked : {name}")
         elif not mouse_click:
             can_receive_input = True
+
 
     def update(self, dt):
         """
@@ -297,7 +317,15 @@ class Player(pygame.sprite.Sprite):
         self.move()
         self.update_adjacent_tiles()
 
+
     def draw_inventory_button(self, surface):
+        """
+            affiche le bouton pour afficher l'inventaire du joueur.
+
+        Args:
+            surface (pygame.Surface): La surface sur laquelle dessiner le bouton.
+        """
+
         font = pygame.font.Font(None, UI_SIZE)
         rect = pygame.Rect(0, 0, UI_SIZE * 4, UI_SIZE * 2)
         rect.center = (UI_SIZE * 7.5, UI_SIZE * 25)

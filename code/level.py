@@ -2,11 +2,7 @@ import csv
 import re
 
 from teleporter import Teleporter
-from settings import *
 from wall import Wall
-from random import randint
-
-from player import Player
 from standardEnemy import StandardEnemy
 from mysteryEnemy import MysteryEnemy
 from spiderWeb import SpiderWeb
@@ -18,6 +14,7 @@ from coin import Coin
 from key import Key
 from stair import Stair
 
+from settings import *
 from utils import draw_text
 
 BLACK = (0, 0, 0)
