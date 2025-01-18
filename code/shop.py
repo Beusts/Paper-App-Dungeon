@@ -1,4 +1,5 @@
 import csv
+import random
 from encodings import search_function
 
 from settings import *
@@ -117,7 +118,7 @@ class Item(pygame.sprite.Sprite):
         self.player = player
 
     def buy(self):
-        if self.player.coins >= self.price:
+        if self.player.coins >= self.price and not self.is_bought:
 
             self.player.coins -= self.price
             self.is_bought = True
@@ -126,7 +127,7 @@ class Item(pygame.sprite.Sprite):
                 self.player = self.use(self.player)
                 return
 
-            self.player.inventory[self.name] += 1
+            self.player.inventory[self.name]["quantity"] += 1
 
     def use(self, player):
         raise NotImplementedError(
@@ -176,7 +177,7 @@ class Gambler(Item):
         roll = randint(1, 6)
 
         if roll > 4:
-            player.winning_coins += 4
+            player.winning_coins += 10
         return player
 
 
@@ -217,7 +218,6 @@ class Hearty_Snack(Item):
     Particular items
 """
 
-
 class Doubling_Potion(Item):
     def __init__(self, position, player):
         super().__init__("Doubling Potion",
@@ -232,9 +232,9 @@ class Scroll_of_Mulligan(Item):
         super().__init__("Scroll of Mulligan",
                          "re-roll your dice (use once).", 10, position, player, True)
 
-    def use(self, level):
-        pass
-
+    def use(self, player):
+        self.player.movement_remaining = 0
+        handle_mouse_click()
 
 class Coin_Rush(Item):
     def __init__(self, position, player):
@@ -259,9 +259,16 @@ class Teleport_Scroll(Item):
         super().__init__("Teleport Scroll",
                          "Teleport to anywhere on the map (use once).", 11, position, player, True)
 
-    def use(self, level):
-        pass
+    def use(self, objects):
+        while True:
+            x, y = randint(0, int(WINDOW_WIDTH // TILE_SIZE - 1)) * TILE_SIZE, randint(0,
+                                                    int(WINDOW_WIDTH // TILE_SIZE - 1)) * TILE_SIZE
 
+            if all(sprite.rect.x != x or sprite.rect.y != y for sprite in self.player.colliders["walls"]) and all(sprite.rect.x != x or sprite.rect.y != y for sprite in self.player.colliders["objects"]) :
+                self.player.rect.x = x
+                self.player.rect.y = y
+                self.player.movement_remaining = 0
+                return
 
 class Magic_Shield(Item):
     def __init__(self, position, player):

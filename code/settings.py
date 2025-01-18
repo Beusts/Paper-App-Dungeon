@@ -14,15 +14,14 @@ FPS = 60
 SLEEP_TIME = 100
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
+
 global is_input_active
 can_receive_input = True
-
 
 # Taille d'une tuile (initiale)
 TILE_SIZE = int((WINDOW_WIDTH / 15))
 
 UI_SIZE = int(WINDOW_WIDTH / 15)
-
 
 def get_tile_size():
     global TILE_SIZE

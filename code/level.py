@@ -216,6 +216,7 @@ class Level:
 
         global can_receive_input
         mouse_pos = pygame.mouse.get_pos()
+
         if pygame.mouse.get_pressed()[0] and can_receive_input:
             if continue_rect.collidepoint(mouse_pos):
                 self.paused = False

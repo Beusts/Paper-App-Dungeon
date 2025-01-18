@@ -7,6 +7,7 @@ from teleporter import Teleporter
 from stair import Stair
 from utils import draw_text
 
+from shop import *
 
 class Player(pygame.sprite.Sprite):
 
@@ -31,7 +32,7 @@ class Player(pygame.sprite.Sprite):
 
         # characteristic of a player
         self.hp = 10
-        self.coins = 0
+        self.coins = 100
         self.deaths = 0
         self.keys = 0
 
@@ -41,10 +42,10 @@ class Player(pygame.sprite.Sprite):
         self.winning_coins = 0
 
         self.inventory = {
-            "Doubling Potion": 0,
-            "Scroll of Mulligan": 0,
-            "Break on Through": 0,
-            "Teleport Scroll": 0,
+            "Doubling Potion": {"quantity": 0 , "item": Doubling_Potion(self.direction, self)},
+            "Scroll of Mulligan": {"quantity": 1 , "item": Scroll_of_Mulligan(self.direction, self)},
+            "Break on Through": {"quantity": 0 , "item": Break_on_Trought(self.direction, self)},
+            "Teleport Scroll": {"quantity": 1 , "item": Teleport_Scroll(self.direction, self)},
         }
 
         self.inventory_button_rect = pygame.Rect(
@@ -110,6 +111,7 @@ class Player(pygame.sprite.Sprite):
         # Si il clique sur le joueur
         elif (clicked_tile.x, clicked_tile.y) == (self.rect.x, self.rect.y) and self.can_move:
             self.show_adjacent_tiles = not self.show_adjacent_tiles
+
             # Redéfinit le nombre de mouvements restants
             if self.movement_remaining == 0:
                 self.movement_roll = randint(1, 6)
@@ -234,31 +236,54 @@ class Player(pygame.sprite.Sprite):
         """
         font = pygame.font.Font(None, UI_SIZE)
 
-        y = 17
-        rect = pygame.Rect(UI_SIZE * 0.2, UI_SIZE * y, UI_SIZE * 3.5, UI_SIZE * 3)
-        rect.inflate_ip(-UI_SIZE * 0.15, -UI_SIZE * 0.15)
+        x, y = (UI_SIZE, UI_SIZE * 17)
+        color = GRAY
 
-        for item, quantity in self.inventory.items():
-            if quantity == 0: continue
+        inventory_rect = []
+        for i in range(len(self.inventory)):
 
-            draw_text(surface, f"{quantity}x - {item} - used", (UI_SIZE * 4, rect.centery), font, BLACK)
+            inventory_rect.append(pygame.draw.rect(surface, color, (x, y, WINDOW_WIDTH - 2 * UI_SIZE, UI_SIZE), width=4))
+            y = y + UI_SIZE * 1.5
+            color = (160, 160, 160) if color == GRAY else GRAY
 
-            # Check for mouse click on the item
-            mouse_pos = pygame.mouse.get_pos()
-            mouse_click = pygame.mouse.get_pressed()[0]
-            global can_receive_input
+        i = 0
 
-            if rect.collidepoint(mouse_pos) and mouse_click and can_receive_input:
-                self.inventory[item].buy()
-                print(f"object clicked : {self.inventory[item].buy()}")
-            elif not mouse_click:
-                can_receive_input = True
+        for key, value in self.inventory.items():
+            draw_text(surface, f"{value["quantity"] }x - {key}", (inventory_rect[i].x + 6, inventory_rect[i].y + 6), font, BLACK)
 
-            y += 1
-            rect = pygame.Rect(UI_SIZE * 0.2, UI_SIZE * y, UI_SIZE * 3.5, UI_SIZE * 3)
+            self.handle_click_inventory(inventory_rect[i], value, key)
+            i += 1
 
 
+    def handle_click_inventory(self, rect, value, key):
+        # Check for mouse click on the item
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_click = pygame.mouse.get_pressed()[0]
 
+        global can_receive_input
+        print(f"if : {rect.collidepoint(mouse_pos) and mouse_click}")
+
+        if rect.collidepoint(mouse_pos) and mouse_click:
+            if value["quantity"] > 0:
+                # TODO : make use() method of each item
+
+                if key == "Teleport Scroll" :
+                    value["item"].use(self.level.all_sprites)
+
+                if key == "Scroll of Mulligan" :
+                    print(f"object to use : {value["item"]}")
+
+                if key == "Break on Through":
+                    print(f"object to use : {value["item"]}")
+
+                if key == "Doubling Potion":
+                    print(f"object to use : {value["item"]}")
+
+                value["quantity"] -= 1
+
+            print(f"object clicked : {key}")
+        elif not mouse_click:
+            can_receive_input = True
 
     def update(self, dt):
         """
