@@ -99,6 +99,15 @@ class Shop(pygame.sprite.Sprite):
         if pygame.mouse.get_pressed()[0] and can_receive_input:
             if continue_rect.collidepoint(mouse_pos):
                 self.close = True
+
+                self.player.hp += self.player.winning_hp - self.player.losing_hp
+                self.player.coins += self.player.winning_coins - self.player.losing_coins
+
+                self.player.losing_coins = 0
+                self.player.winning_coins = 0
+                self.player.losing_hp = 0
+                self.player.winning_hp = 0
+
                 print(self.player.inventory)
         elif not pygame.mouse.get_pressed()[0]:
             can_receive_input = True
@@ -120,7 +129,7 @@ class Item(pygame.sprite.Sprite):
     def buy(self):
         if self.player.coins >= self.price and not self.is_bought:
 
-            self.player.coins -= self.price
+            self.player.losing_coins += self.price
             self.is_bought = True
 
             if not self.use_once:
@@ -166,7 +175,6 @@ class Item(pygame.sprite.Sprite):
 """
     Items that have a direct impact on the player
 """
-
 
 class Gambler(Item):
     def __init__(self, position, player):
@@ -254,7 +262,7 @@ class Break_on_Trought(Item):
     def use(self, level):
         # Next movement, if the player travel into a wall, he goes through the wall ?
         # Or, once used, the next wall the player meet, he goes through it, even if this is not the next roll
-        pass
+        self.player.can_go_through_walls = True
 
 
 class Teleport_Scroll(Item):
@@ -269,7 +277,9 @@ class Teleport_Scroll(Item):
 
             new_rect = pygame.Rect(x, y, TILE_SIZE, TILE_SIZE)
 
-            if not any(sprite.rect.colliderect(new_rect) for sprite in self.player.colliders["walls"]) and not any(sprite.rect.colliderect(new_rect) for sprite in self.player.colliders["objects"]):
+            if not any(sprite.rect.colliderect(new_rect) for sprite in self.player.colliders["walls"]) and \
+                    not any(sprite.rect.colliderect(new_rect) for sprite in self.player.colliders["objects"]):
+
                 self.player.rect.x = x
                 self.player.rect.y = y
                 self.player.movement_remaining = 0

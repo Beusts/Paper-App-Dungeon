@@ -48,6 +48,8 @@ class Player(pygame.sprite.Sprite):
             "Teleport Scroll": {"quantity": 4 , "item": Teleport_Scroll(self.direction, self)},
         }
 
+        self.can_go_through_walls = False
+
         self.inventory_button_rect = pygame.Rect(
             0, 0, UI_SIZE * 4, UI_SIZE * 2)
         self.inventory_button_rect.center = (
@@ -146,7 +148,11 @@ class Player(pygame.sprite.Sprite):
         new_rect = self.rect.move(dx, dy)
 
         # Vérifie les collisions avec les autres sprites walls
-        if not any(sprite.rect.colliderect(new_rect) for sprite in self.colliders["walls"]) and self.movement_remaining > 0:
+
+        print(f"can move througth a wall : {self.can_move_player_through_walls(new_rect)}")
+
+
+        if not any(sprite.rect.colliderect(new_rect) for sprite in self.colliders["walls"]) and self.movement_remaining > 0 or self.can_move_player_through_walls(new_rect):
             self.rect.x += dx
             self.rect.y += dy
             self.movement_remaining -= 1
@@ -154,10 +160,12 @@ class Player(pygame.sprite.Sprite):
 
             self.on_collision_with_object()
         else:
+            self.can_go_through_walls = False
+
             self.can_move = True
             self.direction = Vector2(0, 0)
 
-            if (any(sprite.rect.colliderect(new_rect) for sprite in self.colliders["walls"])):
+            if any(sprite.rect.colliderect(new_rect) for sprite in self.colliders["walls"]):
                 self.show_adjacent_tiles = True
 
     def on_collision_with_object(self):
@@ -176,6 +184,36 @@ class Player(pygame.sprite.Sprite):
                 return
 
             self = object_collided.on_collision(self)
+
+    def is_wall_around_level(self, walls, player_rect):
+        for wall in walls:
+            if wall.rect.colliderect(player_rect):
+                if wall.rect.x <= UI_SIZE or wall.rect.y <= UI_SIZE or \
+                        wall.rect.right >= self.level.rows * TILE_SIZE - 1 or \
+                        wall.rect.bottom >= self.level.cols * TILE_SIZE - 1:
+                    return True
+
+        return False
+
+    def can_move_player_through_walls(self, player_rect):
+
+        if self.movement_remaining > 0 and self.can_go_through_walls and not \
+                self.is_wall_around_level(self.colliders["walls"], player_rect):
+            return True
+
+        if  any(sprite.rect.colliderect(self.rect) for sprite in self.colliders["walls"]) and \
+            self.movement_remaining > 0 and self.can_go_through_walls:
+
+            self.direction = -self.direction
+
+            while any(sprite.rect.colliderect(self.rect) for sprite in self.colliders["walls"]):
+               self.rect.x += UI_SIZE * self.direction[0]
+               self.rect.y += UI_SIZE * self.direction[1]
+
+            self.movement_remaining = 0
+
+        self.can_go_through_walls = False
+        return False
 
     def update_adjacent_tiles(self):
         """
@@ -276,8 +314,6 @@ class Player(pygame.sprite.Sprite):
         mouse_click = pygame.mouse.get_pressed()[0]
 
         global can_receive_input
-
-        print(f"if : { rect.collidepoint(mouse_pos)} and {mouse_click} and {can_receive_input} = {rect.collidepoint(mouse_pos) and mouse_click and can_receive_input}")
 
         if rect.collidepoint(mouse_pos) and mouse_click:
 
