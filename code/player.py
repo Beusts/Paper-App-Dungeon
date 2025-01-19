@@ -148,10 +148,6 @@ class Player(pygame.sprite.Sprite):
         new_rect = self.rect.move(dx, dy)
 
         # Vérifie les collisions avec les autres sprites walls
-
-        print(f"can move througth a wall : {self.can_move_player_through_walls(new_rect)}")
-
-
         if not any(sprite.rect.colliderect(new_rect) for sprite in self.colliders["walls"]) and self.movement_remaining > 0 or self.can_move_player_through_walls(new_rect):
             self.rect.x += dx
             self.rect.y += dy
@@ -160,8 +156,18 @@ class Player(pygame.sprite.Sprite):
 
             self.on_collision_with_object()
         else:
-            self.can_go_through_walls = False
 
+            if any(sprite.rect.colliderect(self.rect) for sprite in self.colliders["walls"]) :
+                self.direction = -self.direction
+
+                while any(sprite.rect.colliderect(self.rect) for sprite in self.colliders["walls"]):
+                    self.rect.x += UI_SIZE * self.direction[0]
+                    self.rect.y += UI_SIZE * self.direction[1]
+
+                self.last_move_time = self.current_time
+                self.movement_remaining = 0
+
+            self.can_go_through_walls = False
             self.can_move = True
             self.direction = Vector2(0, 0)
 
@@ -200,17 +206,6 @@ class Player(pygame.sprite.Sprite):
         if self.movement_remaining > 0 and self.can_go_through_walls and not \
                 self.is_wall_around_level(self.colliders["walls"], player_rect):
             return True
-
-        if  any(sprite.rect.colliderect(self.rect) for sprite in self.colliders["walls"]) and \
-            self.movement_remaining > 0 and self.can_go_through_walls:
-
-            self.direction = -self.direction
-
-            while any(sprite.rect.colliderect(self.rect) for sprite in self.colliders["walls"]):
-               self.rect.x += UI_SIZE * self.direction[0]
-               self.rect.y += UI_SIZE * self.direction[1]
-
-            self.movement_remaining = 0
 
         self.can_go_through_walls = False
         return False
