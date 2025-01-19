@@ -242,7 +242,7 @@ class Scroll_of_Mulligan(Item):
 
 
     def use(self, player):
-        self.player.movement_remaining = randint(1, 6)
+        self.player.movement_remaining = 0
 
 
 class Coin_Rush(Item):
