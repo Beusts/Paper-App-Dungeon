@@ -9,6 +9,7 @@ from utils import draw_text
 
 from shop import *
 
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self):
@@ -42,10 +43,10 @@ class Player(pygame.sprite.Sprite):
         self.winning_coins = 0
 
         self.inventory = {
-            "Doubling Potion": {"quantity": 1 , "item": Doubling_Potion(self.direction, self)},
-            "Scroll of Mulligan": {"quantity": 1 , "item": Scroll_of_Mulligan(self.direction, self)},
-            "Break on Through": {"quantity": 1 , "item": Break_on_Trought(self.direction, self)},
-            "Teleport Scroll": {"quantity": 4 , "item": Teleport_Scroll(self.direction, self)},
+            "Doubling Potion": {"quantity": 1, "item": Doubling_Potion(self.direction, self)},
+            "Scroll of Mulligan": {"quantity": 1, "item": Scroll_of_Mulligan(self.direction, self)},
+            "Break on Through": {"quantity": 1, "item": Break_on_Trought(self.direction, self)},
+            "Teleport Scroll": {"quantity": 4, "item": Teleport_Scroll(self.direction, self)},
         }
 
         self.can_go_through_walls = False
@@ -98,6 +99,26 @@ class Player(pygame.sprite.Sprite):
             self.show_inventory = not self.show_inventory
             self.show_player_info = not self.show_player_info
             return
+
+        # Si l'inventaire est affiché, vérifie si l'utilisateur clique sur un item
+        if self.show_inventory:
+            x, y = (UI_SIZE, UI_SIZE * 17)
+            for name, value in self.inventory.items():
+                inventory_rect = pygame.Rect(
+                    x, y, WINDOW_WIDTH - 2 * UI_SIZE, UI_SIZE)
+                if inventory_rect.collidepoint(mouse_pos) and value["quantity"] > 0:
+                    if name == "Teleport Scroll":
+                        value["item"].use(self.level.all_sprites)
+                    elif name == "Scroll of Mulligan":
+                        value["item"].use(self)
+                    elif name == "Break on Through":
+                        value["item"].use(self)
+                    elif name == "Doubling Potion":
+                        value["item"].use(self)
+
+                    value["quantity"] -= 1
+                    return
+                y += UI_SIZE * 1.5
 
         # Calcule la tuile cliquée en fonction de la position de la souris
         clicked_tile = self.rect.move(
@@ -157,7 +178,7 @@ class Player(pygame.sprite.Sprite):
             self.on_collision_with_object()
         else:
 
-            if any(sprite.rect.colliderect(self.rect) for sprite in self.colliders["walls"]) :
+            if any(sprite.rect.colliderect(self.rect) for sprite in self.colliders["walls"]):
                 self.direction = -self.direction
 
                 while any(sprite.rect.colliderect(self.rect) for sprite in self.colliders["walls"]):
@@ -279,62 +300,17 @@ class Player(pygame.sprite.Sprite):
         x, y = (UI_SIZE, UI_SIZE * 17)
         color = GRAY
 
-        inventory_rect = []
         for i in range(len(self.inventory)):
+            inventory_rect = pygame.draw.rect(surface, color,
+                                              (x, y, WINDOW_WIDTH - 2 * UI_SIZE, UI_SIZE), width=4)
 
-            inventory_rect.append(pygame.draw.rect(surface, color, (x, y, WINDOW_WIDTH - 2 * UI_SIZE, UI_SIZE), width=4))
+            key = list(self.inventory.keys())[i]
+            value = self.inventory[key]
+            draw_text(surface, f"{value['quantity']}x - {key}",
+                      (inventory_rect.x + 6, inventory_rect.y + 6), font, BLACK)
+
             y = y + UI_SIZE * 1.5
             color = (160, 160, 160) if color == GRAY else GRAY
-
-        i = 0
-
-        for key, value in self.inventory.items():
-            draw_text(surface, f"{value["quantity"] }x - {key}", (inventory_rect[i].x + 6, inventory_rect[i].y + 6), font, BLACK)
-
-            self.handle_click_inventory(inventory_rect[i], value, key)
-            i += 1
-
-
-    def handle_click_inventory(self, rect, value, name):
-        """
-            Gère le click de l'utilisateur sur un item de l'inventaire
-
-        :param rect: item de l'inventaire
-        :param value: valeur de l'item
-        :param name: Nom de l'item
-        """
-
-        # Check for mouse click on the item
-        mouse_pos = pygame.mouse.get_pos()
-        mouse_click = pygame.mouse.get_pressed()[0]
-
-        global can_receive_input
-
-        if rect.collidepoint(mouse_pos) and mouse_click:
-
-            if value["quantity"] > 0:
-                # TODO : make use() method of each item
-
-                if name == "Teleport Scroll" :
-                    value["item"].use(self.level.all_sprites)
-
-                if name == "Scroll of Mulligan" :
-                    value["item"].use(self)
-
-                if name == "Break on Through":
-                    value["item"].use(self)
-
-                if name == "Doubling Potion":
-                    value["item"].use(self)
-                    print(f"object to use : {value["item"]}")
-
-                value["quantity"] -= 1
-                can_receive_input = True
-
-            print(f"object clicked : {name}")
-        elif not mouse_click:
-            can_receive_input = True
-
 
     def update(self, dt):
         """
@@ -347,7 +323,6 @@ class Player(pygame.sprite.Sprite):
         self.input()
         self.move()
         self.update_adjacent_tiles()
-
 
     def draw_inventory_button(self, surface):
         """
