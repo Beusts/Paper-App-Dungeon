@@ -22,7 +22,6 @@ class Shop(pygame.sprite.Sprite):
         self.setup(shop_data)
         self.close = False
 
-
     def setup(self, shop_data):
         col = 4
         with open(join('data', 'shop', shop_data + '.csv'), newline='') as csvfile:
@@ -155,7 +154,6 @@ class Item(pygame.sprite.Sprite):
         mouse_pos = pygame.mouse.get_pos()
         mouse_click = pygame.mouse.get_pressed()[0]
 
-
         global can_receive_input
 
         if rect.collidepoint(mouse_pos) and mouse_click and can_receive_input:
@@ -171,10 +169,10 @@ class Item(pygame.sprite.Sprite):
                   (self.position[0] * UI_SIZE + (UI_SIZE * 2), self.position[1] * UI_SIZE + (UI_SIZE * 1.5)), DESC_FONT, BLACK, center_y=True, line_width=UI_SIZE * 10)
 
 
-
 """
     Items that have a direct impact on the player
 """
+
 
 class Gambler(Item):
     def __init__(self, position, player):
@@ -183,10 +181,10 @@ class Gambler(Item):
 
     def use(self, player):
         roll = randint(1, 6)
-
         if roll > 4:
             player.winning_coins += 10
-        return player
+            return True
+        return False
 
 
 class Light_Snack(Item):
@@ -196,8 +194,7 @@ class Light_Snack(Item):
 
     def use(self, player):
         player.winning_hp += 3
-
-        return player
+        return True
 
 
 class Medium_Snack(Item):
@@ -207,8 +204,7 @@ class Medium_Snack(Item):
 
     def use(self, player):
         player.winning_hp += 6
-
-        return player
+        return True
 
 
 class Hearty_Snack(Item):
@@ -218,13 +214,13 @@ class Hearty_Snack(Item):
 
     def use(self, player):
         player.winning_hp += 9
-
-        return player
+        return True
 
 
 """
     Particular items
 """
+
 
 class Doubling_Potion(Item):
     def __init__(self, position, player):
@@ -232,7 +228,13 @@ class Doubling_Potion(Item):
                          "Double the number of a dice roll (use once).", 6, position, player, True)
 
     def use(self, player):
-        self.player.movement_remaining *= 2
+        if player.movement_remaining == 0:
+            player.movement_roll = randint(1, 6)
+            player.movement_remaining = player.movement_roll
+            player.movement_remaining *= 2
+            player.show_adjacent_tiles = True
+            return True
+        return False
 
 
 class Scroll_of_Mulligan(Item):
@@ -240,9 +242,9 @@ class Scroll_of_Mulligan(Item):
         super().__init__("Scroll of Mulligan",
                          "re-roll your dice (use once).", 10, position, player, True)
 
-
     def use(self, player):
-        self.player.movement_remaining = 0
+        player.movement_remaining = 0
+        return True
 
 
 class Coin_Rush(Item):
@@ -260,9 +262,8 @@ class Break_on_Trought(Item):
                          "Traver through a wall (use once).", 9, position, player, True)
 
     def use(self, level):
-        # Next movement, if the player travel into a wall, he goes through the wall ?
-        # Or, once used, the next wall the player meet, he goes through it, even if this is not the next roll
         self.player.can_go_through_walls = True
+        return True
 
 
 class Teleport_Scroll(Item):
@@ -273,7 +274,7 @@ class Teleport_Scroll(Item):
     def use(self, objects):
         while True:
             x, y = randint(0, int(WINDOW_WIDTH // TILE_SIZE - 1)) * TILE_SIZE, randint(0,
-                                                    int(WINDOW_WIDTH // TILE_SIZE - 1)) * TILE_SIZE
+                                                                                       int(WINDOW_WIDTH // TILE_SIZE - 1)) * TILE_SIZE
 
             new_rect = pygame.Rect(x, y, TILE_SIZE, TILE_SIZE)
 
@@ -283,8 +284,8 @@ class Teleport_Scroll(Item):
                 self.player.rect.x = x
                 self.player.rect.y = y
                 self.player.movement_remaining = 0
-                return
-
+                return True
+        return False
 
 
 class Magic_Shield(Item):

@@ -42,12 +42,13 @@ class Player(pygame.sprite.Sprite):
         self.losing_coins = 0
         self.winning_coins = 0
 
-        self.inventory = {
-            "Doubling Potion": {"quantity": 1, "item": Doubling_Potion(self.direction, self)},
-            "Scroll of Mulligan": {"quantity": 1, "item": Scroll_of_Mulligan(self.direction, self)},
-            "Break on Through": {"quantity": 1, "item": Break_on_Trought(self.direction, self)},
-            "Teleport Scroll": {"quantity": 4, "item": Teleport_Scroll(self.direction, self)},
-        }
+        # Simplifier l'inventaire pour stocker directement les Items
+        self.inventory = [
+            {"item": Doubling_Potion(self.direction, self), "quantity": 1},
+            {"item": Scroll_of_Mulligan(self.direction, self), "quantity": 1},
+            {"item": Break_on_Trought(self.direction, self), "quantity": 1},
+            {"item": Teleport_Scroll(self.direction, self), "quantity": 4},
+        ]
 
         self.can_go_through_walls = False
 
@@ -103,20 +104,18 @@ class Player(pygame.sprite.Sprite):
         # Si l'inventaire est affiché, vérifie si l'utilisateur clique sur un item
         if self.show_inventory:
             x, y = (UI_SIZE, UI_SIZE * 17)
-            for name, value in self.inventory.items():
+            for item_data in self.inventory:
                 inventory_rect = pygame.Rect(
                     x, y, WINDOW_WIDTH - 2 * UI_SIZE, UI_SIZE)
-                if inventory_rect.collidepoint(mouse_pos) and value["quantity"] > 0:
-                    if name == "Teleport Scroll":
-                        value["item"].use(self.level.all_sprites)
-                    elif name == "Scroll of Mulligan":
-                        value["item"].use(self)
-                    elif name == "Break on Through":
-                        value["item"].use(self)
-                    elif name == "Doubling Potion":
-                        value["item"].use(self)
+                if inventory_rect.collidepoint(mouse_pos) and item_data["quantity"] > 0:
+                    used = False
+                    if isinstance(item_data["item"], Teleport_Scroll):
+                        used = item_data["item"].use(self.level.all_sprites)
+                    else:
+                        used = item_data["item"].use(self)
 
-                    value["quantity"] -= 1
+                    if used:
+                        item_data["quantity"] -= 1
                     return
                 y += UI_SIZE * 1.5
 
@@ -261,7 +260,7 @@ class Player(pygame.sprite.Sprite):
         Args:
             surface (pygame.Surface): La surface sur laquelle dessiner les tuiles adjacentes.
         """
-        if self.can_move and self.movement_remaining > 0 and self.show_adjacent_tiles:
+        if self.can_move and self.movement_remaining > 0:
             for pos in self.adjacent_positions:
                 font = pygame.font.Font(None, int(get_tile_size() * 0.5))
                 text = font.render(str(self.movement_remaining), True, BLACK)
@@ -280,7 +279,7 @@ class Player(pygame.sprite.Sprite):
             surface (pygame.Surface): La surface sur laquelle dessiner le joueur.
         """
         surface.blit(self.image, self.rect)
-        if self.can_move and self.movement_remaining > 0:
+        if self.show_adjacent_tiles:
             self.draw_adjacent_tiles(surface)
         self.draw_inventory_button(surface)
         if self.show_player_info:
@@ -300,13 +299,11 @@ class Player(pygame.sprite.Sprite):
         x, y = (UI_SIZE, UI_SIZE * 17)
         color = GRAY
 
-        for i in range(len(self.inventory)):
+        for item_data in self.inventory:
             inventory_rect = pygame.draw.rect(surface, color,
                                               (x, y, WINDOW_WIDTH - 2 * UI_SIZE, UI_SIZE), width=4)
 
-            key = list(self.inventory.keys())[i]
-            value = self.inventory[key]
-            draw_text(surface, f"{value['quantity']}x - {key}",
+            draw_text(surface, f"{item_data['quantity']}x - {item_data['item'].name}",
                       (inventory_rect.x + 6, inventory_rect.y + 6), font, BLACK)
 
             y = y + UI_SIZE * 1.5
