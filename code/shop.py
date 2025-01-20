@@ -243,8 +243,12 @@ class Scroll_of_Mulligan(Item):
                          "re-roll your dice (use once).", 10, position, player, True)
 
     def use(self, player):
-        player.movement_remaining = 0
-        return True
+        if player.movement_remaining == player.movement_roll:
+            player.movement_roll = randint(1, 6)
+            player.movement_remaining = player.movement_roll
+            player.show_adjacent_tiles = True
+            return True
+        return False
 
 
 class Coin_Rush(Item):
