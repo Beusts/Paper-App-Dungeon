@@ -15,7 +15,7 @@ class Shop(pygame.sprite.Sprite):
     def __init__(self, shop_data, player):
         self.display_surface = pygame.display.get_surface()
         self.items = []
-        self.player = player  # Déplacez cette ligne avant l'appel à setup
+        self.player = player
         print(f"level hp start : {self.player.level.hp_start}")
         print(f"current hp : {self.player.level.hp_start}")
 
@@ -132,7 +132,7 @@ class Item(pygame.sprite.Sprite):
             self.is_bought = True
 
             if not self.use_once:
-                self.player = self.use(self.player)
+                self.use(self.player)
                 return
 
             self.player.inventory[self.name]["quantity"] += 1
@@ -257,7 +257,7 @@ class Coin_Rush(Item):
                          "All coins and treasure chests are worth 2x on next floor only.", 11, position, player)
 
     def use(self, player):
-        player.level.coin_multiplier = 2
+        player.coin_multiplier = 2
         return True
 
 
@@ -298,8 +298,9 @@ class Magic_Shield(Item):
         super().__init__("Magic Shield",
                          "Provides invinicibility on the next floor only. Enjoy!", 18, position, player)
 
-    def use(self, level):
-        pass
+    def use(self, player):
+        player.is_invincible = True
+        return True
 
 
 class Weaklings(Item):

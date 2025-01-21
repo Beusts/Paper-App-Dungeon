@@ -42,7 +42,8 @@ class Player(pygame.sprite.Sprite):
         self.losing_coins = 0
         self.winning_coins = 0
 
-        # Simplifier l'inventaire pour stocker directement les Items
+        self.coin_multiplier = 1
+
         self.inventory = [
             {"item": Doubling_Potion(self.direction, self), "quantity": 1},
             {"item": Scroll_of_Mulligan(self.direction, self), "quantity": 1},
@@ -51,6 +52,7 @@ class Player(pygame.sprite.Sprite):
         ]
 
         self.can_go_through_walls = False
+        self.is_invincible = False
 
         self.inventory_button_rect = pygame.Rect(
             0, 0, UI_SIZE * 4, UI_SIZE * 2)
@@ -73,7 +75,6 @@ class Player(pygame.sprite.Sprite):
         self.colliders = colliders
         self.level = level
         self.x_offset = x_offset
-        self.coin_multiplier = 1
 
     def input(self):
         """
