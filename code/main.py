@@ -6,6 +6,8 @@ from os.path import join
 from random import randint
 
 from wallGenerator import WallGenerator
+import random
+import csv
 
 
 class Game:
