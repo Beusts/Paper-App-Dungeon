@@ -53,6 +53,7 @@ class Player(pygame.sprite.Sprite):
 
         self.can_go_through_walls = False
         self.is_invincible = False
+        self.weaklings = False
 
         self.inventory_button_rect = pygame.Rect(
             0, 0, UI_SIZE * 4, UI_SIZE * 2)

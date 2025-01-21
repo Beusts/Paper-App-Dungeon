@@ -38,7 +38,10 @@ class MysteryEnemy(Object):
 
         print(f"Collisions with me {self}")
         if not player.is_invincible:
-            player.losing_hp += randint(1, 6)
+            if player.weaklings:
+                player.losing_hp += 1
+            else:
+                player.losing_hp += randint(1, 6)
         self.used = True
         self.has_already_been_used()
 

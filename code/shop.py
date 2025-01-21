@@ -308,5 +308,6 @@ class Weaklings(Item):
         super().__init__("Weaklings",
                          "Act as if all monsters on the next floor have only 1 HP.", 15, position, player)
 
-    def use(self, level):
-        pass
+    def use(self, player):
+        player.weaklings = True
+        return True

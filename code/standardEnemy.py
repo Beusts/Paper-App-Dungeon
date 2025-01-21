@@ -68,7 +68,10 @@ class StandardEnemy(Object):
         if self.has_already_been_used():
             return player
         if not player.is_invincible:
-            player.losing_hp += self.value
+            if player.weaklings:
+                player.losing_hp += 1
+            else:
+                player.losing_hp += self.value
         self.used = True
         self.has_already_been_used()
 
