@@ -37,7 +37,7 @@ class Chest(Object):
             return player
 
         winning_coins = randint(1, 6)
-        player.winning_coins += winning_coins
+        player.winning_coins += winning_coins * player.coin_multiplier
 
         self.used = True
         self.has_already_been_used()

@@ -36,7 +36,7 @@ class Coin(Object):
         if self.has_already_been_used():
             return player
 
-        player.winning_coins += 1
+        player.winning_coins += 1 * player.coin_multiplier
 
         self.used = True
         self.has_already_been_used()

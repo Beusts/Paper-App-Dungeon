@@ -256,8 +256,9 @@ class Coin_Rush(Item):
         super().__init__("Coin Rush",
                          "All coins and treasure chests are worth 2x on next floor only.", 11, position, player)
 
-    def use(self, level):
-        pass
+    def use(self, player):
+        player.level.coin_multiplier = 2
+        return True
 
 
 class Break_on_Trought(Item):

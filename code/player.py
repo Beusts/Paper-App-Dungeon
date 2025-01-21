@@ -72,8 +72,8 @@ class Player(pygame.sprite.Sprite):
 
         self.colliders = colliders
         self.level = level
-
         self.x_offset = x_offset
+        self.coin_multiplier = 1
 
     def input(self):
         """
