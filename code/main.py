@@ -11,6 +11,8 @@ from player import Player
 from os.path import join
 from random import randint
 
+from wallGenerator import WallGenerator
+
 
 class Game:
     def __init__(self):
@@ -85,6 +87,7 @@ class Game:
             for row in level:
                 formatted_row = [str(item).upper() if isinstance(item, str) else f"{item:.2f}" for item in row]
                 writer.writerow(formatted_row)
+
 
     def generate_point(self, min, max):
         row = randint(min, max)
@@ -239,6 +242,35 @@ class Game:
 
         return level
 
+    # level = []
+    #
+    # # Setup matrice level
+    # for i in range(15):
+    #     row = []
+    #     for j in range(15):
+    #         row.append("0")
+    #     level.append(row)
+    #
+    # object_on_level = []
+    #
+    # # Place a player on the level
+    # coo_player = self.generate_point(1, self.rule['size'][0] - 2)
+    # object_on_level.append(coo_player)
+    #
+    # # Place a stair on the level
+    # coo_stair = self.generate_point(1, self.rule['size'][0] - 2)
+    # object_on_level.append(coo_stair)
+    #
+    # wall = WallGenerator(object_on_level, 0.15)
+    # object_on_level = wall.generate_wall_level()
+    #
+    # for x, y in object_on_level:
+    #     level[x][y] = "1"
+    #
+    # level[coo_stair[0]][coo_stair[1]] = "S"
+    # level[coo_player[0]][coo_player[1]] = "P"
+    #
+    # return level
 
 if __name__ == '__main__':
 
