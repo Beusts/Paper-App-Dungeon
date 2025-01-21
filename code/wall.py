@@ -16,9 +16,10 @@ class Wall(pygame.sprite.Sprite):
         self.color = (gray, gray, gray)
         self.rect = pygame.Rect(
             (pos[0], pos[1]),
-            (TILE_SIZE * 0.9, TILE_SIZE * 0.9)
+            (get_tile_size() * 0.9, get_tile_size() * 0.9)
         )
-        self.rect.center = (pos[0] + TILE_SIZE // 2, pos[1] + TILE_SIZE // 2)
+        self.rect.center = (pos[0] + get_tile_size() //
+                            2, pos[1] + get_tile_size() // 2)
 
     def draw(self, surface):
         """
@@ -28,6 +29,6 @@ class Wall(pygame.sprite.Sprite):
             surface (pygame.Surface): La surface sur laquelle dessiner le mur.
         """
         image = pygame.Surface(
-            (TILE_SIZE * 0.9, TILE_SIZE * 0.9), pygame.SRCALPHA)
+            (get_tile_size() * 0.9, get_tile_size() * 0.9), pygame.SRCALPHA)
         pygame.draw.rect(image, self.color, image.get_rect(), border_radius=4)
         surface.blit(image, self.rect)

@@ -26,7 +26,7 @@ class StandardHeart(Object):
         image = pygame.image.load(
             join('graphics', 'heart.png')).convert_alpha()
         image = pygame.transform.scale(
-            image, (TILE_SIZE, TILE_SIZE))
+            image, (get_tile_size(), get_tile_size()))
 
         return self.adding_number_to_standart_heart(image)
 
@@ -40,12 +40,12 @@ class StandardHeart(Object):
         Returns:
             pygame.Surface: L'image avec le numéro ajouté.
         """
-        font = pygame.font.Font(None, int(TILE_SIZE * 0.5))
+        font = pygame.font.Font(None, int(get_tile_size() * 0.5))
         value_to_string = str(self.value)
 
         text_surface = font.render(value_to_string, True, (0, 0, 0))
         text_rect = text_surface.get_rect(
-            centerx=TILE_SIZE / 2, centery=TILE_SIZE / 2)
+            centerx=get_tile_size() / 2, centery=get_tile_size() / 2)
 
         heart_with_number = image.copy()
         heart_with_number.blit(text_surface, text_rect)

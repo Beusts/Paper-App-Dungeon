@@ -1,9 +1,3 @@
-import copy
-import csv
-import math
-import random
-from sqlite3 import connect
-
 from settings import *
 from level import Level
 from shop import Shop
@@ -41,12 +35,14 @@ class Game:
         self.current_level_index = 0
         self.player = Player()
 
-        self.current_stage = Level(self.level_map_files[self.current_level_index], self.player)
+        self.current_stage = Level(
+            self.level_map_files[self.current_level_index], self.player)
         # self.current_stage = Shop('0', self.player)
 
 
 
     def change_level(self):
+
         self.current_level_index += 1
 
         if self.current_level_index >= len(self.level_map_files):
@@ -74,6 +70,10 @@ class Game:
 
             if isinstance(self.current_stage, Level) and self.current_stage.completed:
                 self.change_level()
+
+            if isinstance(self.current_stage, Shop) and self.current_stage.close:
+                self.current_stage = Level(
+                    self.level_map_files[self.current_level_index], self.player)
 
             self.current_stage.run(dt)
             pygame.display.update()

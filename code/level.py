@@ -2,11 +2,7 @@ import csv
 import re
 
 from teleporter import Teleporter
-from settings import *
 from wall import Wall
-from random import randint
-
-from player import Player
 from standardEnemy import StandardEnemy
 from mysteryEnemy import MysteryEnemy
 from spiderWeb import SpiderWeb
@@ -18,6 +14,7 @@ from coin import Coin
 from key import Key
 from stair import Stair
 
+from settings import *
 from utils import draw_text
 
 BLACK = (0, 0, 0)
@@ -74,17 +71,25 @@ class Level:
         with open(join('data', 'levels', level_data + '.csv'), newline='') as csvfile:
 
             level_reader = csv.reader(csvfile, delimiter=',')
+            level_reader = list(level_reader)
+
+            self.rows = len(level_reader)
+            self.cols = len(level_reader[0])
+
+            set_tile_size(int(WINDOW_WIDTH / max(self.rows, self.cols)))
+
+            self.x_offset = (WINDOW_WIDTH - (self.cols * get_tile_size())) / 2
 
             for y, row in enumerate(level_reader):
                 for x, tile in enumerate(row):
                     if tile == '1':
                         # Crée un mur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
-                        Wall((x * TILE_SIZE, y * TILE_SIZE),
+                        Wall((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                              (self.all_sprites, self.walls))
                     elif tile == 'P':
                         # Crée un joueur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
-                        self.player.setup((x * TILE_SIZE, y * TILE_SIZE),
-                                          self.all_sprites, {"walls": self.walls, "objects": self.objects}, self)
+                        self.player.setup((x * get_tile_size() + self.x_offset, y * get_tile_size()),
+                                          self.all_sprites, {"walls": self.walls, "objects": self.objects}, self, self.x_offset)
                     # Regarde si la tuile correspond a un pattern comme ceci : SeN où N est un nombre positif
                     elif re.match(r"Se(\d+)", tile):
 
@@ -93,15 +98,15 @@ class Level:
                         if match:
                             value = int(match.group(1))
 
-                        StandardEnemy((x * TILE_SIZE, y * TILE_SIZE),
+                        StandardEnemy((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                                       [self.all_sprites, self.objects], value)
                     elif tile == 'Me':
 
-                        MysteryEnemy((x * TILE_SIZE, y * TILE_SIZE),
+                        MysteryEnemy((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                                      [self.all_sprites, self.objects])
                     elif tile == 'W':
 
-                        SpiderWeb((x * TILE_SIZE, y * TILE_SIZE),
+                        SpiderWeb((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                                   [self.all_sprites, self.objects])
                     elif re.match(r"Sh(\d+)", tile):
 
@@ -110,35 +115,35 @@ class Level:
                         if match:
                             value = int(match.group(1))
 
-                        StandardHeart((x * TILE_SIZE, y * TILE_SIZE),
+                        StandardHeart((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                                       [self.all_sprites, self.objects], value)
                     elif tile == 'Mh':
 
-                        MysteryHeart((x * TILE_SIZE, y * TILE_SIZE),
+                        MysteryHeart((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                                      [self.all_sprites, self.objects])
                     elif tile == 'K':
 
-                        Key((x * TILE_SIZE, y * TILE_SIZE),
+                        Key((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                             [self.all_sprites, self.objects])
                     elif tile == 'L':
 
-                        Lock((x * TILE_SIZE, y * TILE_SIZE),
+                        Lock((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                              [self.all_sprites, self.objects])
                     elif tile == 'C':
 
-                        Chest((x * TILE_SIZE, y * TILE_SIZE),
+                        Chest((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                               [self.all_sprites, self.objects])
                     elif tile == 'Co':
 
-                        Coin((x * TILE_SIZE, y * TILE_SIZE),
+                        Coin((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                              [self.all_sprites, self.objects])
                     elif tile == 'T':
 
-                        Teleporter((x * TILE_SIZE, y * TILE_SIZE),
+                        Teleporter((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                                    [self.all_sprites, self.objects])
                     elif tile == 'S':
 
-                        Stair((x * TILE_SIZE, y * TILE_SIZE),
+                        Stair((x * get_tile_size() + self.x_offset, y * get_tile_size()),
                               [self.all_sprites, self.objects])
 
             self.hp_start = self.player.hp
@@ -165,33 +170,36 @@ class Level:
         self.player.draw(self.display_surface)
 
         self.draw_grid()
-        self.player.draw_information_player(self.display_surface)
 
     def draw_grid(self):
         """
         Dessine une grille sur la surface d'affichage.
         """
-        width = int(TILE_SIZE * 0.06)
-        for y in range(0, 16 * TILE_SIZE, TILE_SIZE):
+        width = int(get_tile_size() * 0.06)
+        if width < 1:
+            width = 1
+        for y in range(0, (self.rows + 1) * get_tile_size(), get_tile_size()):
             pygame.draw.line(self.display_surface, GRAY,
-                             (0, y - (width / 2)), (15 * TILE_SIZE, y - (width / 2)), width)
-        for x in range(0, 15 * TILE_SIZE, TILE_SIZE):
+                             (self.x_offset, y), (self.cols * get_tile_size() + self.x_offset, y), width)
+        for x in range(0, (self.cols + 1) * get_tile_size(), get_tile_size()):
             pygame.draw.line(self.display_surface, GRAY,
-                             (x - (width / 2), 0), (x - (width / 2), 15 * TILE_SIZE), width)
+                             (x + self.x_offset, 0), (x + self.x_offset, self.rows * get_tile_size()), width)
 
     def draw_end_level_interface(self):
         """
         Affiche l'interface de fin de niveau pour permettre au joueur de choisir de continuer ou de terminer le niveau.
         """
 
-        global is_input_active
-        font = pygame.font.Font(None, TILE_SIZE)
+        global can_receive_input
+        font = pygame.font.Font(None, UI_SIZE)
 
-        continue_rect = pygame.Rect(0, 0, TILE_SIZE * 6, TILE_SIZE * 2)
-        continue_rect.center = (TILE_SIZE * 7.5, TILE_SIZE * 6)
+        continue_rect = pygame.Rect(
+            0, 0, UI_SIZE * 6, UI_SIZE * 2)
+        continue_rect.center = (UI_SIZE * 7.5, UI_SIZE * 6)
 
-        finish_rect = pygame.Rect(0, 0, TILE_SIZE * 6, TILE_SIZE * 2)
-        finish_rect.center = (TILE_SIZE * 7.5, TILE_SIZE * 9)
+        finish_rect = pygame.Rect(
+            0, 0, UI_SIZE * 6, UI_SIZE * 2)
+        finish_rect.center = (UI_SIZE * 7.5, UI_SIZE * 9)
 
         pygame.draw.rect(self.display_surface, GRAY,
                          continue_rect, border_radius=10)
@@ -203,15 +211,16 @@ class Level:
         draw_text(self.display_surface, "Finish",
                   finish_rect.center, font, BLACK, center=True)
 
-        global is_input_active
+        global can_receive_input
         mouse_pos = pygame.mouse.get_pos()
-        if pygame.mouse.get_pressed()[0] and is_input_active:
+
+        if pygame.mouse.get_pressed()[0] and can_receive_input:
             if continue_rect.collidepoint(mouse_pos):
                 self.paused = False
             elif finish_rect.collidepoint(mouse_pos):
                 self.finish_level()
         elif not pygame.mouse.get_pressed()[0]:
-            is_input_active = True
+            can_receive_input = True
 
     def finish_level(self):
         """
@@ -231,6 +240,11 @@ class Level:
         self.player.losing_hp = 0
         self.player.winning_coins = 0
         self.player.losing_coins = 0
+
+        self.player.movement_remaining = 0
+
+        self.player.coin_multiplier = 1
+        self.player.is_invincible = False
 
         if self.player.hp <= 0:
             self.coins = 0
