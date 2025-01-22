@@ -246,6 +246,9 @@ class Player(pygame.sprite.Sprite):
                 # Si la tuile est un mur, ne l'ajoute pas aux tuiles adjacentes
                 if not any(sprite.rect.colliderect(rect) for sprite in self.colliders["walls"]):
                     self.adjacent_positions.append(pos)
+                elif self.can_go_through_walls:
+                    self.adjacent_positions.append(pos)
+
         else:
             for dx, dy in [(-get_tile_size(), 0), (get_tile_size(), 0), (0, -get_tile_size()), (0, get_tile_size())]:
                 pos = (self.rect.x + dx, self.rect.y + dy)
@@ -253,6 +256,8 @@ class Player(pygame.sprite.Sprite):
 
                 # Si la tuile est un mur, ne l'ajoute pas aux tuiles adjacentes
                 if not any(sprite.rect.colliderect(rect) for sprite in self.colliders["walls"]):
+                    self.adjacent_positions.append(pos)
+                elif self.can_go_through_walls:
                     self.adjacent_positions.append(pos)
 
     def draw_adjacent_tiles(self, surface):
