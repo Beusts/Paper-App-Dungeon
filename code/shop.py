@@ -53,9 +53,18 @@ class Shop(pygame.sprite.Sprite):
                 col += 4
 
     def run(self, dt):
+        self.draw()
+        self.handle_input()
+
+    def draw(self):
         self.display_surface.fill('white')
         self.draw_shop()
         self.player.draw_information_player(self.display_surface)
+
+    def handle_input(self):
+        self.handle_continue_button()
+        for item in self.items:
+            item.handle_input()
 
     def draw_shop(self):
         """
@@ -87,16 +96,15 @@ class Shop(pygame.sprite.Sprite):
         text = font.render("Continue", True, BLACK)
         text_rect = text.get_rect(center=rect.center)
         self.display_surface.blit(text, text_rect)
+        self.continue_rect = rect
 
-        self.handle_continue_button(rect)
-
-    def handle_continue_button(self, continue_rect):
+    def handle_continue_button(self):
 
         global can_receive_input
         mouse_pos = pygame.mouse.get_pos()
 
         if pygame.mouse.get_pressed()[0] and can_receive_input:
-            if continue_rect.collidepoint(mouse_pos):
+            if self.continue_rect.collidepoint(mouse_pos):
                 self.close = True
 
                 self.player.hp += self.player.winning_hp - self.player.losing_hp
@@ -150,23 +158,21 @@ class Item(pygame.sprite.Sprite):
             pygame.draw.rect(self.display_surface, BLACK,
                              rect, int(UI_SIZE*0.15))
 
-        # Check for mouse click on the item
-        mouse_pos = pygame.mouse.get_pos()
-        mouse_click = pygame.mouse.get_pressed()[0]
-
-        global can_receive_input
-
-        if rect.collidepoint(mouse_pos) and mouse_click and can_receive_input:
-            self.buy()
-        elif not mouse_click:
-            can_receive_input = True
-
         draw_text(self.display_surface, self.name,
                   (self.position[0] * UI_SIZE + (UI_SIZE * 2), self.position[1] * UI_SIZE), FONT, BLACK)
         draw_text(self.display_surface, f"{self.price}¢",
                   (self.position[0] * UI_SIZE + UI_SIZE / 2, self.position[1] * UI_SIZE + (UI_SIZE * 1.5)), DESC_FONT, BLACK, center=True)
         draw_text(self.display_surface, self.description,
                   (self.position[0] * UI_SIZE + (UI_SIZE * 2), self.position[1] * UI_SIZE + (UI_SIZE * 1.5)), DESC_FONT, BLACK, center_y=True, line_width=UI_SIZE * 10)
+
+    def handle_input(self):
+        rect = pygame.Rect(
+            self.position[0] * UI_SIZE, self.position[1] * UI_SIZE, UI_SIZE, UI_SIZE)
+        if rect.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0]:
+            self.buy()
+        global can_receive_input
+        if not pygame.mouse.get_pressed()[0]:
+            can_receive_input = True
 
 
 """
