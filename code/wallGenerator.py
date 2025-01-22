@@ -5,13 +5,14 @@ from random import randint
 
 class WallGenerator(pygame.sprite.Sprite):
 
-    def __init__(self, current_object_on_level, wall_pourcentage):
+    def __init__(self, current_object_on_level, wall_pourcentage, level_size):
         super().__init__()
         self.wall_pourcentage = wall_pourcentage
         self.current_object_on_level = current_object_on_level
+        self.level_size_rows, self.level_size_cols = level_size
 
     def generate_wall_level(self):
-        size_level = 15 * 15
+        size_level = self.level_size_rows * self.level_size_cols
         max_walls = size_level * self.wall_pourcentage
 
         wall_count = 0
@@ -27,12 +28,11 @@ class WallGenerator(pygame.sprite.Sprite):
 
         while True:
             size_block = (randint(1,3), 1)
-            position = (randint(1, 13), randint(1, 13))
+            position = (randint(1, self.level_size_rows - 2), randint(1, self.level_size_cols - 2))
             block = {"size": size_block, "position": position, "orientation": randint(1, 2)}
 
             if block["orientation"] == 2: block["size"] = (size_block[1], size_block[0])
 
-            print(block)
             if self.is_valid_block(block):
                 self.add_block(block)
                 return block
@@ -42,7 +42,7 @@ class WallGenerator(pygame.sprite.Sprite):
             for col in range(15):
 
                 # Place walls all around the map
-                if row == 0 or row == 14 or col == 0 or col == 14:
+                if row == 0 or row == self.level_size_rows - 1 or col == 0 or col == self.level_size_cols - 1:
                     self.current_object_on_level.append((row, col))
                     continue
 
@@ -52,7 +52,7 @@ class WallGenerator(pygame.sprite.Sprite):
                 for x, y in self.current_object_on_level:
                     if block["position"][0] + i == x and block["position"][1] + j == y: return False
 
-                    if block["position"][0] + i > 15 and block["position"][1] + j > 15: return False
+                    if block["position"][0] + i > self.level_size_rows and block["position"][1] + j > self.level_size_cols: return False
 
         return True
 
