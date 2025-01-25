@@ -17,8 +17,8 @@ class Game:
 
         self.clock = pygame.time.Clock()
 
-        self.level_map_files = {0: '0', 1: '1', 2: 'test', 3: '32'}
-        self.current_level_index = 2
+        self.level_map_files = {0: '0', 1: '1', 2: 'test', 3: '32', 4: 'grid'}
+        self.current_level_index = 4
         self.player = Player()
 
         self.current_stage = Level(
