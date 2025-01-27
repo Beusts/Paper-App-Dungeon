@@ -3,6 +3,7 @@ from level import Level
 from shop import Shop
 from player import Player
 from os.path import join
+from levelGenerator import create_maze_csv_file
 
 
 class Game:
@@ -17,13 +18,17 @@ class Game:
 
         self.clock = pygame.time.Clock()
 
-        self.level_map_files = {0: '0', 1: '1', 2: 'test', 3: '32', 4: 'grid'}
-        self.current_level_index = 4
+        self.level_map_files = []
+        self.current_level_index = 0
+
+        for i in range(6):
+            create_maze_csv_file(f'grid{i}', 15, 15)
+            self.level_map_files.append(f'grid{i}')
+
         self.player = Player()
 
         self.current_stage = Level(
             self.level_map_files[self.current_level_index], self.player)
-        # self.current_stage = Shop('0', self.player)
 
     def change_level(self):
 
