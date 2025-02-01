@@ -55,10 +55,6 @@ def addWall(walls, startPoint, endPoint, doorIdx, orientation):
 
 
 def divide(walls, topLeft, bottomRight, rooms):
-    if (bottomRight[0] - topLeft[0] + 1) * (bottomRight[1] - topLeft[1] + 1) < 26:
-        rooms.append((topLeft, bottomRight))
-        return
-
     possibleRows = []
     possibleCols = []
 
@@ -71,27 +67,32 @@ def divide(walls, topLeft, bottomRight, rooms):
         for i in range(topLeft[0], bottomRight[0]):
             possibleCols.append(i)
 
-        if len(possibleCols) == 0 or len(possibleRows) == 0:
-            rooms.append((topLeft, bottomRight))
-            return
-
         wallY = random.choice(possibleRows)
         door = (wallY, random.choice(possibleCols))
 
         addWall(walls, (topLeft[0], wallY),
                 (bottomRight[0], wallY), door, orientation)
 
-        divide(walls, topLeft, (bottomRight[0], wallY - 1), rooms)
-        divide(walls, (topLeft[0], wallY + 1), bottomRight, rooms)
+        newTopLeft = topLeft
+        newBottomRight = (bottomRight[0], wallY - 1)
+
+        if (newBottomRight[0] - newTopLeft[0] + 1) * (newBottomRight[1] - newTopLeft[1] + 1) >= 26:
+            divide(walls, newTopLeft, newBottomRight, rooms)
+        else:
+            rooms.append((topLeft, (bottomRight[0], wallY - 1), door))
+
+        newTopLeft = (topLeft[0], wallY + 1)
+        newBottomRight = bottomRight
+
+        if (newBottomRight[0] - newTopLeft[0] + 1) * (newBottomRight[1] - newTopLeft[1] + 1) >= 26:
+            divide(walls, newTopLeft, newBottomRight, rooms)
+        else:
+            rooms.append((newTopLeft, newBottomRight, door))
     else:
         for i in range(topLeft[0] + 2, bottomRight[0] - 1):
             possibleCols.append(i)
         for i in range(topLeft[1], bottomRight[1]):
             possibleRows.append(i)
-
-        if len(possibleCols) == 0 or len(possibleRows) == 0:
-            rooms.append((topLeft, bottomRight))
-            return
 
         wallX = random.choice(possibleCols)
         door = (random.choice(possibleRows), wallX)
@@ -99,8 +100,21 @@ def divide(walls, topLeft, bottomRight, rooms):
         addWall(walls, (wallX, topLeft[1]),
                 (wallX, bottomRight[1]), door, orientation)
 
-        divide(walls, topLeft, (wallX - 1, bottomRight[1]), rooms)
-        divide(walls, (wallX + 1, topLeft[1]), bottomRight, rooms)
+        newTopLeft = topLeft
+        newBottomRight = (wallX - 1, bottomRight[1])
+
+        if (newBottomRight[0] - newTopLeft[0] + 1) * (newBottomRight[1] - newTopLeft[1] + 1) >= 26:
+            divide(walls, topLeft, (wallX - 1, bottomRight[1]), rooms)
+        else:
+            rooms.append((topLeft, (wallX - 1, bottomRight[1]), door))
+
+        newTopLeft = (wallX + 1, topLeft[1])
+        newBottomRight = bottomRight
+
+        if (newBottomRight[0] - newTopLeft[0] + 1) * (newBottomRight[1] - newTopLeft[1] + 1) >= 26:
+            divide(walls, (wallX + 1, topLeft[1]), bottomRight, rooms)
+        else:
+            rooms.append(((wallX + 1, topLeft[1]), bottomRight, door))
 
 
 def adding_objects_on_level(maze, witdh, height, object_pourcentage):
