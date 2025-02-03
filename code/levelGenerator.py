@@ -8,7 +8,9 @@ import os
 def create_maze_csv_file(name, width, height):
     maze, rooms = generate_maze(width, height)
 
-    adding_objects_on_level(maze, rooms, width, height, 0.4)
+    # adding_objects_on_level(maze, rooms, width, height, 0.4)
+
+    apply_room_template(maze, rooms)
 
     output_dir = 'data/levels'
     os.makedirs(output_dir, exist_ok=True)
@@ -16,6 +18,7 @@ def create_maze_csv_file(name, width, height):
     with open(os.path.join(output_dir, f'{name}.csv'), 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(maze)
+
 
 def generate_maze(width, height):
     maze = [[0 for _ in range(width)] for _ in range(height)]
@@ -38,6 +41,7 @@ def generate_maze(width, height):
 
     return maze, rooms
 
+
 def chooseOrientation(width, height):
     """
     Horizontal = False
@@ -51,6 +55,7 @@ def chooseOrientation(width, height):
     else:
         return random.choice([True, False])
 
+
 def addWall(walls, startPoint, endPoint, doorIdx, orientation):
     if orientation == True:
         for x in range(0, endPoint[0] - startPoint[0] + 1):
@@ -62,6 +67,7 @@ def addWall(walls, startPoint, endPoint, doorIdx, orientation):
             walls[startPoint[1] + y][startPoint[0]] = 1
         walls[doorIdx[0]][doorIdx[1]] = 0
         walls[doorIdx[0] + 1][doorIdx[1]] = 0
+
 
 def divide(walls, topLeft, bottomRight, rooms):
     possibleRows = []
@@ -88,7 +94,8 @@ def divide(walls, topLeft, bottomRight, rooms):
         if (newBottomRight[0] - newTopLeft[0] + 1) * (newBottomRight[1] - newTopLeft[1] + 1) >= 26:
             divide(walls, newTopLeft, newBottomRight, rooms)
         else:
-            rooms.append((topLeft, (bottomRight[0], wallY - 1), door))
+            rooms.append(
+                (topLeft, (bottomRight[0], wallY - 1), (door, (door[0], door[1] + 1)), []))
 
         newTopLeft = (topLeft[0], wallY + 1)
         newBottomRight = bottomRight
@@ -96,7 +103,8 @@ def divide(walls, topLeft, bottomRight, rooms):
         if (newBottomRight[0] - newTopLeft[0] + 1) * (newBottomRight[1] - newTopLeft[1] + 1) >= 26:
             divide(walls, newTopLeft, newBottomRight, rooms)
         else:
-            rooms.append((newTopLeft, newBottomRight, door))
+            rooms.append((newTopLeft, newBottomRight,
+                         (door, (door[0], door[1] + 1)), []))
     else:
         for i in range(topLeft[0] + 2, bottomRight[0] - 1):
             possibleCols.append(i)
@@ -115,7 +123,8 @@ def divide(walls, topLeft, bottomRight, rooms):
         if (newBottomRight[0] - newTopLeft[0] + 1) * (newBottomRight[1] - newTopLeft[1] + 1) >= 26:
             divide(walls, topLeft, (wallX - 1, bottomRight[1]), rooms)
         else:
-            rooms.append((topLeft, (wallX - 1, bottomRight[1]), door))
+            rooms.append(
+                (topLeft, (wallX - 1, bottomRight[1]), (door, (door[0] + 1, door[1])), []))
 
         newTopLeft = (wallX + 1, topLeft[1])
         newBottomRight = bottomRight
@@ -123,215 +132,87 @@ def divide(walls, topLeft, bottomRight, rooms):
         if (newBottomRight[0] - newTopLeft[0] + 1) * (newBottomRight[1] - newTopLeft[1] + 1) >= 26:
             divide(walls, (wallX + 1, topLeft[1]), bottomRight, rooms)
         else:
-            rooms.append(((wallX + 1, topLeft[1]), bottomRight, door))
+            rooms.append(
+                ((wallX + 1, topLeft[1]), bottomRight, (door, (door[0] + 1, door[1])), []))
 
 
-def adding_objects_on_level(maze, rooms, width, height, object_percentage):
-    current_object_position_on_level = having_current_object_position_on_level(maze)
-    current_object_on_level = []
-
-    # Place a player on the level
-    coo_player = place_player_on_maze(rooms, current_object_position_on_level)
-
-    # Place a stair on the level
-    coo_stair = place_stair_on_maze(rooms, coo_player, current_object_position_on_level)
-
-    current_object_on_level.append({"coo": coo_player, "symbol": "P"})
-    current_object_on_level.append({"coo": coo_stair, "symbol": "S"})
-
-    place_objects_on_rooms(rooms, current_object_position_on_level, current_object_on_level, object_percentage)
-
-
-    for o in current_object_on_level:
-        coo = o["coo"]
-        if not coo: break
-        symbol = o["symbol"]
-        maze[coo[1]][coo[0]] = symbol
-
-    return maze
-
-def having_current_object_position_on_level(maze):
-    objects_position = []
-    row_id, col_id = 0, 0
-
-    for row in maze:
-        for col in row:
-            if col != 0:
-                objects_position.append((row_id, col_id))
-            col_id += 1
-        row_id += 1
-        col_id = 0
-    return objects_position
-
-def place_player_on_maze(rooms, current_object_position_on_level):
-    pos_x, pos_y, width, height = select_random_room(rooms)
-    return generate_point(  (pos_x, pos_x + width), (pos_y, pos_y + height), current_object_position_on_level)
-
-def place_stair_on_maze(rooms, coo_player, current_object_position_on_level):
-    pos_x, pos_y, width, height = select_random_room(rooms)
-
-    if not is_object_in_a_room(pos_x, pos_y, width, height, coo_player):
-        return generate_point(  (pos_x, pos_x + width), (pos_y, pos_y + height), current_object_position_on_level)
-
-    while is_object_in_a_room(pos_x, pos_y, width, height, coo_player):
-        pos_x, pos_y, width, height = select_random_room(rooms)
-
-    return generate_point(  (pos_x, pos_x + width), (pos_y, pos_y + height), current_object_position_on_level)
-
-
-def place_objects_on_rooms(rooms, current_object_position_on_level, current_object_on_level, object_percentage):
-
+def apply_room_template(maze, rooms):
+    templates = [template_base_room, template_chest_room]
+    weights = [0.9, 0.1]
     for room in rooms:
-        start_x, start_y = room[0]
-        end_x, end_y = room[1]
-        width, height = abs(start_x - end_x), abs(start_y - end_y)
-        room_max_objects = width * height * object_percentage
+        template = random.choices(templates, weights)[0]
+        template(maze, room)
 
-        # Place an object inside the rooms
-        _object = generate_random_object(rooms, ((start_x, end_x), (start_y, end_y)),
-                                         current_object_position_on_level, current_object_on_level)
-        if not _object: return
+    player_room = random.choice(rooms)
+    player_point = generate_point(player_room)
+    if player_point:
+        maze[player_point[1]][player_point[0]] = "P"
 
-        # Manage rooms
-        if _object[0] == "C":  # If object is a chest, adding some enemies around it
-            current_object_on_level.append({"coo": _object[1], "symbol": _object[0]})
-            chest_room(start_x, start_y, width, height, room_max_objects, current_object_position_on_level,
-                       current_object_on_level)
-            continue
-
-        if _object[0] == "T":
-            have_teleporter = False
-            for o in current_object_on_level:
-                if "T" in o["symbol"]:
-                    have_teleporter = True
-                    break
-
-            if have_teleporter: continue
-            current_object_on_level.append({"coo": _object[1], "symbol": _object[0]})
-            teleporters_room(rooms, start_x, start_y, current_object_position_on_level, current_object_on_level)
-            continue
-
-        for i in range(int(room_max_objects)):
-            _object = generate_random_object(rooms, ((start_x, end_x), (start_y, end_y)),
-                                             current_object_position_on_level, current_object_on_level)
-
-            if not _object or _object[0] == "C" or _object[0] == "T":
-                continue
-
-            current_object_on_level.append({"coo": _object[1], "symbol": _object[0]})
-    return
-
-def chest_room(pos_x, pos_y, width, height, room_max_objects, current_object_position_on_level, current_object_on_level):
-    for i in range(int(room_max_objects)):
-        row_min_max = pos_x, pos_x + width
-        col_min_max = pos_y, pos_y + height
-        point = generate_point(row_min_max, col_min_max, current_object_position_on_level)
-
-        malus_type = randint(1, 3)
-
-        if malus_type == 1:  # Standart Enemy
-            value = randint(1, 6)
-            symbol = "Se" + str(value)
-            current_object_on_level.append({"coo": point, "symbol": symbol})
-
-        if malus_type == 2:  # Mystery Enemy
-            current_object_on_level.append({"coo": point, "symbol": "Me"})
-
-        if malus_type == 3:
-            current_object_on_level.append({"coo": point, "symbol": "W"})
-
-    return
-
-def teleporters_room(rooms, pos_x, pos_y, current_object_position_on_level, current_object_on_level):
-    print(f"old room : {pos_x, pos_y}")
-
-    # Find another room to put another teleporter
-    new_pos_x, new_pos_y, width, height = select_random_room(rooms)
-
-    while new_pos_x == pos_x and new_pos_y == pos_y:
-        new_pos_x, new_pos_y, width, height = select_random_room(rooms)
-
-    print(f"new room : {new_pos_x, new_pos_y}")
-
-    row_min_max = new_pos_x, new_pos_x + width
-    col_min_max = new_pos_y, new_pos_y + height
-    point = generate_point(row_min_max, col_min_max, current_object_position_on_level)
-    current_object_on_level.append({"coo": point, "symbol": "T"})
-
-def generate_random_object(rooms, borne, current_object_position_on_level, current_object_on_level):
-    object_id = randint(1, 8)
-    row_min_max = borne[0]
-    col_min_max = borne[1]
-
-    new_room = []
-    point = generate_point(  row_min_max, col_min_max, current_object_position_on_level)
-    if not point: return False
-
-    symbol = ""
-
-    if object_id == 1:  # Standart Enemy
-        value = randint(1, 6)
-        symbol = "Se" + str(value)
-
-    if object_id == 2:  # Mystery Enemy
-        symbol = "Me"
-
-    if object_id == 3:  # Standart Heart
-        value = randint(1, 6)
-        symbol = "Sh" + str(value)
-
-    if object_id == 4:  # Mystery Heart
-        symbol = "Mh"
-
-    if object_id == 5:  # Coin
-        symbol = "Co"
-
-    if object_id == 6:  # Chest
-        symbol = "C"
-
-    if object_id == 7:  # spiderWeb
-        symbol = "W"
-
-    if object_id == 8:  # Teleporter
-        symbol = "T"
-
-    return symbol, point
-
-def generate_point( row_min_max, col_min_max, current_object_position_on_level):
-
-    row = randint(row_min_max[0], row_min_max[1])
-    col = randint(col_min_max[0], col_min_max[1])
-    point = (row, col)
-
-    if point not in current_object_position_on_level:
-        current_object_position_on_level.append(point)
-        return point
-
-    while point in current_object_position_on_level:
-        row = randint(row_min_max[0], row_min_max[1])
-        col = randint(col_min_max[0], col_min_max[1])
-        point = (row, col)
-
-    current_object_position_on_level.append(point)
-    return point
+    stair_room = random.choice([room for room in rooms if room != player_room])
+    stair_point = generate_point(stair_room)
+    if stair_point:
+        maze[stair_point[1]][stair_point[0]] = "S"
 
 
-def select_random_room(rooms):
-    room_id = randint(0, len(rooms) - 1)
-    current_room = rooms[room_id]
-    return calculate_size_room(current_room)
+def template_base_room(maze, room):
+    start_x, start_y = room[0]
+    end_x, end_y = room[1]
+    width, height = abs(start_x - end_x) + 1, abs(start_y - end_y) + 1
+    max_objects = int((width * height) * 0.2)
+    print(max_objects)
 
-def calculate_size_room(room):
-    first_x, first_y = room[0]
-    last_x, last_y = room[1]
-    return first_x, first_y, abs(first_x - last_x), abs(first_y - last_y)
+    symbols = [
+        lambda: f"Se{randint(1, 6)}",  # Standart Enemy
+        lambda: "Me",  # Mystery Enemy
+        lambda: f"Sh{randint(1, 6)}",  # Standart Heart
+        lambda: "Mh",  # Mystery Heart
+        lambda: "Co",  # Coin
+        lambda: "C",  # Chest
+        lambda: "W",  # SpiderWeb
+        lambda: "T"  # Teleporter
+    ]
+    for _ in range(max_objects):
+        object_id = randint(0, len(symbols) - 1)
+        symbol = symbols[object_id]()
+        point = generate_point(room)
+        if point:
+            maze[point[1]][point[0]] = symbol
 
-def is_object_in_a_room(pos_x, pos_y, width, height, coo):
-    in_x = pos_x <= coo[0] <= pos_x + width
-    in_y = pos_y <= coo[1] <= pos_y + height
 
-    return in_x and in_y
+def template_chest_room(maze, room):
+    start_x, start_y = room[0]
+    end_x, end_y = room[1]
+
+    for i in range(start_x - 1, end_x + 2):
+        if ((maze[start_y - 1][i] != 1 and not (start_y - 1, i) in room[2]) or (maze[end_y + 1][i] != 1) and not (end_y + 1, i) in room[2]):
+            return
+    for j in range(start_y - 1, end_y + 2):
+        if ((maze[j][start_x - 1] != 1 and not (j, start_x - 1) in room[2]) or (maze[j][end_x + 1] != 1) and not (j, end_x + 1) in room[2]):
+            return
+
+    point = generate_point(room)
+    if point:
+        maze[point[1]][point[0]] = "C"
+
+    width, height = abs(start_x - end_x) + 1, abs(start_y - end_y) + 1
+
+    for i in range(start_x, end_x + 1):
+        for j in range(start_y, end_y + 1):
+            if maze[j][i] == 0 and (0 == randint(0, 2)):
+                maze[j][i] = "Co"
+
+    maze[room[2][0][0]][room[2][0][1]] = "L"
+    maze[room[2][1][0]][room[2][1][1]] = "1"
 
 
-
-
+def generate_point(room):
+    attempts = 0
+    max_attempts = 100
+    while attempts < max_attempts:
+        pos_x = randint(room[0][0], room[1][0])
+        pos_y = randint(room[0][1], room[1][1])
+        if (pos_x, pos_y) not in room[3]:
+            room[3].append((pos_x, pos_y))
+            return pos_x, pos_y
+        attempts += 1
+    return None
