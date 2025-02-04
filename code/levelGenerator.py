@@ -137,11 +137,26 @@ def divide(walls, topLeft, bottomRight, rooms):
 
 
 def apply_room_template(maze, rooms):
-    templates = [template_base_room, template_chest_room]
-    weights = [0.9, 0.1]
+    templates = [
+        {"func": template_base_room, "weight": 1, "max_count": None},
+        {"func": template_chest_room, "weight": 9, "max_count": 1}
+    ]
+    template_counts = {template["func"]: 0 for template in templates}
+
     for room in rooms:
-        template = random.choices(templates, weights)[0]
-        template(maze, room)
+        available_templates = [
+            t for t in templates if t["max_count"] is None or template_counts[t["func"]] < t["max_count"]]
+        if not available_templates:
+            break
+        weights = [t["weight"] for t in available_templates]
+        while available_templates:
+            chosen_template = random.choices(available_templates, weights)[0]
+            if chosen_template["func"](maze, room, rooms):
+                template_counts[chosen_template["func"]] += 1
+                break
+            else:
+                available_templates.remove(chosen_template)
+                weights = [t["weight"] for t in available_templates]
 
     player_room = random.choice(rooms)
     player_point = generate_point(player_room)
@@ -154,7 +169,7 @@ def apply_room_template(maze, rooms):
         maze[stair_point[1]][stair_point[0]] = "S"
 
 
-def template_base_room(maze, room):
+def template_base_room(maze, room, rooms):
     start_x, start_y = room[0]
     end_x, end_y = room[1]
     width, height = abs(start_x - end_x) + 1, abs(start_y - end_y) + 1
@@ -177,18 +192,19 @@ def template_base_room(maze, room):
         point = generate_point(room)
         if point:
             maze[point[1]][point[0]] = symbol
+    return True
 
 
-def template_chest_room(maze, room):
+def template_chest_room(maze, room, rooms):
     start_x, start_y = room[0]
     end_x, end_y = room[1]
 
     for i in range(start_x - 1, end_x + 2):
         if ((maze[start_y - 1][i] != 1 and not (start_y - 1, i) in room[2]) or (maze[end_y + 1][i] != 1) and not (end_y + 1, i) in room[2]):
-            return
+            return False
     for j in range(start_y - 1, end_y + 2):
         if ((maze[j][start_x - 1] != 1 and not (j, start_x - 1) in room[2]) or (maze[j][end_x + 1] != 1) and not (j, end_x + 1) in room[2]):
-            return
+            return False
 
     point = generate_point(room)
     if point:
@@ -203,6 +219,13 @@ def template_chest_room(maze, room):
 
     maze[room[2][0][0]][room[2][0][1]] = "L"
     maze[room[2][1][0]][room[2][1][1]] = "1"
+
+    key_room = random.choice([r for r in rooms if r != room])
+    key_point = generate_point(key_room)
+    if key_point:
+        maze[key_point[1]][key_point[0]] = "K"
+
+    return True
 
 
 def generate_point(room):
