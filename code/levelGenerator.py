@@ -174,7 +174,6 @@ def template_base_room(maze, room, rooms):
     end_x, end_y = room[1]
     width, height = abs(start_x - end_x) + 1, abs(start_y - end_y) + 1
     max_objects = int((width * height) * 0.2)
-    print(max_objects)
 
     symbols = [
         lambda: f"Se{randint(1, 6)}",  # Standart Enemy
