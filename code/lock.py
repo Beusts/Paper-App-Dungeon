@@ -4,7 +4,7 @@ from object import *
 
 class Lock(Object):
 
-    def __init__(self, pos, groups):
+    def __init__(self, pos, groups, lock):
         """
         Initialise un ennemi à la position donnée et l'ajoute aux groupes spécifiés.
 
@@ -13,6 +13,8 @@ class Lock(Object):
             groups (list): Les groupes de sprites auxquels l'ennemi appartient.
             value (int): La valeur associée à l'ennemi.
         """
+        self.lock = lock
+        groups.append(lock)
         super().__init__(pos, groups)
 
     def design(self):
@@ -41,9 +43,6 @@ class Lock(Object):
             self.image.fill((0, 0, 0, 0))
             player.keys -= 1
             self.used = True
-        else:
-            # the player can't go throught the lock
-            player.direction = -player.direction
-            player.movement_remaining = 1
+            self.remove(self.lock)
 
         return player

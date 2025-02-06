@@ -38,6 +38,7 @@ class Level:
 
         self.walls = pygame.sprite.Group()
         self.objects = pygame.sprite.Group()
+        self.lock = pygame.sprite.Group()
 
         self.player = player
 
@@ -89,7 +90,7 @@ class Level:
                     elif tile == 'P':
                         # Crée un joueur aux coordonnées (x, y) et l'ajoute aux groupes appropriés
                         self.player.setup((x * get_tile_size() + self.x_offset, y * get_tile_size()),
-                                          self.all_sprites, {"walls": self.walls, "objects": self.objects}, self, self.x_offset)
+                                          self.all_sprites, {"walls": self.walls, "objects": self.objects, "lock": self.lock}, self, self.x_offset)
                     # Regarde si la tuile correspond a un pattern comme ceci : SeN où N est un nombre positif
                     elif re.match(r"Se(\d+)", tile):
 
@@ -128,7 +129,7 @@ class Level:
                     elif tile == 'L':
 
                         Lock((x * get_tile_size() + self.x_offset, y * get_tile_size()),
-                             [self.all_sprites, self.objects])
+                             [self.all_sprites, self.objects], self.lock)
                     elif tile == 'C':
 
                         Chest((x * get_tile_size() + self.x_offset, y * get_tile_size()),

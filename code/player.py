@@ -170,7 +170,7 @@ class Player(pygame.sprite.Sprite):
         new_rect = self.rect.move(dx, dy)
 
         # Vérifie les collisions avec les autres sprites walls
-        if not any(sprite.rect.colliderect(new_rect) for sprite in self.colliders["walls"]) and self.movement_remaining > 0 or self.can_move_player_through_walls(new_rect):
+        if not (any(sprite.rect.colliderect(new_rect) for sprite in self.colliders["walls"]) or (self.keys == 0 and any(sprite.rect.colliderect(new_rect) for sprite in self.colliders["lock"]))) and self.movement_remaining > 0 or self.can_move_player_through_walls(new_rect):
             self.rect.x += dx
             self.rect.y += dy
             self.movement_remaining -= 1
@@ -244,7 +244,7 @@ class Player(pygame.sprite.Sprite):
                 rect = pygame.Rect(pos, (get_tile_size(), get_tile_size()))
 
                 # Si la tuile est un mur, ne l'ajoute pas aux tuiles adjacentes
-                if not any(sprite.rect.colliderect(rect) for sprite in self.colliders["walls"]):
+                if not any(sprite.rect.colliderect(rect) for sprite in self.colliders["walls"]) and not (self.keys == 0 and any(sprite.rect.colliderect(rect) for sprite in self.colliders["lock"])):
                     self.adjacent_positions.append(pos)
                 elif self.can_go_through_walls:
                     self.adjacent_positions.append(pos)
@@ -255,7 +255,7 @@ class Player(pygame.sprite.Sprite):
                 rect = pygame.Rect(pos, (get_tile_size(), get_tile_size()))
 
                 # Si la tuile est un mur, ne l'ajoute pas aux tuiles adjacentes
-                if not any(sprite.rect.colliderect(rect) for sprite in self.colliders["walls"]):
+                if not any(sprite.rect.colliderect(rect) for sprite in self.colliders["walls"]) and not (self.keys == 0 and any(sprite.rect.colliderect(rect) for sprite in self.colliders["lock"])):
                     self.adjacent_positions.append(pos)
                 elif self.can_go_through_walls:
                     self.adjacent_positions.append(pos)
