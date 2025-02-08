@@ -1,16 +1,13 @@
 import random
 from copyreg import constructor
+from os import pread
 from random import randint
 import csv
 import os
 
-
-def create_maze_csv_file(name, width, height):
+def create_maze_csv_file(name, width, height, difficulty = 1):
     maze, rooms = generate_maze(width, height)
-
-    # adding_objects_on_level(maze, rooms, width, height, 0.4)
-
-    apply_room_template(maze, rooms)
+    apply_room_template(maze, rooms, difficulty)
 
     output_dir = 'data/levels'
     os.makedirs(output_dir, exist_ok=True)
@@ -136,10 +133,11 @@ def divide(walls, topLeft, bottomRight, rooms):
                 ((wallX + 1, topLeft[1]), bottomRight, (door, (door[0] + 1, door[1])), []))
 
 
-def apply_room_template(maze, rooms):
+def apply_room_template(maze, rooms, difficulty):
     templates = [
         {"func": template_base_room, "weight": 1, "max_count": None},
-        {"func": template_chest_room, "weight": 9, "max_count": 1}
+        {"func": template_chest_room, "weight": 9, "max_count": 1},
+        {"func": template_teleporters_room, "weight": 2, "max_count": 1}
     ]
     template_counts = {template["func"]: 0 for template in templates}
 
@@ -151,7 +149,7 @@ def apply_room_template(maze, rooms):
         weights = [t["weight"] for t in available_templates]
         while available_templates:
             chosen_template = random.choices(available_templates, weights)[0]
-            if chosen_template["func"](maze, room, rooms):
+            if chosen_template["func"](maze, room, rooms, difficulty):
                 template_counts[chosen_template["func"]] += 1
                 break
             else:
@@ -169,21 +167,20 @@ def apply_room_template(maze, rooms):
         maze[stair_point[1]][stair_point[0]] = "S"
 
 
-def template_base_room(maze, room, rooms):
+def template_base_room(maze, room, rooms, difficulty):
     start_x, start_y = room[0]
     end_x, end_y = room[1]
     width, height = abs(start_x - end_x) + 1, abs(start_y - end_y) + 1
     max_objects = int((width * height) * 0.2)
 
     symbols = [
-        lambda: f"Se{randint(1, 6)}",  # Standart Enemy
+        lambda: f"Se{randint(1 * difficulty, 6 + int(difficulty / 2))}",  # Standart Enemy
         lambda: "Me",  # Mystery Enemy
         lambda: f"Sh{randint(1, 6)}",  # Standart Heart
         lambda: "Mh",  # Mystery Heart
         lambda: "Co",  # Coin
         lambda: "C",  # Chest
         lambda: "W",  # SpiderWeb
-        lambda: "T"  # Teleporter
     ]
     for _ in range(max_objects):
         object_id = randint(0, len(symbols) - 1)
@@ -193,10 +190,11 @@ def template_base_room(maze, room, rooms):
             maze[point[1]][point[0]] = symbol
     return True
 
-
-def template_chest_room(maze, room, rooms):
+def template_chest_room(maze, room, rooms, difficulty):
     start_x, start_y = room[0]
     end_x, end_y = room[1]
+    width, height = abs(start_x - end_x) + 1, abs(start_y - end_y) + 1
+    max_objects = int((width * height) * 0.2)
 
     for i in range(start_x - 1, end_x + 2):
         if ((maze[start_y - 1][i] != 1 and not (start_y - 1, i) in room[2]) or (maze[end_y + 1][i] != 1) and not (end_y + 1, i) in room[2]):
@@ -209,7 +207,6 @@ def template_chest_room(maze, room, rooms):
     if point:
         maze[point[1]][point[0]] = "C"
 
-    width, height = abs(start_x - end_x) + 1, abs(start_y - end_y) + 1
 
     for i in range(start_x, end_x + 1):
         for j in range(start_y, end_y + 1):
@@ -226,6 +223,20 @@ def template_chest_room(maze, room, rooms):
 
     return True
 
+def template_teleporters_room(maze, room_teleporter_1, rooms, difficulty) :
+    room_teleporter_2 = random.choice([r for r in rooms if r != room_teleporter_1])
+    symbol_teleporters = "T"
+
+    point_teleporter_1 = generate_point(room_teleporter_1)
+    point_teleporter_2 = generate_point(room_teleporter_2)
+
+    if not point_teleporter_1 or not point_teleporter_2:
+        return False
+
+    maze[point_teleporter_1[1]][point_teleporter_1[0]] = symbol_teleporters
+    maze[point_teleporter_2[1]][point_teleporter_2[0]] = symbol_teleporters
+
+    return template_base_room(maze, room_teleporter_1, rooms, difficulty)
 
 def generate_point(room):
     attempts = 0
@@ -238,3 +249,4 @@ def generate_point(room):
             return pos_x, pos_y
         attempts += 1
     return None
+

@@ -6,11 +6,15 @@ from os.path import join
 from levelGenerator import create_maze_csv_file
 
 
+
 class Game:
     def __init__(self):
         """
         Initialise le jeu, la fenêtre d'affichage et le niveau actuel.
         """
+
+        NB_PARTY = 6
+
         pygame.init()
         self.display_surface = pygame.display.set_mode(
             (WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -21,8 +25,13 @@ class Game:
         self.level_map_files = []
         self.current_level_index = 0
 
-        for i in range(6):
-            create_maze_csv_file(f'grid{i}', 15, 15)
+        difficulty = 0
+        for i in range(NB_PARTY):
+
+            if i % 10 == 0:
+                difficulty += 1
+
+            create_maze_csv_file(f'grid{i}', 15, 15, difficulty)
             self.level_map_files.append(f'grid{i}')
 
         self.player = Player()
