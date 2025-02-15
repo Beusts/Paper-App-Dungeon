@@ -15,6 +15,9 @@ SLEEP_TIME = 100
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
 
+# Fréuence d'apparition d'un Shop
+FREQUENCY_SPAWN_SHOP = 2
+
 global is_input_active
 can_receive_input = True
 

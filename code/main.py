@@ -4,7 +4,7 @@ from shop import Shop
 from player import Player
 from os.path import join
 from levelGenerator import create_maze_csv_file
-
+from pdfGenerator import PdfGenerator
 
 
 class Game:
@@ -23,6 +23,8 @@ class Game:
         self.clock = pygame.time.Clock()
 
         self.level_map_files = []
+        self.shop_files = [0, 1, 2]
+
         self.current_level_index = 0
 
         difficulty = 0
@@ -39,6 +41,9 @@ class Game:
         self.current_stage = Level(
             self.level_map_files[self.current_level_index], self.player)
 
+        PdfGenerator(self.level_map_files, self.shop_files)
+
+
     def change_level(self):
 
         self.current_level_index += 1
@@ -48,7 +53,7 @@ class Game:
         else:
             new_level_file = self.level_map_files[self.current_level_index]
 
-            if self.current_level_index % 2 == 1:
+            if self.current_level_index % FREQUENCY_SPAWN_SHOP == 1:
                 self.current_stage = Shop('2', self.player)
             else:
                 self.current_stage = Level(new_level_file, self.player)
