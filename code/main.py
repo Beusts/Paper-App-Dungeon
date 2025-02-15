@@ -6,6 +6,7 @@ from os.path import join
 from levelGenerator import create_maze_csv_file
 from shopGenerator import create_shop_csv_file
 from pdfGenerator import PdfGenerator
+import random
 
 
 class Game:
@@ -34,6 +35,10 @@ class Game:
 
         level_count = 0
         shop_count = 0
+
+        seed = random.random()
+        random.seed(seed)
+        print(seed)
 
         for i in range(total_iterations):
             # Si on est à l'intervalle pour un shop et qu'il reste des shops à ajouter…

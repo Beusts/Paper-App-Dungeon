@@ -22,9 +22,6 @@ def generate_maze(width, height):
 
     topLeft = (1, 1)
     bottomRight = (width - 2, height - 2)
-    seed = random.random()
-    random.seed(seed)
-    print(seed)
 
     divide(maze, topLeft, bottomRight, rooms)
 
