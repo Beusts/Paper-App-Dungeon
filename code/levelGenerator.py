@@ -157,6 +157,11 @@ def apply_room_template(maze, rooms, difficulty):
                 weights = [t["weight"] for t in available_templates]
 
     player_room = random.choice(rooms)
+
+    for item in player_room:
+        if item == "C":
+            player_room = random.choice([room for room in rooms if room != player_room])
+
     player_point = generate_point(player_room)
     if player_point:
         maze[player_point[1]][player_point[0]] = "P"
