@@ -20,7 +20,7 @@ class Shop(pygame.sprite.Sprite):
         print(f"current hp : {self.player.level.hp_start}")
 
         self.setup(shop_data)
-        self.close = False
+        self.completed = False
 
     def setup(self, shop_data):
         col = 4
@@ -105,7 +105,7 @@ class Shop(pygame.sprite.Sprite):
 
         if pygame.mouse.get_pressed()[0] and can_receive_input:
             if self.continue_rect.collidepoint(mouse_pos):
-                self.close = True
+                self.completed = True
 
                 self.player.hp += self.player.winning_hp - self.player.losing_hp
                 self.player.coins += self.player.winning_coins - self.player.losing_coins

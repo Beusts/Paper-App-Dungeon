@@ -16,7 +16,9 @@ BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
 
 # Fréuence d'apparition d'un Shop
-FREQUENCY_SPAWN_SHOP = 2
+FREQUENCY_SPAWN_SHOP = 0.2
+# Nombre de niveaux
+NB_LEVEL = 10
 
 global is_input_active
 can_receive_input = True
@@ -25,6 +27,7 @@ can_receive_input = True
 TILE_SIZE = int((WINDOW_WIDTH / 15))
 
 UI_SIZE = int(WINDOW_WIDTH / 15)
+
 
 def get_tile_size():
     global TILE_SIZE

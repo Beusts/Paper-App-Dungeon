@@ -4,6 +4,7 @@ from shop import Shop
 from player import Player
 from os.path import join
 from levelGenerator import create_maze_csv_file
+from shopGenerator import create_shop_csv_file
 from pdfGenerator import PdfGenerator
 
 
@@ -13,8 +14,6 @@ class Game:
         Initialise le jeu, la fenêtre d'affichage et le niveau actuel.
         """
 
-        NB_PARTY = 6
-
         pygame.init()
         self.display_surface = pygame.display.set_mode(
             (WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -23,26 +22,38 @@ class Game:
         self.clock = pygame.time.Clock()
 
         self.level_map_files = []
-        self.shop_files = [0, 1, 2]
 
         self.current_level_index = 0
 
         difficulty = 0
-        for i in range(NB_PARTY):
+        total_levels = NB_LEVEL
+        total_shops = int(NB_LEVEL * FREQUENCY_SPAWN_SHOP)
+        total_iterations = total_levels + total_shops
+        # Détermine à intervalles réguliers où insérer un shop
+        shop_interval = total_iterations // (total_shops + 1)
 
-            if i % 10 == 0:
-                difficulty += 1
+        level_count = 0
+        shop_count = 0
 
-            create_maze_csv_file(f'grid{i}', 15, 15, difficulty)
-            self.level_map_files.append(f'grid{i}')
+        for i in range(total_iterations):
+            # Si on est à l'intervalle pour un shop et qu'il reste des shops à ajouter…
+            if shop_count < total_shops and (i + 1) % shop_interval == 0:
+                create_shop_csv_file(f'shop{shop_count}', 3)
+                self.level_map_files.append(f'shop{shop_count}')
+                shop_count += 1
+            else:
+                level_count += 1
+                if level_count % 10 == 0 and level_count != 0:
+                    difficulty += 1
+            create_maze_csv_file(f'level{level_count}', 15, 15, difficulty)
+            self.level_map_files.append(f'level{level_count}')
 
         self.player = Player()
 
         self.current_stage = Level(
             self.level_map_files[self.current_level_index], self.player)
 
-        PdfGenerator(self.level_map_files, self.shop_files)
-
+        PdfGenerator(self.level_map_files)
 
     def change_level(self):
 
@@ -51,12 +62,13 @@ class Game:
         if self.current_level_index >= len(self.level_map_files):
             print("game over")
         else:
-            new_level_file = self.level_map_files[self.current_level_index]
-
-            if self.current_level_index % FREQUENCY_SPAWN_SHOP == 1:
-                self.current_stage = Shop('2', self.player)
+            if self.level_map_files[self.current_level_index].startswith('shop'):
+                self.current_stage = Shop(
+                    self.level_map_files[self.current_level_index], self.player)
             else:
-                self.current_stage = Level(new_level_file, self.player)
+                self.current_stage = Level(
+                    self.level_map_files[self.current_level_index], self.player)
+
             print("changing level")
 
     def run(self):
@@ -71,12 +83,8 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
-            if isinstance(self.current_stage, Level) and self.current_stage.completed:
+            if self.current_stage.completed:
                 self.change_level()
-
-            if isinstance(self.current_stage, Shop) and self.current_stage.close:
-                self.current_stage = Level(
-                    self.level_map_files[self.current_level_index], self.player)
 
             self.current_stage.run(dt)
             pygame.display.update()
