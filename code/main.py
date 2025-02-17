@@ -38,7 +38,7 @@ class Game:
 
         seed = random.random()
         random.seed(seed)
-        print(seed)
+        print("Seed pour la génération des niveaux : ", seed)
 
         for i in range(total_iterations):
             # Si on est à l'intervalle pour un shop et qu'il reste des shops à ajouter…
@@ -59,6 +59,9 @@ class Game:
             self.level_map_files[self.current_level_index], self.player)
 
         PdfGenerator(self.level_map_files)
+        seed = random.SystemRandom().random()
+        random.seed(seed)
+        print("Seed pour les mouvements : ", seed)
 
     def change_level(self):
 
