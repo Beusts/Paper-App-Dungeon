@@ -5,8 +5,8 @@ from player import Player
 from os.path import join
 from levelGenerator import create_maze_csv_file
 from shopGenerator import create_shop_csv_file
-from pdfGenerator import PdfGenerator
 import random
+from menu import Menu
 
 
 class Game:
@@ -58,7 +58,6 @@ class Game:
         self.current_stage = Level(
             self.level_map_files[self.current_level_index], self.player)
 
-        PdfGenerator(self.level_map_files)
         seed = random.SystemRandom().random()
         random.seed(seed)
         print("Seed pour les mouvements : ", seed)
@@ -83,6 +82,9 @@ class Game:
         """
         Exécute la boucle principale du jeu.
         """
+        menu = Menu(self.display_surface, self.level_map_files)
+        menu.run()
+        # Boucle principale du jeu
         while True:
             dt = self.clock.tick(FPS) / 1000
 
