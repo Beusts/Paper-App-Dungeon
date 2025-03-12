@@ -241,13 +241,10 @@ def template_teleporters_room(maze, room_teleporter_1, rooms, difficulty):
 
 
 def generate_point(room):
-    attempts = 0
-    max_attempts = 100
-    while attempts < max_attempts:
-        pos_x = randint(room[0][0], room[1][0])
-        pos_y = randint(room[0][1], room[1][1])
-        if (pos_x, pos_y) not in room[3]:
-            room[3].append((pos_x, pos_y))
-            return pos_x, pos_y
-        attempts += 1
-    return None
+    available_points = [(x, y) for x in range(room[0][0], room[1][0] + 1)
+                        for y in range(room[0][1], room[1][1] + 1) if (x, y) not in room[3]]
+    if not available_points:
+        return None
+    point = random.choice(available_points)
+    room[3].append(point)
+    return point
