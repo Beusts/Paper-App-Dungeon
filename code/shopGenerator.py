@@ -18,7 +18,7 @@ def create_shop_csv_file(name, number_of_items):
             "Doubling Potion",
             "Scroll of Mulligan",
             "Coin Rush",
-            "Break on Trought",
+            "Break on Through",
             "Teleport Scroll",
             "Magic Shield",
             "Weaklings"
