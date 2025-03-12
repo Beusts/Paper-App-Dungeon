@@ -33,7 +33,7 @@ class Player(pygame.sprite.Sprite):
 
         # characteristic of a player
         self.hp = 10
-        self.coins = 100
+        self.coins = 0
         self.deaths = 0
         self.keys = 0
 
@@ -45,10 +45,10 @@ class Player(pygame.sprite.Sprite):
         self.coin_multiplier = 1
 
         self.inventory = [
-            {"item": Doubling_Potion(self.direction, self), "quantity": 1},
-            {"item": Scroll_of_Mulligan(self.direction, self), "quantity": 1},
-            {"item": Break_on_Trought(self.direction, self), "quantity": 1},
-            {"item": Teleport_Scroll(self.direction, self), "quantity": 4},
+            {"item": Doubling_Potion(self.direction, self), "quantity": 0},
+            {"item": Scroll_of_Mulligan(self.direction, self), "quantity": 0},
+            {"item": Break_on_Trought(self.direction, self), "quantity": 0},
+            {"item": Teleport_Scroll(self.direction, self), "quantity": 0},
         ]
 
         self.can_go_through_walls = False
