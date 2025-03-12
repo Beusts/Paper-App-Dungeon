@@ -7,6 +7,7 @@ from levelGenerator import create_maze_csv_file
 from shopGenerator import create_shop_csv_file
 import random
 from menu import Menu
+from utils import draw_text
 
 
 class Game:
@@ -69,6 +70,87 @@ class Game:
         random.seed(seed)
         print("Seed pour les mouvements : ", seed)
 
+    def calculate_final_score(self):
+        """
+        Calcule et affiche le score final basé sur les HP, les pièces et les morts du joueur.
+        """
+
+        # Create a game finish screen
+        finish_font = pygame.font.Font(None, UI_SIZE * 2)
+        finish_text = finish_font.render(
+            'CONGRATULATIONS!', True, BLACK)
+        finish_rect = finish_text.get_rect(
+            center=(WINDOW_WIDTH // 2, UI_SIZE * 5))
+
+        sub_font = pygame.font.Font(None, UI_SIZE)
+        sub_text = sub_font.render(
+            'You have completed all levels!', True, BLACK)
+        sub_rect = sub_text.get_rect(
+            center=(WINDOW_WIDTH // 2, UI_SIZE * 7))
+
+        self.display_surface.fill(WHITE)
+        self.display_surface.blit(finish_text, finish_rect)
+        self.display_surface.blit(sub_text, sub_rect)
+
+        # Calculate the score based on HP, coins, and deaths
+        hp_score = self.player.hp * 5
+        coin_score = self.player.coins * 3
+        death_penalty = self.player.deaths
+        final_score = hp_score + coin_score - death_penalty
+        # Define rectangle dimensions and spacing
+        rect_width = UI_SIZE * 3
+        rect_height = UI_SIZE * 2
+        spacing = int(UI_SIZE * 0.6)  # Space between rectangles
+
+        # Calculate total width and starting position (centered)
+        total_width = 4 * rect_width + 3 * spacing
+        start_x = (WINDOW_WIDTH - total_width) / 2
+
+        # Fonts
+        font = pygame.font.Font(None, int(UI_SIZE * 0.8))
+        value_font = pygame.font.Font(None, int(UI_SIZE * 1.5))
+        symbol_font = pygame.font.Font(None, int(UI_SIZE))
+
+        # Score data
+        score_data = [
+            {"title": "HP x 5", "value": str(hp_score)},
+            {"title": "¢ x 3", "value": str(coin_score)},
+            {"title": "# Deaths", "value": str(death_penalty)},
+            {"title": "Score", "value": str(final_score)}
+        ]
+
+        # Symbols to display between rectangles
+        symbols = ["+", "-", "="]
+
+        # Draw the rectangles and text
+        for i, data in enumerate(score_data):
+            x_pos = start_x + i * (rect_width + spacing)
+            rect = pygame.Rect(x_pos, UI_SIZE * 10, rect_width, rect_height)
+
+            pygame.draw.rect(self.display_surface, GRAY,
+                             rect, border_radius=10)
+
+            # Draw title above rectangle
+            title_pos = (rect.centerx, rect.bottom + UI_SIZE * 0.5)
+            draw_text(self.display_surface,
+                      data["title"], title_pos, font, BLACK, center=True)
+
+            # Draw value in rectangle
+            value_pos = rect.center
+            draw_text(self.display_surface,
+                      data["value"], value_pos, value_font, BLACK, center=True)
+
+            # Draw symbols between rectangles
+            if i < len(symbols):
+                symbol_pos = (x_pos + rect_width + spacing/2, rect.centery)
+                draw_text(self.display_surface,
+                          symbols[i], symbol_pos, symbol_font, BLACK, center=True)
+
+        draw_text(self.display_surface, "Final Score",
+                  (WINDOW_WIDTH // 2, UI_SIZE * 9), pygame.font.Font(None, int(UI_SIZE * 2)), BLACK, center=True)
+
+        pygame.display.update()
+
     def change_level(self):
         """
         Passe au niveau suivant dans la séquence.
@@ -79,6 +161,14 @@ class Game:
         self.current_level_index += 1
 
         if self.current_level_index >= len(self.level_map_files):
+            self.calculate_final_score()
+            # Wait for the player to close the game
+            waiting = True
+            while waiting:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
             print("game over")
         else:
             if self.level_map_files[self.current_level_index].startswith('shop'):
