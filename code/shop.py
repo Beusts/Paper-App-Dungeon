@@ -57,7 +57,7 @@ class Shop(pygame.sprite.Sprite):
         self.handle_input()
 
     def draw(self):
-        self.display_surface.fill('white')
+        self.display_surface.fill(WHITE)
         self.draw_shop()
         self.player.draw_information_player(self.display_surface)
 

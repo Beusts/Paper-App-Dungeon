@@ -44,7 +44,7 @@ class StandardEnemy(Object):
         font = pygame.font.Font(None, int(get_tile_size() * 0.5))
         value_to_string = str(self.value)
 
-        text_surface = font.render(value_to_string, True, (255, 255, 255))
+        text_surface = font.render(value_to_string, True, WHITE)
         text_rect = text_surface.get_rect(
             centerx=get_tile_size() / 2, centery=get_tile_size() / 2)
 

@@ -14,6 +14,7 @@ FPS = 60
 SLEEP_TIME = 100
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
+WHITE = (255, 255, 255)
 
 # Fréuence d'apparition d'un Shop
 FREQUENCY_SPAWN_SHOP = 0.2

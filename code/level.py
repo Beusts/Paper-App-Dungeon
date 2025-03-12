@@ -17,11 +17,6 @@ from stair import Stair
 from settings import *
 from utils import draw_text
 
-BLACK = (0, 0, 0)
-GRAY = (200, 200, 200)
-WHITE = (255, 255, 255)
-TRANSPARENT_BLACK = (0, 0, 0, 180)
-
 
 class Level:
     def __init__(self, level_data, player):
@@ -162,7 +157,7 @@ class Level:
             return
 
         self.all_sprites.update(dt)
-        self.display_surface.fill('white')
+        self.display_surface.fill(WHITE)
         for sprite in self.walls:
             sprite.draw(self.display_surface)
         for sprite in self.objects:

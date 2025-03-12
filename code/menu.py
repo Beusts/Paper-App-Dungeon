@@ -1,6 +1,6 @@
 import sys
 import pygame
-from settings import FPS, UI_SIZE, BLACK, GRAY
+from settings import FPS, UI_SIZE, BLACK, GRAY, WHITE
 from utils import draw_text
 from pdfGenerator import PdfGenerator
 
@@ -53,7 +53,7 @@ class Menu:
         return None
 
     def draw(self):
-        self.display_surface.fill('white')
+        self.display_surface.fill(WHITE)
         pygame.draw.rect(self.display_surface, GRAY,
                          (0, 0, UI_SIZE * 15, UI_SIZE * 3))
         round_radius = int(UI_SIZE)
