@@ -8,6 +8,9 @@ from object import *
 
 
 class StandardHeart(Object):
+    """
+    Classe représentant un coeur standard qui augmente la vie du joueur d'une valeur fixe.
+    """
 
     def __init__(self, pos, groups, value):
         """
@@ -59,7 +62,8 @@ class StandardHeart(Object):
 
     def on_collision(self, player):
         """
-        Gestion de la collision avec un joueur.
+        Gestion de la collision avec un joueur. Augmente les points de vie du joueur 
+        de la valeur associée à ce coeur.
 
         Args:
             player (Player): Le joueur en collision avec ce coeur.
