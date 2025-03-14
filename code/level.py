@@ -1,3 +1,8 @@
+"""
+Module définissant la classe Level qui gère un niveau de jeu.
+Ce module est responsable de charger, afficher et gérer les interactions dans un niveau.
+"""
+
 import csv
 import re
 
@@ -19,12 +24,18 @@ from utils import draw_text
 
 
 class Level:
+    """
+    Classe qui gère un niveau de jeu, incluant son chargement à partir d'un fichier CSV,
+    l'affichage des objets et la gestion des interactions.
+    """
+
     def __init__(self, level_data, player):
         """
         Initialise le niveau avec les données spécifiées.
 
         Args:
             level_data (str): Le nom du fichier de données du niveau.
+            player (Player): Le joueur à placer dans ce niveau.
         """
         self.display_surface = pygame.display.get_surface()
 
@@ -220,7 +231,10 @@ class Level:
 
     def finish_level(self):
         """
-        Termine le niveau et affiche les résultats finaux.
+        Termine le niveau et applique les résultats finaux au joueur.
+
+        Cette méthode met à jour les statistiques du joueur en fonction des gains et pertes
+        accumulés pendant le niveau, et marque le niveau comme terminé.
         """
         # Logique pour terminer le niveau et afficher les résultats finaux
         print("Niveau terminé")

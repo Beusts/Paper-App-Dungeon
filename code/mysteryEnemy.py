@@ -1,21 +1,34 @@
+"""
+Module définissant la classe MysteryEnemy, un ennemi qui inflige des dégâts aléatoires au joueur.
+"""
+
 from settings import *
 from object import *
 from random import randint
 
 
 class MysteryEnemy(Object):
+    """
+    Classe représentant un ennemi mystère qui inflige des dégâts aléatoires au joueur.
+    """
 
     def __init__(self, pos, groups):
         """
-        Initialise un ennemi à la position donnée et l'ajoute aux groupes spécifiés. hérite de la classe object
+        Initialise un ennemi mystère à la position donnée et l'ajoute aux groupes spécifiés.
 
         Args:
             pos (tuple): La position (x, y) de l'ennemi.
-            groups (list): Les groupes de sprites auxquels l'enemy appartient.
+            groups (list): Les groupes de sprites auxquels l'ennemi appartient.
         """
         super().__init__(pos, groups)
 
     def design(self):
+        """
+        Crée l'image de l'ennemi mystère avec un point d'interrogation.
+
+        Returns:
+            pygame.Surface: L'image de l'ennemi mystère.
+        """
         image = pygame.image.load(
             join('graphics', 'enemy.png')).convert_alpha()
         image = pygame.transform.scale(
@@ -33,6 +46,15 @@ class MysteryEnemy(Object):
         return enemy
 
     def on_collision(self, player):
+        """
+        Gestion de la collision avec le joueur. Inflige des dégâts aléatoires entre 1 et 6.
+
+        Args:
+            player (Player): Le joueur en collision avec cet ennemi.
+
+        Returns:
+            Player: Le joueur après modification de ses points de vie.
+        """
         if self.has_already_been_used():
             return player
 

@@ -1,17 +1,24 @@
+"""
+Module définissant la classe Lock, un objet verrou nécessitant une clé pour être déverrouillé.
+"""
+
 from settings import *
 from object import *
 
 
 class Lock(Object):
+    """
+    Classe représentant un verrou qui bloque le passage à moins que le joueur possède une clé.
+    """
 
     def __init__(self, pos, groups, lock):
         """
-        Initialise un ennemi à la position donnée et l'ajoute aux groupes spécifiés.
+        Initialise un verrou à la position donnée et l'ajoute aux groupes spécifiés.
 
         Args:
-            pos (tuple): La position (x, y) de l'ennemi.
-            groups (list): Les groupes de sprites auxquels l'ennemi appartient.
-            value (int): La valeur associée à l'ennemi.
+            pos (tuple): La position (x, y) du verrou.
+            groups (list): Les groupes de sprites auxquels le verrou appartient.
+            lock (pygame.sprite.Group): Groupe spécial pour les verrous qui bloquent le passage.
         """
         self.lock = lock
         groups.append(lock)
@@ -19,10 +26,10 @@ class Lock(Object):
 
     def design(self):
         """
-        Crée l'image de l'ennemi avec un numéro dessus.
+        Crée l'image du verrou.
 
         Returns:
-            pygame.Surface: L'image de l'ennemi avec le numéro ajouté.
+            pygame.Surface: L'image du verrou.
         """
         image = pygame.image.load(
             join('graphics', 'locks.png')).convert_alpha()
@@ -32,7 +39,15 @@ class Lock(Object):
         return image
 
     def on_collision(self, player):
+        """
+        Gestion de la collision avec le joueur. Le verrou peut être déverrouillé si le joueur possède une clé.
 
+        Args:
+            player (Player): Le joueur en collision avec ce verrou.
+
+        Returns:
+            Player: Le joueur après interaction avec le verrou.
+        """
         if self.used:
             return player
 

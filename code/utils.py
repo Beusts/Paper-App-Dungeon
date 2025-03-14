@@ -1,7 +1,25 @@
+"""
+Module contenant des fonctions utilitaires pour le jeu Paper App Dungeon.
+"""
+
 import pygame
 
 
 def draw_text(surface, text, position, font, color, center=False, center_y=False, center_x=False, line_width=None):
+    """
+    Dessine du texte sur une surface avec différentes options d'alignement.
+
+    Args:
+        surface (pygame.Surface): La surface sur laquelle dessiner le texte
+        text (str): Le texte à afficher
+        position (tuple): La position (x, y) du texte
+        font (pygame.font.Font): La police à utiliser
+        color (tuple): La couleur RGB du texte
+        center (bool): Si True, centre le texte horizontalement et verticalement
+        center_y (bool): Si True, centre le texte verticalement uniquement
+        center_x (bool): Si True, centre le texte horizontalement uniquement
+        line_width (int): Si spécifié, limite la largeur du texte et crée des retours à la ligne
+    """
     text_surface = font.render(text, True, color)
     if center:
         text_rect = text_surface.get_rect(center=position)

@@ -1,3 +1,8 @@
+"""
+Module définissant la classe Shop et les différents objets achetables dans le jeu.
+Ce module gère l'affichage du magasin et les interactions avec les objets disponibles à l'achat.
+"""
+
 import csv
 import random
 from encodings import search_function
@@ -12,7 +17,18 @@ DESC_FONT = pygame.font.Font(None, int(UI_SIZE * 0.7))
 
 
 class Shop(pygame.sprite.Sprite):
+    """
+    Classe qui gère l'interface du magasin et les objets disponibles à l'achat.
+    """
+
     def __init__(self, shop_data, player):
+        """
+        Initialise le magasin avec les données spécifiées.
+
+        Args:
+            shop_data (str): Le nom du fichier de données du magasin.
+            player (Player): Le joueur qui visite ce magasin.
+        """
         self.display_surface = pygame.display.get_surface()
         self.items = []
         self.player = player
@@ -23,6 +39,12 @@ class Shop(pygame.sprite.Sprite):
         self.completed = False
 
     def setup(self, shop_data):
+        """
+        Configure le magasin en chargeant les objets depuis un fichier CSV.
+
+        Args:
+            shop_data (str): Le nom du fichier de données du magasin.
+        """
         col = 4
         with open(join('data', 'shop', shop_data + '.csv'), newline='') as csvfile:
             shop_reader = csv.reader(csvfile, delimiter=',')
@@ -53,15 +75,27 @@ class Shop(pygame.sprite.Sprite):
                 col += 4
 
     def run(self, dt):
+        """
+        Exécute la boucle principale du magasin.
+
+        Args:
+            dt (float): Le temps écoulé depuis la dernière mise à jour.
+        """
         self.draw()
         self.handle_input()
 
     def draw(self):
+        """
+        Dessine l'interface du magasin sur la surface d'affichage.
+        """
         self.display_surface.fill(WHITE)
         self.draw_shop()
         self.player.draw_information_player(self.display_surface)
 
     def handle_input(self):
+        """
+        Gère les entrées de l'utilisateur dans le magasin.
+        """
         self.handle_continue_button()
         for item in self.items:
             item.handle_input()
@@ -122,7 +156,22 @@ class Shop(pygame.sprite.Sprite):
 
 
 class Item(pygame.sprite.Sprite):
+    """
+    Classe de base pour tous les objets achetables dans le magasin.
+    """
+
     def __init__(self, name, description, price, position, player, use_once=False):
+        """
+        Initialise un objet achetable.
+
+        Args:
+            name (str): Nom de l'objet.
+            description (str): Description de l'objet.
+            price (int): Prix de l'objet en pièces.
+            position (tuple): Position (x, y) de l'objet dans l'interface du magasin.
+            player (Player): Référence au joueur.
+            use_once (bool): Si True, l'objet peut être utilisé une seule fois.
+        """
         super().__init__()
         self.name = name
         self.description = description
@@ -134,6 +183,9 @@ class Item(pygame.sprite.Sprite):
         self.player = player
 
     def buy(self):
+        """
+        Achète l'objet si le joueur a assez de pièces et si l'objet n'a pas déjà été acheté.
+        """
         if self.player.coins >= self.price and not self.is_bought:
 
             self.player.losing_coins += self.price
@@ -146,10 +198,25 @@ class Item(pygame.sprite.Sprite):
             self.player.inventory[self.name]["quantity"] += 1
 
     def use(self, player):
+        """
+        Utilise l'objet sur le joueur. Doit être redéfini dans les sous-classes.
+
+        Args:
+            player (Player): Le joueur sur lequel utiliser l'effet de l'objet.
+
+        Returns:
+            bool: True si l'objet a été utilisé avec succès, False sinon.
+
+        Raises:
+            NotImplementedError: Si la méthode n'est pas redéfinie dans une sous-classe.
+        """
         raise NotImplementedError(
             "This method must be redefined in a subclass")
 
     def draw(self):
+        """
+        Dessine l'objet dans l'interface du magasin.
+        """
         rect = pygame.Rect(
             self.position[0] * UI_SIZE, self.position[1] * UI_SIZE, UI_SIZE, UI_SIZE)
         if self.is_bought:
@@ -166,6 +233,9 @@ class Item(pygame.sprite.Sprite):
                   (self.position[0] * UI_SIZE + (UI_SIZE * 2), self.position[1] * UI_SIZE + (UI_SIZE * 1.5)), DESC_FONT, BLACK, center_y=True, line_width=UI_SIZE * 10)
 
     def handle_input(self):
+        """
+        Gère les entrées de l'utilisateur pour cet objet.
+        """
         rect = pygame.Rect(
             self.position[0] * UI_SIZE, self.position[1] * UI_SIZE, UI_SIZE, UI_SIZE)
         if rect.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0]:

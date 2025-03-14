@@ -1,21 +1,34 @@
+"""
+Module définissant la classe MysteryHeart, un objet qui restaure une quantité aléatoire de points de vie.
+"""
+
 from settings import *
 from object import *
 from random import randint
 
 
 class MysteryHeart(Object):
+    """
+    Classe représentant un cœur mystère qui restaure une quantité aléatoire de points de vie au joueur.
+    """
 
     def __init__(self, pos, groups):
         """
-        Initialise un mystery heart à la position donnée et l'ajoute aux groupes spécifiés. hérite de la classe object
+        Initialise un cœur mystère à la position donnée et l'ajoute aux groupes spécifiés.
 
         Args:
-            pos (tuple): La position (x, y) du coeur.
-            groups (list): Les groupes de sprites auxquels le coeur appartient.
+            pos (tuple): La position (x, y) du cœur.
+            groups (list): Les groupes de sprites auxquels le cœur appartient.
         """
         super().__init__(pos, groups)
 
     def design(self):
+        """
+        Crée l'image du cœur mystère avec un point d'interrogation.
+
+        Returns:
+            pygame.Surface: L'image du cœur mystère.
+        """
         image = pygame.image.load(
             join('graphics', 'heart.png')).convert_alpha()
         image = pygame.transform.scale(
@@ -33,6 +46,15 @@ class MysteryHeart(Object):
         return enemy
 
     def on_collision(self, player):
+        """
+        Gestion de la collision avec le joueur. Restaure une quantité aléatoire de points de vie entre 1 et 6.
+
+        Args:
+            player (Player): Le joueur en collision avec ce cœur.
+
+        Returns:
+            Player: Le joueur après modification de ses points de vie.
+        """
         if self.has_already_been_used():
             return player
 

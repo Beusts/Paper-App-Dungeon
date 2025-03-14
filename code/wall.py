@@ -1,8 +1,17 @@
+"""
+Module définissant la classe Wall, un objet mur qui bloque le passage.
+"""
+
+
 from settings import *
 from random import randint
 
 
 class Wall(pygame.sprite.Sprite):
+    """
+    Classe représentant un mur qui bloque le passage du joueur.
+    """
+
     def __init__(self, pos, groups):
         """
         Initialise un mur à la position donnée et l'ajoute aux groupes spécifiés.

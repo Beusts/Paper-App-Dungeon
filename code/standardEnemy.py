@@ -1,9 +1,17 @@
+"""
+Module définissant la classe StandardEnemy, un objet ennemi qui inflige des dégâts au joueur
+"""
+
+
 from settings import *
 from object import *
 from utils import draw_text
 
 
 class StandardEnemy(Object):
+    """
+    Classe représentant un ennemi standard qui inflige des dégâts au joueur.
+    """
 
     def __init__(self, pos, groups, value):
         """

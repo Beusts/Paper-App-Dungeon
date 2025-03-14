@@ -1,9 +1,18 @@
+"""
+Module définissant la classe de base Object pour tous les objets interactifs du jeu.
+"""
+
 from contextlib import nullcontext
 
 from settings import *
 
 
 class Object(pygame.sprite.Sprite):
+    """
+    Classe de base pour tous les objets interactifs du jeu.
+    Cette classe fournit les fonctionnalités communes à tous les objets comme
+    l'initialisation, le dessin et la gestion des collisions.
+    """
 
     def __init__(self, pos, groups):
         """
@@ -31,21 +40,40 @@ class Object(pygame.sprite.Sprite):
 
     def design(self):
         """
-        Determine ce que l'objet doit ressembler
+        Détermine l'apparence de l'objet. Cette méthode doit être redéfinie dans les sous-classes.
+
+        Raises:
+            NotImplementedError: Si la méthode n'est pas redéfinie dans une sous-classe.
+
+        Returns:
+            pygame.Surface: L'image représentant l'objet.
         """
         raise NotImplementedError(
             "This method must be redefined in a subclass")
 
     def on_collision(self, player):
         """
-        Traite l'interaction avec un objet
+        Gère l'interaction avec le joueur lors d'une collision. 
+        Cette méthode doit être redéfinie dans les sous-classes.
+
+        Args:
+            player (Player): Le joueur en collision avec cet objet.
+
+        Raises:
+            NotImplementedError: Si la méthode n'est pas redéfinie dans une sous-classe.
+
+        Returns:
+            Player: Le joueur après interaction avec l'objet.
         """
         raise NotImplementedError(
             "This method must be redefined in a subclass")
 
     def has_already_been_used(self):
         """
-        Regarde si l'objet a déjà été utilisé => True si oui, False sinon
+        Vérifie si l'objet a déjà été utilisé et change son apparence si c'est le cas.
+
+        Returns:
+            bool: True si l'objet a déjà été utilisé, False sinon.
         """
         if self.used:
             print(f"I've already been used {self}")

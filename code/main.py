@@ -1,3 +1,9 @@
+"""
+Fichier principal du jeu Paper App Dungeon.
+Ce module initialise le jeu, gère la boucle principale et la transition entre les niveaux.
+Il s'occupe également de la génération procédurale des niveaux et des boutiques.
+"""
+
 from settings import *
 from level import Level
 from shop import Shop
@@ -23,6 +29,7 @@ class Game:
 
         self.clock = pygame.time.Clock()
 
+        # Liste des fichiers de niveaux et boutiques générés procéduralement
         self.level_map_files = []
 
         self.current_level_index = 0

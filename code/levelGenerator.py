@@ -1,3 +1,8 @@
+"""
+Module pour la génération procédurale des niveaux sous forme de labyrinthes.
+Ce module contient des fonctions pour créer des niveaux de jeu sous forme de fichiers CSV.
+"""
+
 import random
 from random import randint
 import csv
@@ -5,6 +10,15 @@ import os
 
 
 def create_maze_csv_file(name, width, height, difficulty=1):
+    """
+    Crée un fichier CSV représentant un niveau de labyrinthe.
+
+    Args:
+        name (str): Nom du fichier à créer (sans extension)
+        width (int): Largeur du labyrinthe
+        height (int): Hauteur du labyrinthe
+        difficulty (int, optional): Niveau de difficulté du labyrinthe. Défaut à 1.
+    """
     maze, rooms = generate_maze(width, height)
     apply_room_template(maze, rooms, difficulty)
 
@@ -17,6 +31,16 @@ def create_maze_csv_file(name, width, height, difficulty=1):
 
 
 def generate_maze(width, height):
+    """
+    Génère un labyrinthe avec des salles.
+
+    Args:
+        width (int): Largeur du labyrinthe
+        height (int): Hauteur du labyrinthe
+
+    Returns:
+        tuple: (maze, rooms) où maze est une matrice du labyrinthe et rooms est la liste des salles
+    """
     maze = [[0 for _ in range(width)] for _ in range(height)]
     rooms = []
 
@@ -37,8 +61,14 @@ def generate_maze(width, height):
 
 def chooseOrientation(width, height):
     """
-    Horizontal = False
-    Vertical = True
+    Détermine l'orientation d'un mur dans le labyrinthe.
+
+    Args:
+        width (int): Largeur de la section
+        height (int): Hauteur de la section
+
+    Returns:
+        bool: True pour orientation verticale, False pour horizontale
     """
 
     if width < height:
@@ -50,6 +80,16 @@ def chooseOrientation(width, height):
 
 
 def addWall(walls, startPoint, endPoint, doorIdx, orientation):
+    """
+    Ajoute un mur avec une porte dans le labyrinthe.
+
+    Args:
+        walls (list): Matrice du labyrinthe
+        startPoint (tuple): Point de départ du mur (x, y)
+        endPoint (tuple): Point d'arrivée du mur (x, y)
+        doorIdx (tuple): Position de la porte (x, y)
+        orientation (bool): True pour mur vertical, False pour horizontal
+    """
     if orientation == True:
         for x in range(0, endPoint[0] - startPoint[0] + 1):
             walls[startPoint[1]][startPoint[0] + x] = 1
@@ -63,6 +103,15 @@ def addWall(walls, startPoint, endPoint, doorIdx, orientation):
 
 
 def divide(walls, topLeft, bottomRight, rooms):
+    """
+    Divise récursivement un espace pour créer un labyrinthe.
+
+    Args:
+        walls (list): Matrice du labyrinthe
+        topLeft (tuple): Coin supérieur gauche de l'espace à diviser (x, y)
+        bottomRight (tuple): Coin inférieur droit de l'espace à diviser (x, y)
+        rooms (list): Liste des salles du labyrinthe
+    """
     possibleRows = []
     possibleCols = []
 
@@ -130,6 +179,14 @@ def divide(walls, topLeft, bottomRight, rooms):
 
 
 def apply_room_template(maze, rooms, difficulty):
+    """
+    Applique des modèles aux salles du labyrinthe pour y ajouter des objets et ennemis.
+
+    Args:
+        maze (list): Matrice du labyrinthe
+        rooms (list): Liste des salles du labyrinthe
+        difficulty (int): Niveau de difficulté du labyrinthe
+    """
     templates = [
         {"func": template_base_room, "weight": 1, "max_count": None},
         {"func": template_chest_room, "weight": 9, "max_count": 1},
@@ -166,6 +223,18 @@ def apply_room_template(maze, rooms, difficulty):
 
 
 def template_base_room(maze, room, rooms, difficulty):
+    """
+    Applique un modèle de base à une salle avec des ennemis et objets générés aléatoirement.
+
+    Args:
+        maze (list): Matrice du labyrinthe
+        room (tuple): Informations sur la salle
+        rooms (list): Liste des salles du labyrinthe
+        difficulty (int): Niveau de difficulté
+
+    Returns:
+        bool: True si le modèle a été appliqué avec succès
+    """
     start_x, start_y = room[0]
     end_x, end_y = room[1]
     width, height = abs(start_x - end_x) + 1, abs(start_y - end_y) + 1
@@ -191,6 +260,18 @@ def template_base_room(maze, room, rooms, difficulty):
 
 
 def template_chest_room(maze, room, rooms, difficulty):
+    """
+    Applique un modèle de salle au trésor avec un porte verrouillé.
+
+    Args:
+        maze (list): Matrice du labyrinthe
+        room (tuple): Informations sur la salle
+        rooms (list): Liste des salles du labyrinthe
+        difficulty (int): Niveau de difficulté
+
+    Returns:
+        bool: True si le modèle a été appliqué avec succès
+    """
     start_x, start_y = room[0]
     end_x, end_y = room[1]
     width, height = abs(start_x - end_x) + 1, abs(start_y - end_y) + 1
@@ -224,6 +305,18 @@ def template_chest_room(maze, room, rooms, difficulty):
 
 
 def template_teleporters_room(maze, room_teleporter_1, rooms, difficulty):
+    """
+    Applique un modèle de salle avec téléporteurs.
+
+    Args:
+        maze (list): Matrice du labyrinthe
+        room_teleporter_1 (tuple): Informations sur la première salle avec téléporteur
+        rooms (list): Liste des salles du labyrinthe
+        difficulty (int): Niveau de difficulté
+
+    Returns:
+        bool: True si le modèle a été appliqué avec succès
+    """
     room_teleporter_2 = random.choice(
         [r for r in rooms if r != room_teleporter_1])
     symbol_teleporters = "T"
@@ -241,6 +334,15 @@ def template_teleporters_room(maze, room_teleporter_1, rooms, difficulty):
 
 
 def generate_point(room):
+    """
+    Génère un point aléatoire dans une salle qui n'est pas déjà occupé.
+
+    Args:
+        room (tuple): Informations sur la salle
+
+    Returns:
+        tuple: Coordonnées (x, y) du point généré ou None si aucun espace n'est disponible
+    """
     available_points = [(x, y) for x in range(room[0][0], room[1][0] + 1)
                         for y in range(room[0][1], room[1][1] + 1) if (x, y) not in room[3]]
     if not available_points:

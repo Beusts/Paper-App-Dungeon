@@ -1,3 +1,9 @@
+"""
+Module définissant la classe Player qui représente le joueur dans le jeu.
+Ce module gère les mouvements du joueur, ses interactions avec les objets,
+son inventaire et ses statistiques (points de vie, pièces, etc.).
+"""
+
 from time import sleep
 
 from settings import *
@@ -11,10 +17,15 @@ from shop import *
 
 
 class Player(pygame.sprite.Sprite):
+    """
+    Classe représentant le joueur dans le jeu.
+    Le joueur peut se déplacer dans le niveau, interagir avec des objets,
+    collecter des objets et gérer son inventaire.
+    """
 
     def __init__(self):
         """
-        Initialise un joueur
+        Initialise un joueur avec ses attributs par défaut.
         """
 
         super().__init__()
@@ -64,6 +75,16 @@ class Player(pygame.sprite.Sprite):
         self.show_inventory = False
 
     def setup(self, pos, groups, colliders, level, x_offset):
+        """
+        Configure le joueur avec sa position, ses groupes de sprites et ses collisions.
+
+        Args:
+            pos (tuple): La position initiale (x, y) du joueur.
+            groups (list): Les groupes de sprites auxquels le joueur appartient.
+            colliders (dict): Dictionnaire contenant les groupes de sprites avec lesquels le joueur peut entrer en collision.
+            level (Level): Référence au niveau actuel.
+            x_offset (int): Décalage horizontal pour l'affichage.
+        """
         self.kill()
         self.add(groups)
 
@@ -148,6 +169,7 @@ class Player(pygame.sprite.Sprite):
     def move(self):
         """
         Déplace le joueur selon la direction et le temps écoulé.
+        Utilise le temps pour déterminer quand le joueur peut se déplacer à nouveau.
         """
         if self.current_time - self.last_move_time >= SLEEP_TIME and not self.can_move:
             if self.direction.x != 0 and self.direction.y != 0:
@@ -161,7 +183,7 @@ class Player(pygame.sprite.Sprite):
 
     def try_move(self, dx, dy):
         """
-        Tente de déplacer le joueur de dx et dy.
+        Tente de déplacer le joueur de dx et dy en vérifiant les collisions.
 
         Args:
             dx (int): Déplacement en x.
@@ -197,8 +219,10 @@ class Player(pygame.sprite.Sprite):
                 self.show_adjacent_tiles = True
 
     def on_collision_with_object(self):
-        # Lors d'une collision avec un objet, le joueur execute la methode on_collision de l'objet.
-
+        """
+        Gère les collisions avec des objets interactifs.
+        Appelle la méthode on_collision de l'objet avec lequel le joueur est entré en collision.
+        """
         for object_collided in pygame.sprite.spritecollide(self, self.colliders["objects"], False):
             print(f"collision with {object_collided}")
 
@@ -214,6 +238,16 @@ class Player(pygame.sprite.Sprite):
             self = object_collided.on_collision(self)
 
     def is_wall_around_level(self, walls, player_rect):
+        """
+        Vérifie si le joueur est en collision avec un mur aux limites du niveau.
+
+        Args:
+            walls (pygame.sprite.Group): Groupe de sprites contenant tous les murs.
+            player_rect (pygame.Rect): Rectangle de collision du joueur.
+
+        Returns:
+            bool: True si le joueur est en collision avec un mur aux limites du niveau, False sinon.
+        """
         for wall in walls:
             if wall.rect.colliderect(player_rect):
                 if wall.rect.x <= UI_SIZE or wall.rect.y <= UI_SIZE or \
@@ -224,7 +258,15 @@ class Player(pygame.sprite.Sprite):
         return False
 
     def can_move_player_through_walls(self, player_rect):
+        """
+        Vérifie si le joueur peut traverser les murs.
 
+        Args:
+            player_rect (pygame.Rect): Rectangle de collision du joueur.
+
+        Returns:
+            bool: True si le joueur peut traverser les murs, False sinon.
+        """
         if self.movement_remaining > 0 and self.can_go_through_walls and not \
                 self.is_wall_around_level(self.colliders["walls"], player_rect):
             return True
@@ -235,6 +277,7 @@ class Player(pygame.sprite.Sprite):
     def update_adjacent_tiles(self):
         """
         Met à jour les tuiles adjacentes que le joueur peut atteindre.
+        Les tuiles adjacentes dépendent du résultat du lancer de dé (pair ou impair).
         """
         self.adjacent_positions = []
 
@@ -280,7 +323,7 @@ class Player(pygame.sprite.Sprite):
 
     def draw(self, surface):
         """
-        Dessine le joueur sur la surface spécifiée.
+        Dessine le joueur et ses informations sur la surface spécifiée.
 
         Args:
             surface (pygame.Surface): La surface sur laquelle dessiner le joueur.
@@ -296,7 +339,7 @@ class Player(pygame.sprite.Sprite):
 
     def draw_inventory(self, surface):
         """
-        affiche l'inventaire du joueur.
+        Affiche l'inventaire du joueur avec les objets disponibles.
 
         Args:
             surface (pygame.Surface): La surface sur laquelle dessiner l'inventaire.
@@ -318,7 +361,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, dt):
         """
-        Met à jour l'état du joueur.
+        Met à jour l'état du joueur à chaque frame.
 
         Args:
             dt (float): Le temps écoulé depuis la dernière mise à jour.
@@ -330,12 +373,11 @@ class Player(pygame.sprite.Sprite):
 
     def draw_inventory_button(self, surface):
         """
-            affiche le bouton pour afficher l'inventaire du joueur.
+        Affiche le bouton pour ouvrir/fermer l'inventaire du joueur.
 
         Args:
             surface (pygame.Surface): La surface sur laquelle dessiner le bouton.
         """
-
         font = pygame.font.Font(None, UI_SIZE)
         rect = pygame.Rect(0, 0, UI_SIZE * 4, UI_SIZE * 2)
         rect.center = (UI_SIZE * 7.5, UI_SIZE * 25)
@@ -347,10 +389,11 @@ class Player(pygame.sprite.Sprite):
 
     def draw_information_player(self, surface):
         """
-        Dessine un espace pouvant afficher la vie, l'argent, au début et à la fin d'un level.
+        Dessine un panneau d'informations affichant les statistiques actuelles du joueur.
+        Montre la vie, l'argent, et les variations pendant le niveau.
 
         Args:
-            surface (pygame.Surface): La surface sur laquelle dessiner les informations du joueur.
+            surface (pygame.Surface): La surface sur laquelle dessiner les informations.
         """
         font = pygame.font.Font(None, UI_SIZE)
 

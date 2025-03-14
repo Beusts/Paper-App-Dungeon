@@ -1,3 +1,8 @@
+"""
+Module définissant la classe StandardHeart, un objet coeur qui augmente la vie du joueur.
+"""
+
+
 from settings import *
 from object import *
 

@@ -1,3 +1,8 @@
+"""
+Module pour générer un fichier PDF contenant des captures d'écran de chaque niveau du jeu.
+Ce module est utilisé pour permettre de jouer au jeu sur papier.
+"""
+
 from shop import *
 from level import Level
 from player import Player
@@ -6,8 +11,17 @@ from fpdf import FPDF
 
 
 class PdfGenerator(pygame.sprite.Sprite):
+    """
+    Classe qui génère un fichier PDF contenant des captures d'écran de tous les niveaux du jeu.
+    """
 
     def __init__(self, level_files):
+        """
+        Initialise le générateur de PDF et crée immédiatement le fichier.
+
+        Args:
+            level_files (list): Liste des noms de fichiers de niveaux à inclure dans le PDF
+        """
         self.clock = pygame.time.Clock()
         dt = self.clock.tick(FPS) / 1000
         self.player = Player()
