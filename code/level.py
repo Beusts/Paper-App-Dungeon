@@ -5,6 +5,8 @@ Ce module est responsable de charger, afficher et gérer les interactions dans u
 
 import csv
 import re
+import os
+import pygame
 
 from teleporter import Teleporter
 from wall import Wall
@@ -18,6 +20,7 @@ from chest import Chest
 from coin import Coin
 from key import Key
 from stair import Stair
+from levelGenerator import load_generation_steps
 
 from settings import *
 from utils import draw_text
@@ -47,11 +50,22 @@ class Level:
         self.lock = pygame.sprite.Group()
 
         self.player = player
+        self.level_name = level_data
+
+        # Étapes de génération
+        self.generation_steps = []
+        self.current_step = -1
+        self.showing_generation = False
+        self.step_wall_group = pygame.sprite.Group()
 
         self.setup(level_data)
 
         self.paused = False
         self.completed = False
+
+        # Chargement des étapes de génération
+        if os.path.exists(os.path.join('data', 'levels', f'{level_data}_steps')):
+            self.generation_steps = load_generation_steps(level_data)
 
     def setup(self, level_data):
         """
@@ -156,6 +170,81 @@ class Level:
             self.hp_start = self.player.hp
             self.coins_start = self.player.coins
 
+    def toggle_generation_view(self):
+        """
+        Active/désactive l'affichage des étapes de génération du niveau.
+        """
+        if not self.generation_steps:
+            return
+
+        self.showing_generation = not self.showing_generation
+        if self.showing_generation:
+            self.current_step = 0
+            self.load_generation_step(self.current_step)
+        else:
+            self.step_wall_group.empty()
+
+    def load_generation_step(self, step_index):
+        """
+        Charge l'étape de génération spécifiée.
+
+        Args:
+            step_index (int): L'indice de l'étape à charger
+        """
+        if not 0 <= step_index < len(self.generation_steps):
+            return
+
+        self.step_wall_group.empty()
+        step_data = self.generation_steps[step_index]
+
+        for y, row in enumerate(step_data):
+            for x, tile in enumerate(row):
+                if tile == '1':
+                    Wall((x * get_tile_size() + self.x_offset, y * get_tile_size()),
+                         (self.step_wall_group,), gray=150)
+
+    def next_generation_step(self):
+        """
+        Passe à l'étape de génération suivante.
+        """
+        if not self.showing_generation or self.current_step >= len(self.generation_steps) - 1:
+            return
+
+        self.current_step += 1
+        self.load_generation_step(self.current_step)
+
+    def previous_generation_step(self):
+        """
+        Revient à l'étape de génération précédente.
+        """
+        if not self.showing_generation or self.current_step <= 0:
+            return
+
+        self.current_step -= 1
+        self.load_generation_step(self.current_step)
+
+    def handle_generation_input(self):
+        """
+        Gère les entrées pour la visualisation des étapes de génération.
+        """
+        if not self.showing_generation:
+            return
+
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_RIGHT]:
+            # On utilise un délai pour éviter que l'appui maintenu change trop vite
+            current_time = pygame.time.get_ticks()
+            if current_time - self.last_key_time > 200:  # 200ms de délai
+                self.next_generation_step()
+                self.last_key_time = current_time
+
+        elif keys[pygame.K_LEFT]:
+            current_time = pygame.time.get_ticks()
+            if current_time - self.last_key_time > 200:
+                self.previous_generation_step()
+                self.last_key_time = current_time
+
     def run(self, dt):
         """
         Exécute la boucle principale du niveau.
@@ -163,18 +252,40 @@ class Level:
         Args:
             dt (float): Le temps écoulé depuis la dernière mise à jour.
         """
+        # Initialiser last_key_time une seule fois
+        if not hasattr(self, 'last_key_time'):
+            self.last_key_time = 0
+
         if self.paused:
             self.draw_end_level_interface()
             return
 
+        # Vérifier les touches pour gérer l'affichage des étapes de génération
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_g]:
+            current_time = pygame.time.get_ticks()
+            if current_time - self.last_key_time > 500:  # Éviter les appuis multiples accidentels
+                self.toggle_generation_view()
+                self.last_key_time = current_time
+
+        self.handle_generation_input()
+
         self.all_sprites.update(dt)
         self.display_surface.fill(WHITE)
-        for sprite in self.walls:
-            sprite.draw(self.display_surface)
-        for sprite in self.objects:
-            sprite.draw(self.display_surface)
 
-        self.player.draw(self.display_surface)
+        if self.showing_generation:
+            # Afficher l'étape de génération actuelle
+            for sprite in self.step_wall_group:
+                sprite.draw(self.display_surface)
+
+        else:
+            # Affichage normal du niveau
+            for sprite in self.walls:
+                sprite.draw(self.display_surface)
+            for sprite in self.objects:
+                sprite.draw(self.display_surface)
+
+            self.player.draw(self.display_surface)
 
         self.draw_grid()
 

@@ -12,7 +12,7 @@ class Wall(pygame.sprite.Sprite):
     Classe représentant un mur qui bloque le passage du joueur.
     """
 
-    def __init__(self, pos, groups):
+    def __init__(self, pos, groups, gray=None):
         """
         Initialise un mur à la position donnée et l'ajoute aux groupes spécifiés.
 
@@ -21,7 +21,8 @@ class Wall(pygame.sprite.Sprite):
             groups (list): Les groupes de sprites auxquels le mur appartient.
         """
         super().__init__(groups)
-        gray = randint(100, 200)
+        if gray is None:
+            gray = randint(100, 200)
         self.color = (gray, gray, gray)
         self.rect = pygame.Rect(
             (pos[0], pos[1]),

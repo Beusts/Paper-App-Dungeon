@@ -9,6 +9,46 @@ import csv
 import os
 
 
+def stock_steps(maze):
+    global name_step
+    output_dir = os.path.join('data', 'levels', f'{name_step}_steps')
+    os.makedirs(output_dir, exist_ok=True)
+
+    global step
+    step += 1
+    with open(os.path.join(output_dir, f'{step}.csv'), 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(maze)
+
+
+def load_generation_steps(name):
+    """
+    Charge les étapes de génération d'un labyrinthe à partir des fichiers CSV.
+
+    Args:
+        name (str): Nom du niveau pour lequel charger les étapes
+
+    Returns:
+        list: Liste des matrices représentant chaque étape de la génération
+    """
+    steps = []
+    steps_dir = os.path.join('data', 'levels', f'{name}_steps')
+
+    if not os.path.exists(steps_dir):
+        return steps
+
+    step_files = [f for f in os.listdir(steps_dir) if f.endswith('.csv')]
+    step_files.sort(key=lambda x: int(x.split('.')[0]))
+
+    for step_file in step_files:
+        with open(os.path.join(steps_dir, step_file), newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=',')
+            maze_step = list(reader)
+            steps.append(maze_step)
+
+    return steps
+
+
 def create_maze_csv_file(name, width, height, difficulty=1):
     """
     Crée un fichier CSV représentant un niveau de labyrinthe.
@@ -19,7 +59,17 @@ def create_maze_csv_file(name, width, height, difficulty=1):
         height (int): Hauteur du labyrinthe
         difficulty (int, optional): Niveau de difficulté du labyrinthe. Défaut à 1.
     """
-    maze, rooms = generate_maze(width, height)
+    global name_step
+    name_step = name
+
+    output_dir = os.path.join('data', 'levels', f'{name_step}_steps')
+    if os.path.exists(output_dir):
+        for file in os.listdir(output_dir):
+            os.remove(os.path.join(output_dir, file))
+        os.rmdir(output_dir)
+    os.makedirs(output_dir, exist_ok=True)
+
+    maze, rooms = generate_maze(width, height, name)
     apply_room_template(maze, rooms, difficulty)
 
     output_dir = os.path.join('data', 'levels')
@@ -30,7 +80,7 @@ def create_maze_csv_file(name, width, height, difficulty=1):
         writer.writerows(maze)
 
 
-def generate_maze(width, height):
+def generate_maze(width, height, name):
     """
     Génère un labyrinthe avec des salles.
 
@@ -47,6 +97,9 @@ def generate_maze(width, height):
     topLeft = (1, 1)
     bottomRight = (width - 2, height - 2)
 
+    global step
+    step = 0
+
     divide(maze, topLeft, bottomRight, rooms)
 
     for i in range(width):
@@ -55,6 +108,7 @@ def generate_maze(width, height):
     for i in range(height):
         maze[i][0] = 1
         maze[i][width - 1] = 1
+    stock_steps(maze)
 
     return maze, rooms
 
@@ -93,13 +147,17 @@ def addWall(walls, startPoint, endPoint, doorIdx, orientation):
     if orientation == True:
         for x in range(0, endPoint[0] - startPoint[0] + 1):
             walls[startPoint[1]][startPoint[0] + x] = 1
+        stock_steps(walls)
         walls[doorIdx[0]][doorIdx[1]] = 0
         walls[doorIdx[0]][doorIdx[1] + 1] = 0
+        stock_steps(walls)
     else:
         for y in range(0, endPoint[1] - startPoint[1] + 1):
             walls[startPoint[1] + y][startPoint[0]] = 1
+        stock_steps(walls)
         walls[doorIdx[0]][doorIdx[1]] = 0
         walls[doorIdx[0] + 1][doorIdx[1]] = 0
+        stock_steps(walls)
 
 
 def divide(walls, topLeft, bottomRight, rooms):
