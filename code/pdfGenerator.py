@@ -165,10 +165,15 @@ class GenerationStepsPdfGenerator(pygame.sprite.Sprite):
         images_per_page = images_per_row * rows_per_page
         total_images = len(image_files)
 
-        # Calculer la taille des miniatures
-        # 180mm est la largeur utilisable de la page A4
-        thumbnail_width = 180 / images_per_row
+        # Calculer la taille des miniatures avec un ratio plus petit pour laisser de l'espace
+        usable_width = 180  # 180mm est la largeur utilisable de la page A4
+        # 80% de l'espace disponible pour l'image
+        thumbnail_width = (usable_width / images_per_row) * 0.8
         thumbnail_height = thumbnail_width  # Pour garder l'aspect carré
+
+        # Calcul des marges horizontales et verticales
+        h_margin = (usable_width - (thumbnail_width *
+                    images_per_row)) / (images_per_row + 1)
 
         # Créer des frises pour chaque ensemble d'images
         page_count = 1
@@ -184,10 +189,10 @@ class GenerationStepsPdfGenerator(pygame.sprite.Sprite):
                 row = j // images_per_row
                 col = j % images_per_row
 
-                # Calculer la position de l'image sur la page
-                x = 15 + col * thumbnail_width
-                # 40mm de marge en haut, 15mm entre les lignes
-                y = 40 + row * (thumbnail_height + 15)
+                # Calculer la position de l'image sur la page avec marges
+                x = 15 + h_margin + col * (thumbnail_width + h_margin)
+                # 40mm de marge en haut, 10mm pour le texte
+                y = 40 + row * (thumbnail_height + 10)
 
                 # Ouvrir et redimensionner l'image avec PIL
                 img_path = os.path.join(save_path, image_file)
@@ -198,9 +203,11 @@ class GenerationStepsPdfGenerator(pygame.sprite.Sprite):
 
                 # Ajouter le numéro d'étape sous l'image
                 step_num = int(image_file.split('_')[-1].split('.')[0]) + 1
-                pdf.set_font("Arial", "", 8)
-                pdf.set_xy(x, y + thumbnail_height)
-                pdf.cell(thumbnail_width, 5, f"Étape {step_num}", 0, 1, "C")
+                # Augmenter la taille de police de 8 à 10
+                pdf.set_font("Arial", "", 10)
+                # +2mm d'espace après l'image
+                pdf.set_xy(x, y + thumbnail_height + 2)
+                pdf.cell(thumbnail_width, 6, f"Étape {step_num}", 0, 1, "C")
 
                 # Supprimer l'image après l'avoir ajoutée au PDF
                 os.remove(img_path)
