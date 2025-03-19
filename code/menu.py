@@ -6,7 +6,7 @@ import sys
 import pygame
 from settings import FPS, UI_SIZE, BLACK, GRAY, WHITE
 from utils import draw_text
-from pdfGenerator import PdfGenerator
+from pdfGenerator import PdfGenerator, GenerationStepsPdfGenerator
 
 
 class Menu:
@@ -25,17 +25,46 @@ class Menu:
         self.display_surface = display_surface
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, UI_SIZE * 2)
+        self.small_font = pygame.font.Font(None, UI_SIZE)
 
+        # Ajustement des positions des boutons pour mettre Quit en dernier
         self.start_rect = pygame.Rect(0, 0, UI_SIZE * 10, UI_SIZE * 2)
         self.start_rect.center = (UI_SIZE * 7.5, UI_SIZE * 6)
 
-        self.quit_rect = pygame.Rect(0, 0, UI_SIZE * 10, UI_SIZE * 2)
-        self.quit_rect.center = (UI_SIZE * 7.5, UI_SIZE * 12)
-
         self.pdf_rect = pygame.Rect(0, 0, UI_SIZE * 10, UI_SIZE * 2)
         self.pdf_rect.center = (UI_SIZE * 7.5, UI_SIZE * 9)
+        
+        self.gen_steps_pdf_rect = pygame.Rect(0, 0, UI_SIZE * 10, UI_SIZE * 2)
+        self.gen_steps_pdf_rect.center = (UI_SIZE * 7.5, UI_SIZE * 12)
+
+        self.quit_rect = pygame.Rect(0, 0, UI_SIZE * 10, UI_SIZE * 2)
+        self.quit_rect.center = (UI_SIZE * 7.5, UI_SIZE * 15)
 
         self.level_map_files = level_map_files
+        self.level_only_files = [
+            f for f in level_map_files if f.startswith('level')]
+
+        # Pour l'interface de sélection du niveau
+        self.selecting_level = False
+        self.level_buttons = []
+        self.back_button_rect = pygame.Rect(0, 0, UI_SIZE * 6, UI_SIZE * 1.5)
+        self.back_button_rect.center = (UI_SIZE * 7.5, UI_SIZE * 18)
+
+        # Créer les boutons pour chaque niveau
+        button_width, button_height = UI_SIZE * 6, UI_SIZE * 1.5
+        max_buttons_per_row = 2
+        rows = (len(self.level_only_files) +
+                max_buttons_per_row - 1) // max_buttons_per_row
+
+        for i, level_name in enumerate(self.level_only_files):
+            row = i // max_buttons_per_row
+            col = i % max_buttons_per_row
+            x = UI_SIZE * 3 + col * (button_width + UI_SIZE) + UI_SIZE
+            y = UI_SIZE * 6 + row * (button_height + UI_SIZE)
+
+            button_rect = pygame.Rect(0, 0, button_width, button_height)
+            button_rect.center = (x, y)
+            self.level_buttons.append((button_rect, level_name))
 
     def run(self):
         """
@@ -55,6 +84,15 @@ class Menu:
                 sys.exit()
             elif action == 'generate_pdf':
                 PdfGenerator(self.level_map_files)
+            elif action == 'select_level_for_gen_steps':
+                self.selecting_level = True
+            elif action == 'back':
+                self.selecting_level = False
+            elif action and action.startswith('export_steps_'):
+                level_name = action[13:]  # Extrait le nom du niveau
+                GenerationStepsPdfGenerator(level_name)
+                self.selecting_level = False
+
             self.draw()
             pygame.display.update()
 
@@ -63,7 +101,7 @@ class Menu:
         Gère les événements d'entrée utilisateur dans le menu.
 
         Returns:
-            str: L'action à effectuer ('start', 'quit', 'generate_pdf') ou None si aucune action
+            str: L'action à effectuer ou None si aucune action
         """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -71,12 +109,25 @@ class Menu:
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mouse_pos = pygame.mouse.get_pos()
-                if self.start_rect.collidepoint(mouse_pos):
-                    return 'start'
-                elif self.quit_rect.collidepoint(mouse_pos):
-                    return 'quit'
-                elif self.pdf_rect.collidepoint(mouse_pos):
-                    return 'generate_pdf'
+
+                if self.selecting_level:
+                    # Vérifier les boutons de niveau quand on est dans le mode sélection
+                    for button, level_name in self.level_buttons:
+                        if button.collidepoint(mouse_pos):
+                            return f'export_steps_{level_name}'
+
+                    if self.back_button_rect.collidepoint(mouse_pos):
+                        return 'back'
+                else:
+                    # Interface principale
+                    if self.start_rect.collidepoint(mouse_pos):
+                        return 'start'
+                    elif self.quit_rect.collidepoint(mouse_pos):
+                        return 'quit'
+                    elif self.pdf_rect.collidepoint(mouse_pos):
+                        return 'generate_pdf'
+                    elif self.gen_steps_pdf_rect.collidepoint(mouse_pos):
+                        return 'select_level_for_gen_steps'
         return None
 
     def draw(self):
@@ -91,11 +142,25 @@ class Menu:
             pygame.draw.rect(self.display_surface, GRAY,
                              (i * UI_SIZE, UI_SIZE * 3, UI_SIZE, UI_SIZE),
                              border_bottom_left_radius=round_radius, border_bottom_right_radius=round_radius)
-        self.draw_button(self.start_rect, "Start Game")
-        self.draw_button(self.quit_rect, "Quit")
-        self.draw_button(self.pdf_rect, "Generate PDF")
+
         draw_text(self.display_surface, "Paper App Dungeon",
                   (UI_SIZE * 7.5, UI_SIZE * 2), self.font, BLACK, center=True)
+
+        if self.selecting_level:
+            # Affichage de l'interface de sélection du niveau
+
+            # Afficher tous les boutons de niveau
+            for button, level_name in self.level_buttons:
+                self.draw_button(button, level_name)
+
+            # Bouton retour
+            self.draw_button(self.back_button_rect, "Retour")
+        else:
+            # Menu principal
+            self.draw_button(self.start_rect, "Start Game")
+            self.draw_button(self.pdf_rect, "Generate PDF")
+            self.draw_button(self.gen_steps_pdf_rect, "Gen. Steps PDF")
+            self.draw_button(self.quit_rect, "Quit")
 
     def draw_button(self, rect, text):
         """
