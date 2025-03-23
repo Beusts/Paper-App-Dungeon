@@ -34,7 +34,7 @@ class Game:
 
         self.current_level_index = 0
 
-        difficulty = 0
+        difficulty = 1
         total_levels = NB_LEVEL
         total_shops = int(NB_LEVEL * FREQUENCY_SPAWN_SHOP)
         total_iterations = total_levels + total_shops
