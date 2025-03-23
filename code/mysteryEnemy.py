@@ -36,7 +36,7 @@ class MysteryEnemy(Object):
 
         font = pygame.font.Font(None, int(get_tile_size() * 0.5))
 
-        text_surface = font.render("?", True, BLACK)
+        text_surface = font.render("?", True, WHITE)
         text_rect = text_surface.get_rect(
             centerx=get_tile_size() / 2, centery=get_tile_size() / 2)
 
