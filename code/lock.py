@@ -55,7 +55,7 @@ class Lock(Object):
 
         if player.keys >= 1:
             # change the lock into a simple case
-            self.image.fill(BLACK)
+            self.image.fill((0, 0, 0, 0))
             player.keys -= 1
             self.used = True
             self.remove(self.lock)
