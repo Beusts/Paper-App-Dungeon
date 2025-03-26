@@ -56,10 +56,10 @@ class Player(pygame.sprite.Sprite):
         self.coin_multiplier = 1
 
         self.inventory = [
-            {"item": Doubling_Potion(self.direction, self), "quantity": 0},
-            {"item": Scroll_of_Mulligan(self.direction, self), "quantity": 0},
-            {"item": Break_on_Trought(self.direction, self), "quantity": 0},
-            {"item": Teleport_Scroll(self.direction, self), "quantity": 0},
+            {"item": "Doubling Potion", "quantity": 0},
+            {"item": "Scroll of Mulligan", "quantity": 0},
+            {"item": "Break on Throught", "quantity": 0},
+            {"item": "Teleport Scroll", "quantity": 0},
         ]
 
         self.can_go_through_walls = False
