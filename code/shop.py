@@ -200,7 +200,7 @@ class Item(pygame.sprite.Sprite):
                 self.use(self.player)
                 return
 
-            self.player.inventory[self.name]["quantity"] += 1
+            self.player.inventory[self]["quantity"] += 1
 
     def use(self, player):
         """
