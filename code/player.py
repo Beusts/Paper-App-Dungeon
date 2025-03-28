@@ -44,7 +44,7 @@ class Player(pygame.sprite.Sprite):
 
         # characteristic of a player
         self.hp = 10
-        self.coins = 0
+        self.coins = 100
         self.deaths = 0
         self.keys = 0
 
@@ -58,7 +58,7 @@ class Player(pygame.sprite.Sprite):
         self.inventory = [
             {"item": Doubling_Potion(self.direction, self), "quantity": 0},
             {"item": Scroll_of_Mulligan(self.direction, self), "quantity": 0},
-            {"item": Break_on_Trought(self.direction, self), "quantity": 0},
+            {"item": Break_on_Trought(self.direction, self), "quantity": 10},
             {"item": Teleport_Scroll(self.direction, self), "quantity": 0},
         ]
 
@@ -248,11 +248,12 @@ class Player(pygame.sprite.Sprite):
         Returns:
             bool: True si le joueur est en collision avec un mur aux limites du niveau, False sinon.
         """
+        level_width = self.level.rows * get_tile_size()
+        level_height = self.level.cols * get_tile_size()
+
         for wall in walls:
             if wall.rect.colliderect(player_rect):
-                if wall.rect.x <= UI_SIZE or wall.rect.y <= UI_SIZE or \
-                        wall.rect.right >= self.level.rows * TILE_SIZE - 1 or \
-                        wall.rect.bottom >= self.level.cols * TILE_SIZE - 1:
+                if wall.rect.x <= get_tile_size() or wall.rect.x >= level_width - get_tile_size() or wall.rect.y <= get_tile_size() or wall.rect.y >= level_height - get_tile_size():
                     return True
 
         return False
