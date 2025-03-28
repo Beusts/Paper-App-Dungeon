@@ -506,10 +506,10 @@ class Teleport_Scroll(Item):
             bool: True si l'objet a été utilisé avec succès, False sinon.
         """
         while True:
-            x, y = randint(0, int(WINDOW_WIDTH // TILE_SIZE - 1)) * TILE_SIZE, randint(0,
-                                                                                       int(WINDOW_WIDTH // TILE_SIZE - 1)) * TILE_SIZE
+            x, y = randint(0, int(WINDOW_WIDTH // UI_SIZE - 1)) * UI_SIZE, randint(0,
+                                                                                   int(WINDOW_WIDTH // UI_SIZE - 1)) * UI_SIZE
 
-            new_rect = pygame.Rect(x, y, TILE_SIZE, TILE_SIZE)
+            new_rect = pygame.Rect(x, y, UI_SIZE, UI_SIZE)
 
             if not any(sprite.rect.colliderect(new_rect) for sprite in self.player.colliders["walls"]) and \
                     not any(sprite.rect.colliderect(new_rect) for sprite in self.player.colliders["objects"]):
