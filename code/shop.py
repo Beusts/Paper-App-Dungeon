@@ -200,7 +200,10 @@ class Item(pygame.sprite.Sprite):
                 self.use(self.player)
                 return
 
-            self.player.inventory[self]["quantity"] += 1
+            for item_data in self.player.inventory:
+                if isinstance(item_data["item"], type(self)):
+                    item_data["quantity"] += 1
+                    return
 
     def use(self, player):
         """
