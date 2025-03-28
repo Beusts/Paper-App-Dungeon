@@ -44,7 +44,7 @@ class Player(pygame.sprite.Sprite):
 
         # characteristic of a player
         self.hp = 10
-        self.coins = 100
+        self.coins = 0
         self.deaths = 0
         self.keys = 0
 
