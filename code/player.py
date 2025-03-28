@@ -58,7 +58,7 @@ class Player(pygame.sprite.Sprite):
         self.inventory = [
             {"item": Doubling_Potion(self.direction, self), "quantity": 0},
             {"item": Scroll_of_Mulligan(self.direction, self), "quantity": 0},
-            {"item": Break_on_Trought(self.direction, self), "quantity": 10},
+            {"item": Break_on_Trought(self.direction, self), "quantity": 0},
             {"item": Teleport_Scroll(self.direction, self), "quantity": 0},
         ]
 
