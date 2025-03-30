@@ -2,7 +2,7 @@
 
 ## Description
 
-Paper-App-Dungeon est un jeu de type roguelike où le joueur explore des donjons générés aléatoire. Le joueur peut collecter des objets, combattre des ennemis, et visiter des boutiques entre les niveaux.
+Paper-App-Dungeon est un jeu de type roguelike où le joueur explore des donjons générés aléatoirement. Le joueur peut collecter des objets, combattre des ennemis, et visiter des boutiques entre les niveaux.
 
 Le jeu combine les mécaniques de jeux de plateau traditionnels (avec des lancers de dés) et les jeux de type dungeon crawler.
 
